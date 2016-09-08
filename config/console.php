@@ -23,6 +23,10 @@ $config = [
             ],
         ],
         'db' => $db,
+        'bot' => array_merge([
+            'class' => 'app\components\TelegramBot',
+            'name' => $params['name']
+        ], require(__DIR__. '/bot.php')),
     ],
     'params' => $params,
     /*

@@ -1,13 +1,12 @@
 <?php
 namespace app\Components;
 
+use Longman\TelegramBot\Telegram;
 use Yii;
-use Exception;
 use \yii\base\Configurable;
-use \Longman\TelegramBot;
 
 
-class Component extends Telegram implements Configurable
+class TelegramBot extends Telegram implements Configurable
 {
 	/**
 	 * Bot token

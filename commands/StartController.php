@@ -7,6 +7,7 @@
 
 namespace app\commands;
 
+use app\Components\TelegramBot;
 use yii\console\Controller;
 
 /**
@@ -17,14 +18,14 @@ use yii\console\Controller;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class HelloController extends Controller
+class StartController extends Controller
 {
     /**
-     * This command echoes what you have entered as the message.
-     * @param string $message the message to be echoed.
+     * This command starts the bot.
+     * Yet to be implemented
      */
-    public function actionIndex($message = 'hello world')
+    public function actionIndex($baseAddress, $port = 13000)
     {
-        echo $message . "\n";
+        \Yii::$app->bot->setWebhook("https://$baseAddress:$port");
     }
 }
