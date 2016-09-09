@@ -1,6 +1,7 @@
 <?php
 namespace app\Components;
 
+use Longman\TelegramBot\DB;
 use \Longman\TelegramBot\Telegram;
 use Yii;
 use \yii\base\Configurable;
@@ -22,5 +23,7 @@ class TelegramBot extends Telegram  implements Configurable
 			Yii::configure($this, $config);
 		}
 		parent::__construct($this->token, $this->name);
+
+        DB::externalInitialize(Yii::$app->db->pdo, $this);
 	}
 }
