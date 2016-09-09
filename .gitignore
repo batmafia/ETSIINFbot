@@ -28,3 +28,4 @@ phpunit.phar
 
 #Bot key
 etsiinfbot.pem
+etsiinfbot.key
