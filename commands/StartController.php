@@ -24,8 +24,9 @@ class StartController extends Controller
      * This command starts the bot.
      * Yet to be implemented
      */
-    public function actionIndex($baseAddress, $port = 13000)
+    public function actionIndex($baseAddress, $port = 8443)
     {
-        \Yii::$app->bot->setWebhook("https://$baseAddress:$port");
+        shell_exec('openssl req -newkey rsa:2048 -sha256 -nodes -keyout etsiinfbot.key -x509 -days 365 -out etsiinfbot.pem -subj "/C=ES/ST=Madrid/L=Madrid/O=ETSIINF/CN='.$baseAddress.'"');
+        \Yii::$app->bot->setWebhook("https://$baseAddress:$port", "etsiinfbot.pem");
     }
 }
