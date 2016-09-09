@@ -10,14 +10,11 @@ use \yii\base\Configurable;
 
 class TelegramBot extends Telegram  implements Configurable
 {
-	/**
-	 * Bot token
-	 * @var string
-	 * Bot name
-	 * @var string
-	 */
+
 	public $token;
 	public $name;
+    public $admins;
+
 	public function __construct($config = [])
 	{
 		if (!empty($config)) {
@@ -25,9 +22,26 @@ class TelegramBot extends Telegram  implements Configurable
 		}
 		parent::__construct($this->token, $this->name);
 
+        $this->enableAdmins($this->admins);
+        $this->addCommands();
+        $this->initializeDB();
+	}
+
+	private function addCommands()
+    {
+        $this->addCommandsPath("controllers/userCommands");
+
+        if($this->isAdmin())
+        {
+            $this->addCommandsPath('controllers/adminCommands');
+        }
+    }
+
+    private function initializeDB()
+    {
         Yii::$app->db->open();
         $this->dbo = DB::externalInitialize(Yii::$app->db->pdo, $this);
         ConversationDB::initializeConversation();
         $this->mysql_enabled = true;
-	}
+    }
 }
