@@ -14,14 +14,10 @@ use yii\console\Controller;
 
 class StartController extends Controller
 {
-    /**
-     * This command starts the bot.
-     * Yet to be implemented
-     */
+
     public function actionHook($baseAddress, $port = 8443)
     {
         shell_exec('openssl req -newkey rsa:2048 -sha256 -nodes -keyout etsiinfbot.key -x509 -days 365 -out etsiinfbot.pem -subj "/C=ES/ST=Madrid/L=Madrid/O=ETSIINF/CN='.escapeshellarg($baseAddress).'"');
-        \Yii::$app->bot->unsetWebHook();
         $result = \Yii::$app->bot->setWebhook("https://$baseAddress:$port", "etsiinfbot.pem");
 
         /** @var $result Request */
@@ -32,8 +28,14 @@ class StartController extends Controller
         }
     }
 
-    public function actionUpdates()
+    public function actionStopHook()
     {
-        \Yii::$app->bot->handleGetUpdates();
+        \Yii::$app->bot->unsetWebHook();
+    }
+
+    public function actionUpdates($timeout=1)
+    {
+        while(\Yii::$app->bot->handleGetUpdates()->isOk())
+            sleep($timeout);
     }
 }
