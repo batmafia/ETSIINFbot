@@ -8,6 +8,7 @@
         
 * Update dependencies
  
+        composer global require "fxp/composer-asset-plugin:^1.2.0"
         php composer.phar update
         
 * Set your local config
