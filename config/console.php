@@ -25,7 +25,8 @@ $config = [
         'db' => $db,
         'bot' => array_merge([
             'class' => 'app\components\TelegramBot',
-            'name' => $params['name']
+            'name' => $params['name'],
+            'admins'=>$params['admins']
         ], require(__DIR__. '/bot.php')),
     ],
     'params' => $params,
