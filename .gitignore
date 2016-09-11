@@ -29,3 +29,8 @@ phpunit.phar
 #Bot key
 etsiinfbot.pem
 etsiinfbot.key
+
+
+# All temporary files
+*~
+**/*~
