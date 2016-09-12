@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace app\commands;
+namespace app\console;
 
 use app\Components\TelegramBot;
 use Longman\TelegramBot\Request;
