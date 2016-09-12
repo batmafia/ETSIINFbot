@@ -12,10 +12,9 @@ use app\models\ContactForm;
 class SiteController extends Controller
 {
 
-    public $defaultAction = 'web-hook';
+    public $enableCsrfValidation = false;
 
-    public function actionWebHook(){
-        $this->enableCsrfValidation = false;
+    public function actionIndex(){
         \Yii::$app->bot->handle();
     }
 }
