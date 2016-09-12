@@ -10,9 +10,9 @@
  * Written by Jack'lul <jacklul@jacklul.com>
  */
 
-namespace Longman\TelegramBot\Commands\AdminCommands;
+namespace Commands\Admin;
 
-use Longman\TelegramBot\Commands\AdminCommand;
+use Commands\Base\BaseAdminCommand;
 use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\Chat;
 use Longman\TelegramBot\Request;
@@ -20,7 +20,7 @@ use Longman\TelegramBot\Request;
 /**
  * Admin "/whois" command
  */
-class WhoisCommand extends AdminCommand
+class WhoisCommand extends BaseAdminCommand
 {
     /**#@+
      * {@inheritdoc}

@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Longman\TelegramBot\Commands\AdminCommands;
+namespace Commands\Admin;
 
-use Longman\TelegramBot\Commands\AdminCommand;
+use Commands\Base\BaseAdminCommand;
 use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\Chat;
 use Longman\TelegramBot\Request;
@@ -18,7 +18,7 @@ use Longman\TelegramBot\Request;
 /**
  * Admin "/chats" command
  */
-class ChatsCommand extends AdminCommand
+class ChatsCommand extends BaseAdminCommand
 {
     /**#@+
      * {@inheritdoc}

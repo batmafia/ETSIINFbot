@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Longman\TelegramBot\Commands\UserCommands;
+namespace Commands\User;
 
-use Longman\TelegramBot\Commands\UserCommand;
+use Commands\Base\BaseUserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\ReplyKeyboardHide;
 use Longman\TelegramBot\Request;
@@ -22,7 +22,7 @@ use Longman\TelegramBot\Request;
  * returns a message to let the user know which conversation it was.
  * If no conversation is active, the returned message says so.
  */
-class CancelCommand extends UserCommand
+class CancelCommand extends BaseUserCommand
 {
     /**#@+
      * {@inheritdoc}

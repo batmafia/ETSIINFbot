@@ -8,15 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Longman\TelegramBot\Commands\UserCommands;
+namespace Commands\User;
 
-use Longman\TelegramBot\Commands\UserCommand;
+use Commands\Base\BaseUserCommand;
 use Longman\TelegramBot\Request;
 
 /**
  * User "/help" command
  */
-class HelpCommand extends UserCommand
+class HelpCommand extends BaseUserCommand
 {
     /**#@+
      * {@inheritdoc}

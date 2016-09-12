@@ -8,17 +8,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Longman\TelegramBot\Commands\AdminCommands;
+namespace Commands\Admin;
 
+use Commands\Base\BaseAdminCommand;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Conversation;
-use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\Message;
 use Longman\TelegramBot\Entities\ReplyKeyboardHide;
 use Longman\TelegramBot\Entities\ReplyKeyboardMarkup;
 use Longman\TelegramBot\Exception\TelegramException;
 
-class SendtochannelCommand extends AdminCommand
+class SendtochannelCommand extends BaseAdminCommand
 {
     /**#@+
      * {@inheritdoc}

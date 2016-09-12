@@ -3,6 +3,7 @@ namespace app\Components;
 
 use Longman\TelegramBot\ConversationDB;
 use Longman\TelegramBot\DB;
+use Longman\TelegramBot\Entities\Update;
 use \Longman\TelegramBot\Telegram;
 use Yii;
 use \yii\base\Configurable;
@@ -29,11 +30,20 @@ class TelegramBot extends Telegram  implements Configurable
 
 	private function addCommands()
     {
-        $this->addCommandsPath(Yii::$app->basePath."/commands/user");
+        $this->commands_paths = [];
+
+        require_once Yii::$app->basePath."/commands/base/BaseCommand.php";
+        foreach (glob(Yii::$app->basePath."/commands/base/*.php") as $filename)
+        {
+            require_once $filename;
+        }
+
+        parent::addCommandsPath(Yii::$app->basePath."/commands/system");
+        parent::addCommandsPath(Yii::$app->basePath."/commands/user");
 
         if($this->isAdmin())
         {
-            $this->addCommandsPath(Yii::$app->basePath."/commands/admin");
+            parent::addCommandsPath(Yii::$app->basePath."/commands/admin");
         }
     }
 
@@ -44,4 +54,35 @@ class TelegramBot extends Telegram  implements Configurable
         ConversationDB::initializeConversation();
         $this->mysql_enabled = true;
     }
+
+    public function getCommandObject($command)
+    {
+        $which = ['System'];
+        ($this->isAdmin()) && $which[] = 'Admin';
+        $which[] = 'User';
+
+        foreach ($which as $auth) {
+            $command_namespace =  'Commands\\' . $auth . '\\' . $this->ucfirstUnicode($command) . 'Command';
+            if (class_exists($command_namespace)) {
+                return new $command_namespace($this, $this->update);
+            }
+        }
+
+        return null;
+    }
+
+
+    public function addCommandsPath($path, $before = true)
+    {
+        return $this;
+    }
+
+
+    public function processUpdate(Update $update)
+    {
+        $this->update = $update;
+        $this->addCommands();
+        return parent::processUpdate($update);
+    }
+
 }

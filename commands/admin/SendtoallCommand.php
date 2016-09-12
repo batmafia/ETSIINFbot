@@ -8,15 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Longman\TelegramBot\Commands\AdminCommands;
+namespace Commands\Admin;
 
-use Longman\TelegramBot\Commands\AdminCommand;
+use Commands\Base\BaseAdminCommand;
 use Longman\TelegramBot\Request;
 
 /**
  * Admin "/sendtoall" command
  */
-class SendtoallCommand extends AdminCommand
+class SendtoallCommand extends BaseAdminCommand
 {
     /**#@+
      * {@inheritdoc}
