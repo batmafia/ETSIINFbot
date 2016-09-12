@@ -29,11 +29,11 @@ class TelegramBot extends Telegram  implements Configurable
 
 	private function addCommands()
     {
-        $this->addCommandsPath("controllers/userCommands");
+        $this->addCommandsPath(Yii::$app->basePath."/controllers/userCommands");
 
         if($this->isAdmin())
         {
-            $this->addCommandsPath('controllers/adminCommands');
+            $this->addCommandsPath(Yii::$app->basePath."/controllers/adminCommands");
         }
     }
 
