@@ -5,6 +5,7 @@ return [
     'admins' => [
         'Fril' => 4103888,
         'diegofpb' => 85785,
-        'Svg153' => 5341682
+        'Svg153' => 5341682,
+        'mrgarri' => 444646
     ]
 ];
