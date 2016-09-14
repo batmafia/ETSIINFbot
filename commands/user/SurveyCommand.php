@@ -20,7 +20,7 @@ class SurveyCommand extends BaseUserCommand
     /**#@+
      * {@inheritdoc}
      */
-    public $enabled = true;
+    public $enabled = false;
 
     protected $name = 'survey';
     protected $description = 'Survery for bot users';
