@@ -43,14 +43,8 @@ abstract class BaseRegularCommand extends BaseCommand
                 case 'text':
                     $args[] = $this->getMessage()->getText(true);
                     break;
-                case 'location':
-                    $args[] = $this->getMessage()->getLocation();
-                    break;
-                case 'photo':
-                    $args[] = $this->getMessage()->getPhoto();
-                    break;
-                case 'contact':
-                    $args[] = $this->getMessage()->getContact();
+                default:
+                    $args[] = $this->getMessage()->{"get".ucfirst($parameter->getName())}();
                     break;
             }
         }
