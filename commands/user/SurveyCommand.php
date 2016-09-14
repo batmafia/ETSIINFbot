@@ -20,7 +20,7 @@ class SurveyCommand extends BaseUserCommand
     /**#@+
      * {@inheritdoc}
      */
-    public $enabled = true;
+    public $enabled = false;
 
     protected $name = 'survey';
     protected $description = 'Survery for bot users';
@@ -71,25 +71,25 @@ class SurveyCommand extends BaseUserCommand
         $this->getConversation()->notes['age'] = $text;
         return $this->nextStep();
     }
-    
+
     public function processSex($text)
     {
         $this->getRequest()->keyboard([['M','F']]);
-        
+
         if ($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->sendMessage('Select your gender:');
         }
-        
+
         if(!($text == 'M' || $text == 'F'))
         {
             return $this->getRequest()->sendMessage('Select your gender, choose a keyboard option:');
         }
-        
+
         $this->getConversation()->notes['gender'] = $text;
         return $this->nextStep();
     }
-    
+
     public function processLocation($location)
     {
         if ($this->isProcessed() || is_null($location)) {
@@ -100,28 +100,28 @@ class SurveyCommand extends BaseUserCommand
         $this->getConversation()->notes['latitude'] = $location->getLatitude();
         return $this->nextStep();
     }
-    
+
     public function processPhoto($photo)
     {
         if ($this->isProcessed() || is_null($photo)) {
             return $this->getRequest()->hideKeyboard()->sendMessage('Insert your picture:');
         }
-        
+
         $this->getConversation()->notes['photo_id'] = $photo[0]->getFileId();
         return $this->nextStep();
     }
-    
+
     public function processContact($contact)
     {
         if ($this->isProcessed() || is_null($contact))
         {
             return $this->getRequest()->contactKeyboard()->sendMessage('Share your contact information:');
         }
-        
+
         $this->getConversation()->notes['phone_number'] = $contact->getPhoneNumber();
         return $this->nextStep();
     }
-    
+
     public function processResult()
     {
         $out_text = '/Survey result:' . "\n";
