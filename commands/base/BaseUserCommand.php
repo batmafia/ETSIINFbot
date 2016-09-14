@@ -2,7 +2,7 @@
 
 namespace Commands\Base;
 
-abstract class BaseUserCommand extends BaseCommand {
+abstract class BaseUserCommand extends BaseRegularCommand {
 
     public function isUserCommand()
     {

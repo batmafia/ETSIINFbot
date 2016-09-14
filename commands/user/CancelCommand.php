@@ -12,8 +12,6 @@ namespace Commands\User;
 
 use Commands\Base\BaseUserCommand;
 use Longman\TelegramBot\Conversation;
-use Longman\TelegramBot\Entities\ReplyKeyboardHide;
-use Longman\TelegramBot\Request;
 
 /**
  * User "/cancel" command
@@ -52,7 +50,7 @@ class CancelCommand extends BaseUserCommand
             $text = 'Conversation "' . $conversation_command . '" cancelled!';
         }
 
-        return $this->hideKeyboard($text);
+        return $this->getRequest()->hideKeyboard()->sendMessage($text);
     }
 
     /**
@@ -60,22 +58,7 @@ class CancelCommand extends BaseUserCommand
      */
     public function executeNoDb()
     {
-        return $this->hideKeyboard('Nothing to cancel.');
+        return $this->sendMessage('Nothing to cancel.');
     }
 
-    /**
-     * Hide the keyboard and output a text
-     *
-     * @param string $text
-     *
-     * @return \Longman\TelegramBot\Entities\ServerResponse
-     */
-    private function hideKeyboard($text)
-    {
-        return Request::sendMessage([
-            'reply_markup' => new ReplyKeyboardHide(['selective' => true]),
-            'chat_id'      => $this->getMessage()->getChat()->getId(),
-            'text'         => $text,
-        ]);
-    }
 }
