@@ -33,6 +33,7 @@ class TelegramBot extends Telegram  implements Configurable
         $this->commands_paths = [];
 
         require_once Yii::$app->basePath."/commands/base/BaseCommand.php";
+        require_once Yii::$app->basePath."/commands/base/BaseRegularCommand.php";
         foreach (glob(Yii::$app->basePath."/commands/base/*.php") as $filename)
         {
             require_once $filename;

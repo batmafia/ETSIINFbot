@@ -2,7 +2,7 @@
 
 namespace Commands\Base;
 
-abstract class BaseAdminCommand extends BaseCommand {
+abstract class BaseAdminCommand extends BaseRegularCommand {
 
     public function isAdminCommand()
     {
