@@ -37,7 +37,7 @@ class SurveyCommand extends BaseUserCommand
     {
         if (empty($text))
         {
-            $this->getConversation()->update();
+            $this->getConversation();
             return $this->getRequest()->sendMessage('Type your name:');
         }
 
