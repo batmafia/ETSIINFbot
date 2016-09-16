@@ -8,14 +8,17 @@ git clone https://github.com/svg153/ETSIINFbot.git
 ```
 * Update dependencies
     - move to ETSIINFbot folder
-        ```shell
-        sudo composer.phar global require "fxp/composer-asset-plugin:^1.2.0"
+        ```
+        sudo php composer.phar global require "fxp/composer-asset-plugin:^1.2.0"
+        ```
+        
+        ```
         sudo php composer.phar update
         ```
     
 * Dependencies problems
     - longman/telegram-bot 0.35 requires ext-curl * -> the requested PHP extension curl is missing from your system.
-        ```shell
+        ```
         sudo apt-get install php-curl
         ```
 
