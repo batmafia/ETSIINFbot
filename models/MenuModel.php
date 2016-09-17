@@ -1,12 +1,15 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: frildoren
- * Date: 17/09/16
- * Time: 20:33
- */
-class MenuModel
+namespace app\models;
+
+use yii\base\Model;
+
+class MenuModel extends Model
 {
+
+    public static function buildModel($url)
+    {
+
+    }
 
 }
