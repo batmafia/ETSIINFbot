@@ -20,7 +20,7 @@
         "yiisoft/yii2-swiftmailer": "*",
         "fxp/composer-asset-plugin": "~1.1.1",
         "longman/telegram-bot": "0.35",
-        "sunra/php-simple-html-dom-parser": "1.5.1"
+        "sunra/php-simple-html-dom-parser": "1.5.1",
         "nategood/httpful": "*"
     },
     "require-dev": {
