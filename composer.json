@@ -12,14 +12,15 @@
         "irc": "irc://irc.freenode.net/yii",
         "source": "https://github.com/yiisoft/yii2"
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
         "yiisoft/yii2": ">=2.0.5",
         "yiisoft/yii2-bootstrap": "*",
         "yiisoft/yii2-swiftmailer": "*",
         "fxp/composer-asset-plugin": "~1.1.1",
-        "longman/telegram-bot": "0.35"
+        "longman/telegram-bot": "0.35",
+        "garyjl/yii2-simple_html_dom": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
