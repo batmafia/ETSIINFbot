@@ -17,7 +17,6 @@ class WebHookController extends Controller
 
     public function actionDeploy()
     {
-        
         $payload = json_decode(file_get_contents('php://input'));
         if($payload->ref === "refs/heads/master") {
 
