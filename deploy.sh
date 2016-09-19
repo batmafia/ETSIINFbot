@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export COMPOSER_HOME=~
+export COMPOSER_HOME=/root/ETSIINFbot
 
 git pull &&
 php composer.phar update &&
