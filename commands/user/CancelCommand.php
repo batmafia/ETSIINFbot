@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Commands\User;
+namespace app\commands\user;
 
-use Commands\Base\BaseUserCommand;
+use app\commands\base\BaseUserCommand;
 use Longman\TelegramBot\Conversation;
 
 /**

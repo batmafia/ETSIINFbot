@@ -1,6 +1,6 @@
 <?php
 
-namespace Commands\Base;
+namespace app\commands\base;
 
 use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\Update;

@@ -22,6 +22,7 @@ class TelegramBot extends Telegram  implements Configurable
 			Yii::configure($this, $config);
 		}
 		parent::__construct($this->token, $this->name);
+        $this->version = Yii::$app->params['version'];
 
         $this->enableAdmins($this->admins);
         $this->addCommands();
@@ -63,7 +64,7 @@ class TelegramBot extends Telegram  implements Configurable
         $which[] = 'User';
 
         foreach ($which as $auth) {
-            $command_namespace =  'Commands\\' . $auth . '\\' . $this->ucfirstUnicode($command) . 'Command';
+            $command_namespace =  'app\commands\\' . $auth . '\\' . $this->ucfirstUnicode($command) . 'Command';
             if (class_exists($command_namespace)) {
                 return new $command_namespace($this, $this->update);
             }

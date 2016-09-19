@@ -1,6 +1,6 @@
 <?php
 
-namespace Commands\Base;
+namespace app\commands\base;
 
 abstract class BaseAdminCommand extends BaseRegularCommand {
 

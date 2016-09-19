@@ -1,6 +1,6 @@
 <?php
 
-namespace Commands\Base;
+namespace app\commands\base;
 
 use Longman\TelegramBot\Entities\ReplyKeyboardHide;
 use Longman\TelegramBot\Entities\ReplyKeyboardMarkup;
@@ -12,6 +12,7 @@ class Request
 
     function __construct($chatId)
     {
+        \Longman\TelegramBot\Request::initialize(\Yii::$app->bot);
         $this->data['chat_id'] = $chatId;
     }
 

@@ -8,8 +8,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Commands\System;
-use Commands\Base\BaseSystemCommand;
+namespace app\commands\system;
+use app\commands\base\BaseSystemCommand;
 use Longman\TelegramBot\Commands\SystemCommand;
 
 /**
