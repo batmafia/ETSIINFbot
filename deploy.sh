@@ -1,4 +1,4 @@
-!#/bin/sh
+#!/bin/sh
 
 git pull &&
 php composer.phar update &&
