@@ -17,7 +17,7 @@ class WebHookController extends Controller
 
     public function actionDeploy()
     {
-        $payload = json_decode($_REQUEST['payload']);
+        $payload = json_decode(file_get_contents('php://input'));
         if($payload->ref === "refs/heads/master") {
 
             exec("cd /root/ETSIINFbot && ./deploy.sh 2>&1", $out, $ret);
