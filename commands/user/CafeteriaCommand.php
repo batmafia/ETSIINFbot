@@ -8,225 +8,87 @@
  * file that was distributed with this source code.
  */
 
-namespace Longman\TelegramBot\Commands\UserCommands;
+namespace Commands\User;
 
-use Longman\TelegramBot\Request;
-use Longman\TelegramBot\Conversation;
-use Longman\TelegramBot\Commands\UserCommand;
-use Longman\TelegramBot\Entities\ForceReply;
-use Longman\TelegramBot\Entities\ReplyKeyboardHide;
-use Longman\TelegramBot\Entities\ReplyKeyboardMarkup;
+use Commands\Base\BaseUserCommand;
 
 /**
  * User "/cafeteria" command
  */
-class SurveyCommand extends UserCommand
+class CafeteriaCommand extends BaseUserCommand
 {
     /**#@+
      * {@inheritdoc}
      */
-    public $enabled = false;
+    public $enabled = true;
 
     protected $name = 'cafeteria';
-    protected $description = 'Muestra el menú de comidas de la cafetería de la ETSIINF';
+    protected $description = 'Consulta el menú de la cafetería de la ETSIINF.';
     protected $usage = '/cafeteria';
     protected $version = '0.1.0';
     protected $need_mysql = true;
     /**#@-*/
 
-    /**
-     * Conversation Object
-     *
-     * @var \Longman\TelegramBot\Conversation
-     */
-    protected $conversation;
 
     /**
-     * {@inheritdoc}
+     * Global Vars
      */
-    public function execute()
+
+
+
+    /**
+     * [process_SelectMenu description]
+     * @param  [type] $text [description]
+     * @return [type]       [description]
+     */
+    public function process_SelectMenu($text)
     {
-        $message = $this->getMessage();
 
-        $chat = $message->getChat();
-        $user = $message->getFrom();
-        $text = $message->getText(true);
+        $opts = ['Lun','Mar','Mie','Jue','Vie'];
+        $opts2= ['Menú Semanal Completo'];
+        $cancel = ['Cancelar'];
+        $keyboard = [$opts,$opts2,$cancel];
+        $titleKeyboard = 'Selecciona si deseas consultar un dia o el menú completo';
+        $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
 
-        $chat_id = $chat->getId();
-        $user_id = $user->getId();
+        $this->getConversation();
 
-        //Preparing Respose
-        $data = [];
-        if ($chat->isGroupChat() || $chat->isSuperGroup()) {
-            //reply to message id is applied by default
-            //Force reply is applied by default to so can work with privacy on
-            $data['reply_markup'] = new ForceReply([ 'selective' => true]);
-        }
-        $data['chat_id'] = $chat_id;
+        $this->getRequest()->keyboard($keyboard);
 
-        //Conversation start
-        $this->conversation = new Conversation($user_id, $chat_id, $this->getName());
-
-        //cache data from the tracking session if any
-        if (!isset($this->conversation->notes['state'])) {
-            $state = '0';
-        } else {
-            $state = $this->conversation->notes['state'];
+        if ( $this->isProcessed() || empty($text) )
+        {
+            return $this->getRequest()->sendMessage($titleKeyboard);
         }
 
-        //state machine
-        //entrypoint of the machine state if given by the track
-        //Every time the step is achived the track is updated
-        switch ($state) {
-            case 0:
-                if (empty($text)) {
-                    $this->conversation->notes['state'] = 0;
-                    $this->conversation->update();
-
-                    $keyboard = [['Lun','Mar','Mie','Jue','Vie'],['Menu Semanal Completo'],['Cancelar']];
-                    $reply_keyboard_markup = new ReplyKeyboardMarkup(
-                        [
-                            'keyboard' => $keyboard ,
-                            'resize_keyboard' => true,
-                            'one_time_keyboard' => true,
-                            'selective' => true
-                        ]
-                    );
-                    $data['reply_markup'] = $reply_keyboard_markup;
-
-                    $data['text'] = 'Selecciona que menú deseas ver de la cafetería:';
-                    $data['reply_markup'] = new ReplyKeyBoardHide(['selective' => true]);
-                    $result = Request::sendMessage($data);
-                    break;
-                }
-                $this->conversation->notes['option'] = $text;
-                $text = '';
-                // no break
-            case 1:
-                if (empty($text)) {
-                    $this->conversation->notes['state'] = 1;
-                    $this->conversation->update();
-    
-                    $data['text'] = 'Type your surname:';
-                    $result = Request::sendMessage($data);
-                    break;
-                }
-                $this->conversation->notes['surname'] = $text;
-                ++$state;
-                $text = '';
-
-                // no break
-            case 2:
-                if (empty($text) || !is_numeric($text)) {
-                    $this->conversation->notes['state'] = 2;
-                    $this->conversation->update();
-
-                    $data['text'] = 'Type your age:';
-                    if (!empty($text) && !is_numeric($text)) {
-                        $data['text'] = 'Type your age, must be a number';
-                    }
-                    $result = Request::sendMessage($data);
-                    break;
-                }
-                $this->conversation->notes['age'] = $text;
-                $text = '';
-
-                // no break
-            case 3:
-                if (empty($text) || !($text == 'M' || $text == 'F')) {
-                    $this->conversation->notes['state'] = 3;
-                    $this->conversation->update();
-
-                    $keyboard = [['M','F']];
-                    $reply_keyboard_markup = new ReplyKeyboardMarkup(
-                        [
-                            'keyboard' => $keyboard ,
-                            'resize_keyboard' => true,
-                            'one_time_keyboard' => true,
-                            'selective' => true
-                        ]
-                    );
-                    $data['reply_markup'] = $reply_keyboard_markup;
-                    $data['text'] = 'Select your gender:';
-                    if (!empty($text) && !($text == 'M' || $text == 'F')) {
-                        $data['text'] = 'Select your gender, choose a keyboard option:';
-                    }
-                    $result = Request::sendMessage($data);
-                    break;
-                }
-                $this->conversation->notes['gender'] = $text;
-                $text = '';
-           
-                // no break
-            case 4:
-                if (is_null($message->getLocation())) {
-                    $this->conversation->notes['state'] = 4;
-                    $this->conversation->update();
-                    $data['reply_markup'] = new ReplyKeyboardMarkup([
-                        'keyboard' => [[
-                            [ 'text' => 'Share Location', 'request_location' => true ],
-                        ]],
-                        'resize_keyboard'   => true,
-                        'one_time_keyboard' => true,
-                        'selective'         => true,
-                    ]);
-                    $data['text'] = 'Share your location:';
-                    $result = Request::sendMessage($data);
-                    break;
-                }
-
-                $this->conversation->notes['longitude'] = $message->getLocation()->getLongitude();
-                $this->conversation->notes['latitude'] = $message->getLocation()->getLatitude();
-
-                // no break
-            case 5:
-                if (is_null($message->getPhoto())) {
-                    $this->conversation->notes['state'] = 5;
-                    $this->conversation->update();
-
-                    $data['text'] = 'Insert your picture:';
-                    $data['reply_markup'] = new ReplyKeyBoardHide(['selective' => true]);
-                    $result = Request::sendMessage($data);
-                    break;
-                }
-                $this->conversation->notes['photo_id'] = $message->getPhoto()[0]->getFileId();
-
-                // no break
-            case 6:
-                if (is_null($message->getContact())) {
-                    $this->conversation->notes['state'] = 6;
-                    $this->conversation->update();
-
-                    $data['text'] = 'Share your contact information:';
-                    $data['reply_markup'] = new ReplyKeyboardMarkup([
-                        'keyboard' => [[
-                            [ 'text' => 'Share Contact', 'request_contact' => true ],
-                        ]],
-                        'resize_keyboard'   => true,
-                        'one_time_keyboard' => true,
-                        'selective'         => true,
-                    ]);
-                    $result = Request::sendMessage($data);
-                    break;
-                }
-                $this->conversation->notes['phone_number'] = $message->getContact()->getPhoneNumber();
-
-                // no break
-            case 7:
-                $this->conversation->update();
-                $out_text = '/Survey result:' . "\n";
-                unset($this->conversation->notes['state']);
-                foreach ($this->conversation->notes as $k => $v) {
-                    $out_text .= "\n" . ucfirst($k).': ' . $v;
-                }
-
-                $data['photo'] = $this->conversation->notes['photo_id'];
-                $data['reply_markup'] = new ReplyKeyBoardHide(['selective' => true]);
-                $data['caption'] = $out_text;
-                $this->conversation->stop();
-                $result = Request::sendPhoto($data);
-                break;
+        if( !(in_array($text, $opts) || in_array($text, $cancel)) || in_array($text, $opts2))
+        {
+            return $this->getRequest()->sendMessage($msgErrorImputKeyboard);
         }
+
+        if (in_array($text, $cancel))
+        {
+            return $this->cancelConversation();
+        }
+
+        $this->getConversation()->notes['option'] = $text;
+        $this->stopConversation();
+        return 0;
+    }
+
+    /**
+     * [cancelConversation description]
+     * @return [type] [description]
+     */
+    private function cancelConversation()
+    {
+        $msgCancel = "Comando cancelado.";
+        $msgThanks = "Gracias por usar ETSIINFbot.";
+        $heart = "\xE2\x9D\xA4"; // http://apps.timwhitlock.info/unicode/inspect/hex/2764
+        $sign = "ETSIINFbot by Batmafia with".$heart.".";
+        $msgCancelConver = $msgCancel."\n".$msgThanks."\n".$sign;
+        $result = $this->getRequest()->hideKeyboard()->sendMessage($msgCancelConver);
+        $this->stopConversation();
         return $result;
     }
+
 }
