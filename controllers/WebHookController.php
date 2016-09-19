@@ -17,8 +17,8 @@ class WebHookController extends Controller
 
     public function actionDeploy()
     {
-        
-        if($_POST['ref'] === "refs/heads/master") {
+        $payload = json_decode($_REQUEST['payload']);
+        if($payload->ref === "refs/heads/master") {
 
             exec("cd /root/ETSIINFbot && ./deploy.sh 2>&1", $out, $ret);
             $mes = $ret ?
@@ -36,7 +36,7 @@ class WebHookController extends Controller
         {
             foreach (Yii::$app->params['admins'] as $id) {
                 $req = new Request($id);
-                $req->sendMessage("There is a new push in branch ".$_POST['ref']);
+                $req->sendMessage("There is a new push in branch ".$payload->ref);
             }
         }
     }
