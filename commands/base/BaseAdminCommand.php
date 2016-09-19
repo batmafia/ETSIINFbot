@@ -1,8 +1,8 @@
 <?php
 
-namespace Commands\Base;
+namespace app\commands\base;
 
-abstract class BaseAdminCommand extends BaseCommand {
+abstract class BaseAdminCommand extends BaseRegularCommand {
 
     public function isAdminCommand()
     {

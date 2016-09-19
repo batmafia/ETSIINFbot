@@ -1,24 +1,10 @@
 <?php
 
-namespace Commands\Base;
+namespace app\commands\base;
 
 use \Longman\TelegramBot\Commands\Command;
 
-abstract class BaseCommand extends Command {
-
-    public function isAdminCommand()
-    {
-        return false;
-    }
-
-    public function isUserCommand()
-    {
-        return false;
-    }
-
-    public function isSystemCommand()
-    {
-        return false;
-    }
+abstract class BaseCommand extends Command
+{
 
 }

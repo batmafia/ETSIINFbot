@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Commands\System;
+namespace app\commands\system;
 
-use Commands\Base\BaseSystemCommand;
+use app\commands\base\BaseSystemCommand;
 
 use Longman\TelegramBot\Entities\InlineQueryResultArticle;
 use Longman\TelegramBot\Entities\InputTextMessageContent;

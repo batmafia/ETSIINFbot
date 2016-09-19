@@ -1,8 +1,8 @@
 <?php
 
-namespace Commands\Base;
+namespace app\commands\base;
 
-abstract class BaseUserCommand extends BaseCommand {
+abstract class BaseUserCommand extends BaseRegularCommand {
 
     public function isUserCommand()
     {

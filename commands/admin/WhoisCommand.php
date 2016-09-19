@@ -10,9 +10,9 @@
  * Written by Jack'lul <jacklul@jacklul.com>
  */
 
-namespace Commands\Admin;
+namespace app\commands\admin;
 
-use Commands\Base\BaseAdminCommand;
+use app\commands\base\BaseAdminCommand;
 use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\Chat;
 use Longman\TelegramBot\Request;
