@@ -15,20 +15,17 @@ class WebHookController extends Controller
         \Yii::$app->bot->handle();
     }
 
-    public function actionDeploy($token)
+    public function actionDeploy()
     {
-        if($token === 'ivb3iuwet7wai3292')
-        {
-            exec(Yii::$app->basePath . "/deploy.sh", $out, $ret);
-            $mes = $ret ?
-                "There was some error deploying ".Yii::$app->params['name']." v.".Yii::$app->params['version']
-                : Yii::$app->params['name']." v.".Yii::$app->params['version']." deployed correctly";
+        exec(Yii::$app->basePath . "/deploy.sh", $out, $ret);
+        $mes = $ret ?
+            "There was some error deploying ".Yii::$app->params['name']." v.".Yii::$app->params['version']
+            : Yii::$app->params['name']." v.".Yii::$app->params['version']." deployed correctly";
 
-            foreach(Yii::$app->params['admins'] as $id)
-            {
-                $req = new Request($id);
-                $req->sendMessage($mes);
-            }
+        foreach(Yii::$app->params['admins'] as $id)
+        {
+            $req = new Request($id);
+            $req->sendMessage($mes);
         }
     }
 }
