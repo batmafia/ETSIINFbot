@@ -17,16 +17,28 @@ class WebHookController extends Controller
 
     public function actionDeploy()
     {
-        exec("cd /root/ETSIINFbot && ./deploy.sh 2>&1", $out, $ret);
-        $mes = $ret ?
-            "There was some error deploying ".Yii::$app->params['name']." v.".Yii::$app->params['version']
-            : Yii::$app->params['name']." v.".Yii::$app->params['version']." deployed correctly";
+
+        $post = \GuzzleHttp\json_decode($_POST);
+        if($post['ref'] === "refs/heads/master") {
+
+            exec("cd /root/ETSIINFbot && ./deploy.sh 2>&1", $out, $ret);
+            $mes = $ret ?
+                "There was some error deploying " . Yii::$app->params['name'] . " v." . Yii::$app->params['version']
+                : Yii::$app->params['name'] . " v." . Yii::$app->params['version'] . " deployed correctly";
 
 
-        foreach(Yii::$app->params['admins'] as $id)
+            foreach (Yii::$app->params['admins'] as $id) {
+                $req = new Request($id);
+                $req->sendMessage($mes . "\n\n The output was:\n" . implode("\n", $out));
+            }
+
+        }
+        else
         {
-            $req = new Request($id);
-            $req->sendMessage($mes."\n\n The output was:\n".implode("\n", $out));
+            foreach (Yii::$app->params['admins'] as $id) {
+                $req = new Request($id);
+                $req->sendMessage("There is a new push in branch ".$post['ref']);
+            }
         }
     }
 
