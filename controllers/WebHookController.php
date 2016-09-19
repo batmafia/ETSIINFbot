@@ -2,12 +2,9 @@
 
 namespace app\controllers;
 
+use app\commands\base\Request;
 use Yii;
-use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\filters\VerbFilter;
-use app\models\LoginForm;
-use app\models\ContactForm;
 
 class WebHookController extends Controller
 {
@@ -23,6 +20,15 @@ class WebHookController extends Controller
         if($token === 'ivb3iuwet7wai3292')
         {
             exec(Yii::$app->basePath . "/deploy.sh", $out, $ret);
+            $mes = $ret ?
+                "There was some error deploying ".Yii::$app->params['name']." v.".Yii::$app->params['version']
+                : Yii::$app->params['name']." v.".Yii::$app->params['version']." deployed correctly";
+
+            foreach(Yii::$app->params['admins'] as $id)
+            {
+                $req = new Request($id);
+                $req->sendMessage($mes);
+            }
         }
     }
 }
