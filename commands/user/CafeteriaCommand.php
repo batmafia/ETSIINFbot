@@ -77,7 +77,7 @@ class CafeteriaCommand extends BaseUserCommand
 
     /**
      * [cancelConversation description]
-     * @return [type] [description]
+     * @return [type] [description] 
      */
     private function cancelConversation()
     {
