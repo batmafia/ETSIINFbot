@@ -17,6 +17,7 @@ class WebHookController extends Controller
 
     public function actionDeploy()
     {
+        
         if($_POST['ref'] === "refs/heads/master") {
 
             exec("cd /root/ETSIINFbot && ./deploy.sh 2>&1", $out, $ret);
