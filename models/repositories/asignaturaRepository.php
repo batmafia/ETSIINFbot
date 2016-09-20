@@ -16,30 +16,23 @@ class AsignaturaRepository
 {
 
 
-    public static function getAsignatura($plan,$codAsignatura,$semestre,$anio)
+    public static function getAsignatura($plan, $codAsignatura, $semestre, $anio)
     {
-        $request = Request::get("https://www.upm.es/comun_gauss/publico/api/$anio/$semestre/$plan"."_"."$codAsignatura.json")
+        $request = Request::get("https://www.upm.es/comun_gauss/publico/api/$anio/$semestre/$plan" . "_" . "$codAsignatura.json")
             ->expects(Mime::JSON)->send();
-        if(!$request->hasErrors())
-        {
+        if (!$request->hasErrors()) {
             $asigObj = new Asignatura();
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
             $asigObj->setAttributes($data);
 
-            if($asigObj->validate())
-            {
+            if ($asigObj->validate()) {
                 return $asigObj;
-            }
-            else
-            {
+            } else {
                 print_r($asigObj->getErrors());
             }
-        }
-        else
-        {
+        } else {
             throw new Exception("Repository exception");
         }
 
     }
-
 }
