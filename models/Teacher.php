@@ -19,33 +19,21 @@ class Teacher extends Model
     public $coordinador;
     public $tutorias = [];
 
-/*{
-    "nombre":"Victor",
-    "apellidos":"Gimenez Martinez",
-    "email":"victor.gimenez@upm.es",
-    "despacho":"1307",
-    "coordinador":false,
-    "tutorias":[
-        {
-            "dia":"1",
-            "hora_inicio":"13:00",
-            "hora_fin":"15:00",
-            "observaciones":null
-        },
-        {
-            "dia":"3",
-            "hora_inicio":"13:00",
-            "hora_fin":"15:00",
-            "observaciones":null
-        },
-        {
-            "dia":"4",
-            "hora_inicio":"13:00",
-            "hora_fin":"15:00",
-            "observaciones":null
-        }
-    ]
-},*/
+// {
+    // "nombre":"Maria Gloria",
+    // "apellidos":"Sanchez Torrubia",
+    // "email":"mariagloria.sanchez@upm.es",
+    // "despacho":"1318",
+    // "coordinador":false,
+    // "tutorias":[
+    // {
+    // "dia":null,
+    // "hora_inicio":null,
+    // "hora_fin":null,
+    // "observaciones":null
+    // }
+    // ]
+// },
 
     /**
      * @return array the validation rules.
@@ -53,52 +41,12 @@ class Teacher extends Model
     public function rules()
     {
         return [
-            [['nombre','apellidos','email','despacho'], 'string'],
+            [['nombre','apellidos','email'], 'string'],
+            ['despacho', 'integer'],
             ['coordinador', 'boolean'],
-            ['tutorias', 'safe'],
+            ['tutorias', '??????'],
         ];
     }
 
 
-    public function getInfo(){
-
-        if($this->coordinador){
-            $message="El profesor $this->nombre $this->apellidos (coordinador de la asignatura) puedes encontrarle en el despacho $this->despacho o puedes contactar
-            con el mediante su correo electrónico $this->email\n";
-        }else{
-            $message="El profesor $this->nombre $this->apellidos puedes encontrarle en el despacho $this->despacho o puedes contactar
-            con el mediante su correo electrónico $this->email\n";
-        }
-
-        if (!empty($this->tutorias))
-        {
-            $message.="Las tutorias programadas son:\n";
-            foreach ($this->tutorias as $tutoria)
-            {
-                $message.= $tutoria->getMessage()."\n";
-            }
-        }
-
-        return $message;
-
-    }
-
-    public function setAttributes($values, $safeOnly = true)
-    {
-        parent::setAttributes($values, $safeOnly);
-
-        $tutorias = [];
-        foreach($this->tutorias as $i=>$t)
-        {
-            $tutorial = new Tutorial();
-            $tutorial->setAttributes($t);
-            if($tutorial->validate())
-            {
-                $tutorias[] = $tutorial;
-            }
-
-        }
-        $this->tutorias = $tutorias;
-
-    }
 }
