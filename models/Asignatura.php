@@ -108,7 +108,7 @@ class Asignatura extends Model
         return [
             [['nombre','anio','semestre','guia','depto','plan','caracter','fecha_actualizacion'], 'string'],
             ['profesores', 'validateProfesor'],
-            [['codigo','ects'] 'integer']
+            [['codigo','ects'], 'integer'],
         ];
     }
 
