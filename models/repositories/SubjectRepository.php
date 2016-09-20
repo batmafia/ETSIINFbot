@@ -7,28 +7,28 @@
  */
 namespace app\models\repositories;
 
-use app\models\Asignatura;
+use app\models\Subject;
 use Httpful\Mime;
 use Httpful\Request;
 use yii\base\Exception;
 
-class AsignaturaRepository
+class SubjectRepository
 {
 
 
-    public static function getAsignatura($plan, $codAsignatura, $semestre, $anio)
+    public static function getSubject($plan, $codSubject, $semester, $year)
     {
-        $request = Request::get("https://www.upm.es/comun_gauss/publico/api/$anio/$semestre/$plan" . "_" . "$codAsignatura.json")
+        $request = Request::get("https://www.upm.es/comun_gauss/publico/api/$year/$semester/$plan" . "_" . "$codSubject.json")
             ->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
-            $asigObj = new Asignatura();
+            $subjObj = new Subject();
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
-            $asigObj->setAttributes($data);
+            $subjObj->setAttributes($data);
 
-            if ($asigObj->validate()) {
-                return $asigObj;
+            if ($subjObj->validate()) {
+                return $subjObj;
             } else {
-                print_r($asigObj->getErrors());
+                print_r($subjObj->getErrors());
             }
         } else {
             throw new Exception("Repository exception");
