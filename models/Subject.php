@@ -10,7 +10,7 @@ namespace app\models;
 
 use yii\base\Model;
 
-class Asignatura extends Model
+class Subject extends Model
 {
 
     public $codigo;

@@ -10,7 +10,7 @@ namespace app\models;
 
 use yii\base\Model;
 
-class Profesor extends Model
+class Teacher extends Model
 {
     public $nombre;
     public $apellidos;
