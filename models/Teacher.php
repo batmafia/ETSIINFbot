@@ -27,10 +27,10 @@ class Teacher extends Model
     "coordinador":false,
     "tutorias":[
         {
-        "dia":"1",
-        "hora_inicio":"13:00",
-        "hora_fin":"15:00",
-        "observaciones":null
+            "dia":"1",
+            "hora_inicio":"13:00",
+            "hora_fin":"15:00",
+            "observaciones":null
         },
         {
             "dia":"3",
@@ -55,9 +55,31 @@ class Teacher extends Model
         return [
             [['nombre','apellidos','email','despacho'], 'string'],
             ['coordinador', 'boolean'],
-            ['tutorias', '??????'],
+            ['tutorias', 'each', 'rule'=>['each', 'rule'=>['validateModels']]],
         ];
     }
 
+
+    public function validateModels($attribute, $value)
+    {
+        return $this->{$attribute}->validate();
+    }
+
+
+    public function getInfo(){
+
+        if($this->coordinador){
+            $message="El profesor $this->nombre $this->apellidos (coordinador de la asignatura) puedes encontrarle en el despacho $this->despacho o puedes contactar
+            con el mediante su correo electrónico $this->email\n";
+        }else{
+            $message="El profesor $this->nombre $this->apellidos puedes encontrarle en el despacho $this->despacho o puedes contactar
+            con el mediante su correo electrónico $this->email\n";
+        }
+
+        
+
+        return $message;
+
+    }
 
 }
