@@ -19,21 +19,33 @@ class Teacher extends Model
     public $coordinador;
     public $tutorias = [];
 
-// {
-    // "nombre":"Maria Gloria",
-    // "apellidos":"Sanchez Torrubia",
-    // "email":"mariagloria.sanchez@upm.es",
-    // "despacho":"1318",
-    // "coordinador":false,
-    // "tutorias":[
-    // {
-    // "dia":null,
-    // "hora_inicio":null,
-    // "hora_fin":null,
-    // "observaciones":null
-    // }
-    // ]
-// },
+/*{
+    "nombre":"Victor",
+    "apellidos":"Gimenez Martinez",
+    "email":"victor.gimenez@upm.es",
+    "despacho":"1307",
+    "coordinador":false,
+    "tutorias":[
+        {
+        "dia":"1",
+        "hora_inicio":"13:00",
+        "hora_fin":"15:00",
+        "observaciones":null
+        },
+        {
+            "dia":"3",
+            "hora_inicio":"13:00",
+            "hora_fin":"15:00",
+            "observaciones":null
+        },
+        {
+            "dia":"4",
+            "hora_inicio":"13:00",
+            "hora_fin":"15:00",
+            "observaciones":null
+        }
+    ]
+},*/
 
     /**
      * @return array the validation rules.
@@ -41,8 +53,7 @@ class Teacher extends Model
     public function rules()
     {
         return [
-            [['nombre','apellidos','email'], 'string'],
-            ['despacho', 'integer'],
+            [['nombre','apellidos','email','despacho'], 'string'],
             ['coordinador', 'boolean'],
             ['tutorias', '??????'],
         ];
