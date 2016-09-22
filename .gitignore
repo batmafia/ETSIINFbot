@@ -35,3 +35,4 @@ etsiinfbot.key
 # All temporary files
 *~
 **/*~
+*.lock
