@@ -17,26 +17,12 @@ class Tutorial extends Model
     public $hora_fin;
     public $observaciones;
     /*{
-        "tutorias":[
-            {
-                "dia":"1",
-                "hora_inicio":"13:00",
-                "hora_fin":"15:00",
-                "observaciones":null
-            },
-            {
                 "dia":"3",
                 "hora_inicio":"13:00",
                 "hora_fin":"15:00",
                 "observaciones":null
             },
-            {
-                "dia":"4",
-                "hora_inicio":"13:00",
-                "hora_fin":"15:00",
-                "observaciones":null
-            }
-        ]
+
     },*/
 
     /**
@@ -45,9 +31,29 @@ class Tutorial extends Model
     public function rules()
     {
         return [
-            [['dia','hora_inicio','hora_fin','observaciones'], 'string'],
+            [['dia','hora_inicio','hora_fin'], 'string'],
+            ['observaciones','safe']
         ];
     }
 
+    public function getMessage()
+    {
+        $days = [
+            '1'     =>  'lunes',
+            '2'     =>  'martes',
+            '3'     =>  'miércoles',
+            '4'     =>  'jueves',
+            '5'     =>  'viernes'
+        ];
 
+        $dayOfWeek = $days[$this->dia];
+
+        $message = "Los $dayOfWeek de $this->hora_inicio a $this->hora_fin";
+
+        if($this->observaciones!==null){
+            $message.="\nObservaciones: $this->observaciones";
+        }
+
+        return $message;
+    }
 }
