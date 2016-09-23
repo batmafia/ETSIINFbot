@@ -107,12 +107,22 @@ class Subject extends Model
     {
         return [
             [['nombre','anio','semestre','guia','depto','plan','caracter','fecha_actualizacion'], 'string'],
-            ['profesores', 'validateProfesor'],
+            ['profesores', 'safe'],
             [['codigo','ects'], 'integer'],
         ];
     }
 
+    public function getBasicInfo(){
 
+        $numeroProfesores = count($this->profesores);
+
+        $message = "La asignatura *$this->nombre* pertenece al departamento de *$this->depto*, tiene un peso de *$this->ects 
+        ects* y tienes a *$numeroProfesores profesores* dispuestos a ayudarte. Selecciona mediante el teclado una opción.\n
+		(Información actualizada en $this->fecha_actualizacion).";
+
+        return $message;
+
+    }
 
 
 }
