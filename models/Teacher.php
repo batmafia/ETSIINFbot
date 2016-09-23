@@ -55,14 +55,8 @@ class Teacher extends Model
         return [
             [['nombre','apellidos','email','despacho'], 'string'],
             ['coordinador', 'boolean'],
-            ['tutorias', 'each', 'rule'=>['each', 'rule'=>['validateModels']]],
+            ['tutorias', 'safe'],
         ];
-    }
-
-
-    public function validateModels($attribute, $value)
-    {
-        return $this->{$attribute}->validate();
     }
 
 
@@ -76,10 +70,35 @@ class Teacher extends Model
             con el mediante su correo electrónico $this->email\n";
         }
 
-        
+        if (!empty($this->tutorias))
+        {
+            $message.="Las tutorias programadas son:\n";
+            foreach ($this->tutorias as $tutoria)
+            {
+                $message.= $tutoria->getMessage()."\n";
+            }
+        }
 
         return $message;
 
     }
 
+    public function setAttributes($values, $safeOnly = true)
+    {
+        parent::setAttributes($values, $safeOnly);
+
+        $tutorias = [];
+        foreach($this->tutorias as $i=>$t)
+        {
+            $tutorial = new Tutorial();
+            $tutorial->setAttributes($t);
+            if($tutorial->validate())
+            {
+                $tutorias[] = $tutorial;
+            }
+
+        }
+        $this->tutorias = $tutorias;
+
+    }
 }
