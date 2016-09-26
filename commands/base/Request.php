@@ -67,6 +67,12 @@ class Request
         return $this;
     }
 
+    public function caption($caption)
+    {
+        $this->data['caption'] = strlen($caption)>200 ? substr($caption, 0, 200) : $caption;
+        return $this;
+    }
+
     public function sendMessage($message)
     {
         $this->data['text'] = $message;
@@ -77,10 +83,9 @@ class Request
         return $result;
     }
 
-    public function sendPhoto($photoId, $caption='')
+    public function sendPhoto($photoId)
     {
         $this->data['photo'] = $photoId;
-        $this->data['caption'] = strlen($caption)>200 ? substr($caption, 0, 200) : $caption;
         $result = \Longman\TelegramBot\Request::sendPhoto($this->data);
 
         $this->data = [];
@@ -88,9 +93,8 @@ class Request
         return $result;
     }
 
-    public function sendDocument($file, $caption='')
+    public function sendDocument($file)
     {
-        $this->data['caption'] = strlen($caption)>200 ? substr($caption, 0, 200) : $caption;
         $result = \Longman\TelegramBot\Request::sendDocument($this->data, $file);
 
         $this->data = [];
