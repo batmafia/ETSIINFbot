@@ -8,7 +8,7 @@
 
 namespace app\models;
 use yii\base\Model;
-class MetroligeroStop extends Model
+class MetroligeroApiResponse extends Model
 {
     public $status;
     public $cached;
