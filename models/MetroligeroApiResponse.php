@@ -13,6 +13,9 @@ class MetroligeroApiResponse extends Model
     public $status;
     public $cached;
     public $data = [];
+
+    private $dataClass;
+
 /*{
     "status":"OK",
     "cached":true,
@@ -22,19 +25,23 @@ class MetroligeroApiResponse extends Model
         "second_stop":1474
     }
 }*/
+
+
+
     /**
      * @return array the validation rules.
      */
     public function rules()
     {
         return [
-            [['status','cached'], 'string'],
-            ['lines', 'each', 'rule'=>['each', 'rule'=>['validateModels']]],
+            ['status', 'string'],
+            ['cached','boolean'],
+            ['data', 'each', 'rule'=>'validateModel'],
         ];
     }
 
 
-    public function validateModels($attribute, $value)
+    public function validateModel($attribute, $value)
     {
         return $this->{$attribute}->validate();
     }
@@ -43,16 +50,12 @@ class MetroligeroApiResponse extends Model
     {
         parent::setAttributes($values, $safeOnly);
 
-        $busConnections = new BusConnections;
-        $busConnections->setAttributes($this->connectedStops);
-        $this->connectedStops = $busConnections;
-        $lines = [];
-        foreach($this->lines as $i=>$l)
-        {
-            $line = new BusLine;
-            $line->setAttributes($l);
-            $lines[$line->lineNumber][] = $line;
-        }
-        $this->lines = $lines;
+        $data = new $this->dataClass;
+        /** @var $data Model */
+        $data->setAttributes($this->data);
+
+        $this->data = $data;
+
+
     }
 }
