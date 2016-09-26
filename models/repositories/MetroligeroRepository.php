@@ -7,7 +7,7 @@
  */
 
 namespace app\models\repositories;
-use app\models\MetroligeroStop;
+use app\models\MetroligeroApiResponse;
 use Httpful\Mime;
 use Httpful\Request;
 use yii\base\Exception;
@@ -15,7 +15,7 @@ class MetroligeroRepository
 {
     /**
      * @param $busStopId
-     * @return MetroligeroStpo
+     * @return MetroligeroApiResponse
      */
     public static function getMetroligeroStop($origin,$destination)
     {
@@ -23,7 +23,7 @@ class MetroligeroRepository
             ->expects(Mime::JSON)->send();
         if(!$request->hasErrors())
         {
-            $metroligeroObj = new MetroligeroStop();
+            $metroligeroObj = new MetroligeroApiResponse();
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
             $metroligeroObj->setAttributes($data);
             if($metroligeroObj->validate())
