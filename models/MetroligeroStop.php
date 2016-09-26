@@ -10,9 +10,9 @@ namespace app\models;
 use yii\base\Model;
 class MetroligeroData extends Model
 {
-    public $date;
-    public $first_stop;
-    public $second_stop;
+    private $date;
+    private $first_stop;
+    private $second_stop;
 
 
     /*"date":"Fri, 23 Sep 2016 21:34:24 +0200",
@@ -28,13 +28,14 @@ class MetroligeroData extends Model
         ];
     }
 
-    public function getArrivals()
+    public function getFirstStopMinutes()
     {
-        $first_stop=round(($this->first_stop/60));
-        $second_stop=round(($this->second_stop/60));
+        return round(($this->first_stop/60));
+    }
 
-        return "Próximo tren llegará en $first_stop min.\n
-                Siguiente tren llegará en $second_stop min.";
+    public function getSecondStopMinutes()
+    {
+        return round(($this->second_stop/60));
     }
 }
 

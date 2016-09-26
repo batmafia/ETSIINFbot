@@ -8,6 +8,7 @@
 
 namespace app\models\repositories;
 use app\models\MetroligeroApiResponse;
+use app\models\MetroligeroStop;
 use Httpful\Mime;
 use Httpful\Request;
 use yii\base\Exception;
@@ -23,7 +24,8 @@ class MetroligeroRepository
             ->expects(Mime::JSON)->send();
         if(!$request->hasErrors())
         {
-            $metroligeroObj = new MetroligeroApiResponse();
+
+            $metroligeroObj = new MetroligeroApiResponse(["dataClass"=>MetroligeroStop::className()]);
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
             $metroligeroObj->setAttributes($data);
             if($metroligeroObj->validate())
