@@ -15,8 +15,8 @@ use yii\base\Exception;
 class MetroligeroRepository
 {
     /**
-     * @param $busStopId
-     * @return MetroligeroApiResponse
+     * @param $origin, destination
+     * @return MetroligeroStop
      */
     public static function getMetroligeroStop($origin,$destination)
     {
@@ -30,7 +30,7 @@ class MetroligeroRepository
             $metroligeroObj->setAttributes($data);
             if($metroligeroObj->validate())
             {
-                return $metroligeroObj;
+                return $metroligeroObj->data;
             }
             else
             {

@@ -8,11 +8,11 @@
 
 namespace app\models;
 use yii\base\Model;
-class MetroligeroData extends Model
+class MetroligeroStop extends Model
 {
-    private $date;
-    private $first_stop;
-    private $second_stop;
+    public $date;
+    public $first_stop;
+    public $second_stop;
 
 
     /*"date":"Fri, 23 Sep 2016 21:34:24 +0200",

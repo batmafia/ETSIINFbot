@@ -14,7 +14,7 @@ class MetroligeroApiResponse extends Model
     public $cached;
     public $data = [];
 
-    private $dataClass;
+    public $dataClass;
 
 /*{
     "status":"OK",
@@ -36,7 +36,7 @@ class MetroligeroApiResponse extends Model
         return [
             ['status', 'string'],
             ['cached','boolean'],
-            ['data', 'each', 'rule'=>'validateModel'],
+            ['data', 'validateModel'],
         ];
     }
 
