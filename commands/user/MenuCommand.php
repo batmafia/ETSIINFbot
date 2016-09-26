@@ -8,9 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Commands\User;
+namespace app\commands\user;
 
 use app\commands\base\BaseUserCommand;
+use app\models\repositories\MenuRepository;
 
 /**
  * User "/menu" command
