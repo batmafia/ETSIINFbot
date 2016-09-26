@@ -3,28 +3,24 @@
 namespace app\models\repositories;
 
 
+use Httpful\Request;
+use Sunra\PhpSimple\HtmlDomParser;
+
 class MenuRepository
 {
 
-    public static function updateLastMenu()
+    public static function getLastPdfLink()
     {
         $request = Request::get("http://www.fi.upm.es/?pagina=228")->send();
         if(!$request->hasErrors())
         {
-            $dom = SimpleHtmlDom::str_get_html($request->raw_body);
+            $dom = HtmlDomParser::str_get_html($request->raw_body);
             /** @var $dom \simple_html_dom */
             $elems = $dom->find("a.pdf");
-            $last = end($elems);
-            $url = "http://www.fi.upm.es/".$last->getAttribute("href");
+            $last = $elems[0];
 
-            $request2 = Request::get($url)->send();
-            $modified = strtotime($request2->headers->toArray()['last-modified']);
+            return "http://www.fi.upm.es/".$last->getAttribute("href");
         }
-    }
-
-    public static function getLastMenu()
-    {
-
     }
 
 }
