@@ -6,7 +6,7 @@
  * Time: 10:02
  */
 
-namespace app\commands\base;
+namespace Commands\Base;
 
 
 class Conversation extends \Longman\TelegramBot\Conversation
