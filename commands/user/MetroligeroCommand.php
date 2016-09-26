@@ -6,13 +6,13 @@
  * Time: 19:26
  */
 
-namespace Commands\User;
+namespace app\commands\user;
 use app\models\repositories\MetroligeroRepository;
-use Commands\Base\BaseUserCommand;
+use app\commands\base\BaseUserCommand;
 /**
  * User "/metroligero" command
  */
-class BusCommand extends BaseUserCommand
+class MetroligeroCommand extends BaseUserCommand
 {
     /**#@+
      * {@inheritdoc}
@@ -26,7 +26,7 @@ class BusCommand extends BaseUserCommand
     /**#@-*/
 
 
-    public function process_Location($text)
+    public function processLocation($text)
     {
         $opts = ['Colonia Jardín','Montepríncipe','Puerta Boadilla'];
         $cancel = ['Cancelar'];
@@ -52,7 +52,7 @@ class BusCommand extends BaseUserCommand
     }
 
 
-    public function process_Location2($text)
+    public function processLocation2($text)
     {
         $opts = ['Colonia Jardín','Puerta Boadilla'];
         $cancel = ['Cancelar'];
@@ -82,7 +82,7 @@ class BusCommand extends BaseUserCommand
     }
 
 
-    public function process_SendLineInfo()
+    public function processSendLineInfo()
     {
         $location1=$this->getConversation()->notes['location'];
 
@@ -108,7 +108,8 @@ class BusCommand extends BaseUserCommand
 
         $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
 
-        $outText=$llegadas;
+        $outText = "Primer tren en ".$llegadas->getFirstStopMinutes()." min\n".
+                    "Siguiente tren en ".$llegadas->getSecondStopMinutes()." min";
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
         $this->stopConversation();
