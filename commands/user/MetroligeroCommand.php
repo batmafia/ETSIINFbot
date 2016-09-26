@@ -57,7 +57,7 @@ class MetroligeroCommand extends BaseUserCommand
         $opts = ['Colonia Jardín','Puerta Boadilla'];
         $cancel = ['Cancelar'];
         $keyboard = [$opts,$cancel];
-        $titleKeyboard = '¿Hacia dónde te diriges?:';
+        $titleKeyboard = '¿Hacia dónde te diriges?';
         $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
         $this->getRequest()->keyboard($keyboard);
         if ($this->isProcessed() || empty($text))
@@ -106,10 +106,11 @@ class MetroligeroCommand extends BaseUserCommand
 
         }
 
-        $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
+        $metroIcon = "\xF0\x9F\x9A\x89"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
 
-        $outText = "Primer tren en ".$llegadas->getFirstStopMinutes()." min\n".
-                    "Siguiente tren en ".$llegadas->getSecondStopMinutes()." min";
+        $outText = "$metroIcon El primer tren llegará en *".$llegadas->getFirstStopMinutes()." min*".
+            " y el siguiente en *".$llegadas->getSecondStopMinutes()." min*.";
+
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
         $this->stopConversation();
