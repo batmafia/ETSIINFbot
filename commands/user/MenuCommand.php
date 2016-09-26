@@ -10,10 +10,10 @@
 
 namespace Commands\User;
 
-use Commands\Base\BaseUserCommand;
+use app\commands\base\BaseUserCommand;
 
 /**
- * User "/cafeteria" command
+ * User "/menu" command
  */
 class MenuCommand extends BaseUserCommand
 {
@@ -37,9 +37,7 @@ class MenuCommand extends BaseUserCommand
     public function processMenu()
     {
         $link = MenuRepository::getLastPdfLink();
-
-        $req = new Request(\Yii::$app->params['admins']['Fril']);
-        $req->sendDocument($link, 'Prueba');
+        $this->getRequest()->caption("Prueba")->sendDocument($link);
     }
 
 }
