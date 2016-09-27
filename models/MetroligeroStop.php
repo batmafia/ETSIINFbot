@@ -14,7 +14,6 @@ class MetroligeroStop extends Model
     public $first_stop;
     public $second_stop;
 
-
     /*"date":"Fri, 23 Sep 2016 21:34:24 +0200",
     "first_stop":695,
     "second_stop":1474*/
@@ -28,14 +27,28 @@ class MetroligeroStop extends Model
         ];
     }
 
+    private function getIntervalo(){
+
+        date_default_timezone_set('Europe/Madrid');
+
+        $datetime1 = new \DateTime($this->date);
+        $datetime2 = new \DateTime(date('r'));
+
+        $interval = date_diff($datetime2, $datetime1);
+        return $interval->format('%i');
+
+    }
+
     public function getFirstStopMinutes()
     {
-        return round(($this->first_stop/60));
+        $intervalo = $this->getIntervalo();
+        return round(($this->first_stop/60)-$intervalo);
     }
 
     public function getSecondStopMinutes()
     {
-        return round(($this->second_stop/60));
+        $intervalo = $this->getIntervalo();
+        return round(($this->second_stop/60)-$intervalo);
     }
 }
 

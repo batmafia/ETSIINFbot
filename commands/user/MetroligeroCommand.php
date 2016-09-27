@@ -112,11 +112,12 @@ class MetroligeroCommand extends BaseUserCommand
         $FirstWaitTime = $llegadas->getFirstStopMinutes();
         $SecondWaitTime = $llegadas->getSecondStopMinutes();
         if ($FirstWaitTime == 0) {
-            $outText .= "$metroIcon El primer tren *está llegando*";
+            $outText .= "$metroIcon El primer tren *está entrando en la estación*";
+            $outText .= " y el siguiente llegará en *".$SecondWaitTime." min*.";
         } else {
             $outText .= "$metroIcon El primer tren llegará en *".$FirstWaitTime." min*";
+            $outText .= " y el siguiente en *".$SecondWaitTime." min*.";
         }
-        $outText .= " y el siguiente en *".$SecondWaitTime." min*.";
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
         $this->stopConversation();
