@@ -60,7 +60,7 @@ class HelpCommand extends BaseUserCommand
                 $command = $commands[$command];
                 $text = 'Comando: ' . $command->getName() . ' v' . $command->getVersion() . "\n";
                 $text .= 'Descripción: ' . $command->getDescription() . "\n";
-                $text .= 'Usp: ' . $command->getUsage();
+                $text .= 'Uso: ' . $command->getUsage();
             } else {
                 $text = 'No hay ayuda disponible, el comando /' . $command . ' no ha sido encontrado.';
             }
