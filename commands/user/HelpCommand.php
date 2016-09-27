@@ -46,7 +46,9 @@ class HelpCommand extends BaseUserCommand
         //If no command parameter is passed, show the list
         if ($command === '') {
             $text = $this->telegram->getBotName() . ' v. ' . $this->telegram->getVersion() . "\n\n";
-            $text .= 'Lista de comandos:' . "\n";
+            $text .= "Bienvenido al bot de la escuela ". $this->message->getChat()->getFirstName() .
+                ", espero serte útil.\n\n";
+            $text .= 'Aquí tienes la lista de comandos:' . "\n";
             foreach ($commands as $command) {
                 $text .= '/' . $command->getName() . ' - ' . $command->getDescription() . "\n";
             }
