@@ -60,7 +60,7 @@ class WhoisCommand extends BaseAdminCommand
         }
 
         if ($text === '') {
-            $text = 'Provide the id to lookup: /whois <id>';
+            $text = 'Especifica el ID a buscar: /whois <id>';
         } else {
             $user_id = $text;
 

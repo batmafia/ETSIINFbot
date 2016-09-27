@@ -22,7 +22,7 @@ class SendtoallCommand extends BaseAdminCommand
      * {@inheritdoc}
      */
     protected $name = 'sendtoall';
-    protected $description = 'Envia el mensaje a todos los usuarios del bot,';
+    protected $description = 'Envia el mensaje a todos los usuarios del bot.';
     protected $usage = '/sendtoall <Mensaje a enviar>';
     protected $version = '1.2.1';
     protected $need_mysql = true;
