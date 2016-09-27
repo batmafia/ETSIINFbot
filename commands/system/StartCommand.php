@@ -22,7 +22,7 @@ class StartCommand extends BaseSystemCommand
      * {@inheritdoc}
      */
     protected $name = 'start';
-    protected $description = 'Start command';
+    protected $description = 'Comando de start';
     protected $usage = '/start';
     protected $version = '1.0.1';
     /**#@-*/
@@ -35,7 +35,8 @@ class StartCommand extends BaseSystemCommand
         $message = $this->getMessage();
 
         $chat_id = $message->getChat()->getId();
-        $text = 'Hi there!' . "\n" . 'Type /help to see all commands!';
+        $text = '¡Bienvenido al bot de la ETSIINF '.$message->getChat()->getFirstName()."!\n".
+            'Gracias por usarnos, para obtener la lista de los comandos disponibles escribe /help';
 
         $data = [
             'chat_id' => $chat_id,
