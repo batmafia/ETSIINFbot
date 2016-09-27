@@ -108,9 +108,15 @@ class MetroligeroCommand extends BaseUserCommand
 
         $metroIcon = "\xF0\x9F\x9A\x89"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
 
-        $outText = "$metroIcon El primer tren llegará en *".$llegadas->getFirstStopMinutes()." min*".
-            " y el siguiente en *".$llegadas->getSecondStopMinutes()." min*.";
-
+        $outText = "";
+        $FirstWaitTime = $llegadas->getFirstStopMinutes();
+        $SecondWaitTime = $llegadas->getSecondStopMinutes();
+        if ($FirstWaitTime == 0) {
+            $outText .= "$metroIcon El primer tren *está llegando*";
+        } else {
+            $outText .= "$metroIcon El primer tren llegará en *".$FirstWaitTime." min*";
+        }
+        $outText .= " y el siguiente en *".$SecondWaitTime." min*.";
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
         $this->stopConversation();
@@ -120,13 +126,18 @@ class MetroligeroCommand extends BaseUserCommand
 
     private function cancelConversation()
     {
-        $msgCancel = "Comando cancelado.";
+        $msgCancel = "*Comando cancelado.*";
         $msgThanks = "Gracias por usar ETSIINFbot.";
+        $msgHelp = "Más comandos en /help.";
         $heart = "\xE2\x9D\xA4"; // http://apps.timwhitlock.info/unicode/inspect/hex/2764
         $sign = "ETSIINFbot by Batmafia with".$heart.".";
-        $msgCancelConver = $msgCancel."\n".$msgThanks."\n".$sign;
-        $result = $this->getRequest()->hideKeyboard()->sendMessage($msgCancelConver);
+
+        #$msgCancelConver = $msgCancel."\n".$msgThanks."\n".$sign;
+        $msgCancelConver = $msgCancel."\n".$msgHelp;
+
+        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($msgCancelConver);
         $this->stopConversation();
         return $result;
     }
+
 }
