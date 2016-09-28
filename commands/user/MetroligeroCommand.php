@@ -14,7 +14,7 @@ use app\commands\base\BaseUserCommand;
  */
 class MetroligeroCommand extends BaseUserCommand
 {
-    /**#@+
+    /**
      * {@inheritdoc}
      */
     public $enabled = true;
@@ -23,25 +23,33 @@ class MetroligeroCommand extends BaseUserCommand
     protected $usage = '/metroligero';
     protected $version = '0.1.0';
     protected $need_mysql = true;
-    /**#@-*/
-
+    
+    
+    const COLONIA_JARDIN = 'Colonia Jardin';
+    const MONTEPRINCIPE = 'Montepríncipe';
+    const PUERTA_BOADILLA = 'Puerta Boadilla';
+    
+    private $stops = [
+        self::COLONIA_JARDIN => '201',
+        self::MONTEPRINCIPE => '353',
+        self::PUERTA_BOADILLA => '362'
+    ];
 
     public function processLocation($text)
     {
-        $opts = ['Colonia Jardín','Montepríncipe','Puerta Boadilla'];
-        $cancel = ['Cancelar'];
-        $keyboard = [$opts,$cancel];
-        $titleKeyboard = '¿Dónde te encuentras?';
-        $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
         $this->getConversation();
+        
+        $cancel = ['Cancelar'];
+        $keyboard = [array_keys($this->stops), $cancel];
+        
         $this->getRequest()->keyboard($keyboard);
         if ( $this->isProcessed() || empty($text) )
         {
-            return $this->getRequest()->sendMessage($titleKeyboard);
+            return $this->getRequest()->sendMessage('¿Dónde te encuentras?');
         }
-        if( !(in_array($text, $opts) || in_array($text, $cancel)) )
+        if( !(in_array($text, array_keys($this->stops)) || in_array($text, $cancel)) )
         {
-            return $this->getRequest()->sendMessage($msgErrorImputKeyboard);
+            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
         if (in_array($text, $cancel))
         {
@@ -54,16 +62,15 @@ class MetroligeroCommand extends BaseUserCommand
 
     public function processLocation2($text)
     {
-        $opts = ['Colonia Jardín','Puerta Boadilla'];
+        $opts = [self::COLONIA_JARDIN, self::PUERTA_BOADILLA];
         $cancel = ['Cancelar'];
-        $keyboard = [$opts,$cancel];
-        $titleKeyboard = '¿Hacia dónde te diriges?';
-        $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
+        $keyboard = [$opts, $cancel];
+        
         $this->getRequest()->keyboard($keyboard);
         if ($this->isProcessed() || empty($text))
         {
             if($this->getConversation()->notes['location']=="Montepríncipe"){
-                return $this->getRequest()->sendMessage($titleKeyboard);
+                return $this->getRequest()->sendMessage('¿Hacia dónde te diriges?');
             }else{
                 return $this->nextStep();
             }
@@ -71,7 +78,7 @@ class MetroligeroCommand extends BaseUserCommand
         }
         if( !(in_array($text, $opts) || in_array($text, $cancel)) )
         {
-            return $this->getRequest()->sendMessage($msgErrorImputKeyboard);
+            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
         if (in_array($text, $cancel))
         {
@@ -84,39 +91,27 @@ class MetroligeroCommand extends BaseUserCommand
 
     public function processSendLineInfo()
     {
-        $location1=$this->getConversation()->notes['location'];
-
+        $location1 = $this->getConversation()->notes['location'];
         if(empty($this->getConversation()->notes['location2']))
         {
-            if ($location1=="Colonia Jardín"){
-                $llegadas = MetroligeroRepository::getMetroligeroStop('201','353');
-            }else{
-                $llegadas = MetroligeroRepository::getMetroligeroStop('362','353');
-            }
-
-
-        }else{
-
-            $location2=$this->getConversation()->notes['location2'];
-            if($location2="Colonia Jardín"){
-                $llegadas = MetroligeroRepository::getMetroligeroStop('353','201');
-            }else{
-                $llegadas = MetroligeroRepository::getMetroligeroStop('353','362');
-            }
-
+            $llegadas = MetroligeroRepository::getMetroligeroStop($this->stops[$location1], $this->stops[self::MONTEPRINCIPE]);
+        }
+        else
+        {
+            $location2 = $this->getConversation()->notes['location2'];
+            $llegadas = MetroligeroRepository::getMetroligeroStop($this->stops[$location1], $this->stops[$location2]);
         }
 
         $metroIcon = "\xF0\x9F\x9A\x89"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
 
-        $outText = "";
         $FirstWaitTime = $llegadas->getFirstStopMinutes();
         $SecondWaitTime = $llegadas->getSecondStopMinutes();
         if ($FirstWaitTime == 0) {
-            $outText .= "$metroIcon El primer tren *está entrando en la estación*";
-            $outText .= " y el siguiente llegará en *".$SecondWaitTime." min*.";
+            $outText = "$metroIcon El primer tren *está entrando en la estación*"
+                     . " y el siguiente llegará en *".$SecondWaitTime." min*.";
         } else {
-            $outText .= "$metroIcon El primer tren llegará en *".$FirstWaitTime." min*";
-            $outText .= " y el siguiente en *".$SecondWaitTime." min*.";
+            $outText = "$metroIcon El primer tren llegará en *".$FirstWaitTime." min*"
+                     . " y el siguiente en *".$SecondWaitTime." min*.";
         }
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
@@ -128,12 +123,8 @@ class MetroligeroCommand extends BaseUserCommand
     private function cancelConversation()
     {
         $msgCancel = "*Comando cancelado.*";
-        $msgThanks = "Gracias por usar ETSIINFbot.";
         $msgHelp = "Más comandos en /help.";
-        $heart = "\xE2\x9D\xA4"; // http://apps.timwhitlock.info/unicode/inspect/hex/2764
-        $sign = "ETSIINFbot by Batmafia with".$heart.".";
 
-        #$msgCancelConver = $msgCancel."\n".$msgThanks."\n".$sign;
         $msgCancelConver = $msgCancel."\n".$msgHelp;
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($msgCancelConver);
