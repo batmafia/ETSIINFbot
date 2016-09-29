@@ -60,7 +60,7 @@ class MenuCommand extends BaseUserCommand
             if(!empty($menus))
             {
                 $cap = $menus[0]['caption'];
-                return $this->getRequest()->markdown()->sendMessage("⚠️ El menú disponible en la web de la cafetería es antiguo ( *$cap* ). Prueba más tarde.");
+                return $this->getRequest()->markdown()->sendMessage("⚠️ El menú disponible en la web de la cafetería es antiguo (*$cap*). Prueba más tarde.");
 
             }else{
                 return $this->getRequest()->markdown()->sendMessage("⚠️ *No se ha encontrado ningún menú* en la web de la cafetería. Prueba más tarde.");
