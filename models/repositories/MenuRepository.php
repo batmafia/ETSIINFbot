@@ -52,12 +52,10 @@ class MenuRepository
                 $menu = new MenuModel();
                 $menu->setAttributes([
                     'link'=>"http://www.fi.upm.es/".$elem->getAttribute("href"),
-                    'caption'=>$elem->innertext(),
+                    'caption'=>html_entity_decode($elem->innertext()),
                     'validFrom'=>strtotime($days[0]."-".$month."-".$year),
                     'validTo'=>strtotime($days[1]."-".$month."-".$year),
                 ]);
-
-                print_r($menu->getAttributes());
 
                 if($menu->validate())
                     $menus[] = $menu;

@@ -35,6 +35,12 @@ class Request
         return $this;
     }
 
+    public function markdown()
+    {
+        $this->data['parse_mode'] = 'Markdown';
+        return $this;
+    }
+
     public function locationKeyboard()
     {
         $this->data['reply_markup'] = new ReplyKeyboardMarkup([
