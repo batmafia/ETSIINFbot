@@ -39,8 +39,8 @@ class MenuCommand extends BaseUserCommand
     {
         date_default_timezone_set('Europe/Madrid');
         $menus = MenuRepository::getMenus();
-
         $selectedMenu = null;
+
         foreach ($menus as $key => $weekMenu)
         {
             if (time() < strtotime("+1 day",$weekMenu->validTo))
