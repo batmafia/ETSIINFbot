@@ -28,7 +28,6 @@ class BusStop extends Model
             [['connectedStops'], 'validateModels'],
             ['lines', 'each', 'rule'=>['each', 'rule'=>['validateModels']]],
             // stopNumber must be a int
-            ['stopNumber', 'integer'],
             [['connectedStops', 'notAvailableLines'], 'safe'],
         ];
     }

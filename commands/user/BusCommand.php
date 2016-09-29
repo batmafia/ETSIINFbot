@@ -24,7 +24,7 @@ class BusCommand extends BaseUserCommand
     public $enabled = true;
 
     protected $name = 'bus';
-    protected $description = 'Consulta los minutos que quedan para que salga el autobús.';
+    protected $description = 'Consulta el tiempo que queda para que salga el autobús.';
     protected $usage = '/bus';
     protected $version = '0.1.0';
     protected $need_mysql = true;
@@ -34,6 +34,8 @@ class BusCommand extends BaseUserCommand
     /**
      * Global Vars
      */
+    const ETSIINF = 'ETSIINF';
+    const MADRID = 'Madrid';
 
 
 
@@ -83,7 +85,7 @@ class BusCommand extends BaseUserCommand
     public function processSelectLocation($text)
     {
 
-        $opts = ['ETSIINF','Madrid'];
+        $opts = [self::ETSIINF,self::MADRID];
         $cancel = ['Cancelar'];
         $keyboard = [$opts,$cancel];
         $titleKeyboard = 'Selecciona donde te encuentras actualmente:';
@@ -178,57 +180,22 @@ class BusCommand extends BaseUserCommand
      * @param  [type] $location [description]
      * @return [type]           [description]
      */
-    private function getStopId($busline, $location)
+    private function getStopId($busLine, $location)
     {
-        $stopId = 'NaN';
-
-        switch ($location) {
-            case 'ETSIINF':
-                switch ($busline) {
-                    case '591':
-                        $stopId = '08411';
-                        break;
-                    case '865':
-                        $stopId = '17573';
-                        break;
-                    case '571':
-                        $stopId = '08771';
-                        break;
-                    case '573':
-                        $stopId = '08771';
-                        break;
-                    default:
-                        $stopId = 'NaN';
-                        break;
-                }
-                break;
-
-            case 'Madrid':
-                switch ($busline) {
-                    case '591':
-                        $stopId = '08380';
-                        break;
-                    case '865':
-                        $stopId = '08380';
-                        break;
-                    case '571':
-                        $stopId = '15782';
-                        break;
-                    case '573':
-                        $stopId = '11278';
-                        break;
-                    default:
-                        $stopId = 'NaN';
-                        break;
-                }
-                break;
-
-            default:
-                $stopId = 'NaN';
-                break;
-        }
-
-        return $stopId;
+        return [
+            self::ETSIINF => [
+                '591' => '08411',
+                '865' => '17573',
+                '571' => '08771',
+                '573' => '08771'
+            ],
+            self::MADRID => [
+                '591' => '08380',
+                '865' => '8-1684',
+                '571' => '15782',
+                '573' => '11278'
+            ]
+        ][$location][$busLine];
     }
 
 
