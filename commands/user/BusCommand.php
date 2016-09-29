@@ -132,7 +132,7 @@ class BusCommand extends BaseUserCommand
         }
         else
         {
-            $outText="$busIcon El bus *$lineId* saldrá de la parada *$stop->stopName*:\n";
+            $outText = "$busIcon El bus *$lineId* saldrá de la parada *$stop->stopName*:\n";
 
             foreach($stop->getLinesByNumber($lineId) as $line)
             {
@@ -145,21 +145,21 @@ class BusCommand extends BaseUserCommand
                         $msg .= "*En la parada*";
                         break;
                     case ($waitTimeMinutes  <= 60):
-                        $minStr = "minutos";
-                        if ($waitTimeMinutes == "1 ")
-                            $minStr = "minuto";
-                        $msg .= "*".$waitTimeMinutes." ".$minStr.".*";
+                        $msg .= "En *$waitTimeMinutes minuto";
+                        if($waitTimeMinutes > 1)
+                            $msg .= "s";
+                        $msg .= "*";
                         break;
                     case ($waitTimeMinutes > 60):
                         $hours = floor($waitTimeMinutes/60);
                         $mins = $waitTimeMinutes%60;
-                        $msg .= "A las *".$hours.":".$mins.".*";
+                        $msg .= "A las *$hours:$mins*";
                         break;
                     default:
-                        $msg .= $waitTimeMinutes."NO VALIDO";
+                        $msg .= "$waitTimeMinutes NO VALIDO";
                         break;
                 }
-                $outText .= " - ".$msg."\n";
+                $outText .= " - ".$msg.".\n";
             }
         }
 
