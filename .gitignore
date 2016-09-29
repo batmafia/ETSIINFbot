@@ -12,6 +12,9 @@ nbproject
 # windows thumbnail cache
 Thumbs.db
 
+# cache folder
+/cache
+
 # composer vendor dir
 /vendor
 
@@ -31,6 +34,9 @@ phpunit.phar
 etsiinfbot.pem
 etsiinfbot.key
 
+# individual auth for github access
+auth.json
+.htaccess
 
 # All temporary files
 *~
