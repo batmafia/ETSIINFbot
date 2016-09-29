@@ -40,29 +40,31 @@ class MenuCommand extends BaseUserCommand
         date_default_timezone_set('Europe/Madrid');
         $menus = MenuRepository::getMenus();
 
-        $selectedMenu = "none";
+        $selectedMenu = null;
         foreach ($menus as $key => $weekMenu)
         {
-            if (time() < strtotime("+1 day",$weekMenu['validTo']))
+            if (time() < strtotime("+1 day",$weekMenu->validTo))
             {
                 $selectedMenu=$key;
             }
         }
 
-        if($selectedMenu !== "none")
+        if($selectedMenu !== null)
         {
             $hbIcon = "\xF0\x9F\x8D\x94";
-            $cap = $menus[$selectedMenu]['caption'];
+            $cap = $menus[$selectedMenu]->caption;
             return $this->getRequest()->caption("$hbIcon $cap")->sendDocument($menus[$selectedMenu]->link);
 
-        }else
+        }
+        else
         {
             if(!empty($menus))
             {
-                $cap = $menus[0]['caption'];
+                $cap = $menus[0]->caption;
                 return $this->getRequest()->markdown()->sendMessage("⚠️ El menú disponible en la web de la cafetería es antiguo (*$cap*). Prueba más tarde.");
-
-            }else{
+            }
+            else
+            {
                 return $this->getRequest()->markdown()->sendMessage("⚠️ *No se ha encontrado ningún menú* en la web de la cafetería. Prueba más tarde.");
             }
         }
