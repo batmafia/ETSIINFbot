@@ -7,6 +7,7 @@
  */
 namespace app\models\repositories;
 
+use app\models\PlanSubject;
 use app\models\Subject;
 use Httpful\Mime;
 use Httpful\Request;
@@ -35,4 +36,39 @@ class SubjectRepository
         }
 
     }
+<<<<<<< cbbe332223efc2638c280ab96b39bb2fbf1dd202
+=======
+
+    public static function getSubjectsList($plan, $anio)
+    {
+        $request = Request::get
+        ("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/plan.json/$plan/asignaturas?anio=$anio")
+            ->expects(Mime::JSON)->send();
+        if (!$request->hasErrors()) {
+
+            $data = \GuzzleHttp\json_decode($request->raw_body, true);
+            $subjectsList=[];
+
+            foreach ($data as $subjCode => $subject)
+            {
+                $subject = new PlanSubject();
+                $subject->setAttributes($data);
+
+                if ($subject->validate()) {
+                    $subjectsList[]=$subject;
+                }
+                else
+                {
+                    print_r($subject->getErrors());
+                }
+
+            }
+
+            return $subjectsList;
+
+        } else {
+            throw new Exception("Repository exception");
+        }
+    }
+>>>>>>> Added Models for the second API.
 }
