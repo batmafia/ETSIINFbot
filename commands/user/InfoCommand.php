@@ -31,15 +31,35 @@ class InfoCommand extends BaseUserCommand
     {
         //TODO: Use actual $infoArray from repository
         $infoArray = [
-            'VPN' => 'Info de VPN',
             'Asociaciones' => [
                 'ACM'=>'Info de ACM',
                 'ASCFI'=>'Info de ASCFI'
             ],
-            'Horarios'=>'Info de horarios',
-            'Otros'=>[
-                'Yo que se'=>'Eso'
-            ]
+            'Asociaciones' => [
+                // https://www.fi.upm.es/?id=actividades/asociaciones
+                'ACM'=>'Info de ACM',
+                'Histrión'=>'Info de Histrión',
+                'ASCFI'=>'Info de ASCFI',
+                'Alfa - Omega'=>'Info de Alfa - Omega',
+                'CITFI'=>'Info de CITFI',
+                'Clib Deportivo'=>'Info de Club Deportivo',
+                'I.D.I.M.'=>'Info de I.D.I.M.',
+                'NERV'=>'Info de NERV',
+                'Tuna'=>'Tuna de Informática'
+            ],
+            'Secretaria' => [
+                'Lugar'=>'Lugar',
+                'Horario'=>'Horario',
+                'Teléfono'=>'Telefono',
+                'Correo'=>'Correo'
+            ],
+            'WIFI' => [
+                'FIWIFI'=>'FIWIFI',
+                'WIFIUPM'=>'WIFIUPM',
+                'eduroam'=>'eduroam'
+            ],
+            'VPN' => 'Info de VPN',
+            'FTP' => 'Info de FPT'
         ];
 
         $opts = $this->getCurrentOptions($infoArray);
