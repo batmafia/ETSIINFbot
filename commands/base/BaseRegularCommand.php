@@ -94,6 +94,15 @@ abstract class BaseRegularCommand extends BaseCommand
         return $this->conversation->notes['step_index'];
     }
 
+    public function cancelConversation()
+    {
+        $msgCancelConver = "*Comando cancelado.*\n".
+                            "Más comandos en /help.";
+
+        $this->stopConversation();
+        return $this->getRequest()->hideKeyboard()->markdown()->sendMessage($msgCancelConver);
+    }
+
     /**
      * @return Request
      */
