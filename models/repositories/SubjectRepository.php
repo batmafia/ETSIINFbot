@@ -7,6 +7,7 @@
  */
 namespace app\models\repositories;
 
+use app\models\PlanSubject;
 use app\models\Subject;
 use Httpful\Mime;
 use Httpful\Request;
@@ -42,15 +43,27 @@ class SubjectRepository
         ("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/plan.json/$plan/asignaturas?anio=$anio")
             ->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
-            $subjListObj = new SubjectList();
-            $data = \GuzzleHttp\json_decode($request->raw_body, true);
-            $subjListObj->setAttributes($data);
 
-            if ($subjListObj->validate()) {
-                return $subjListObj;
-            } else {
-                print_r($subjListObj->getErrors());
+            $data = \GuzzleHttp\json_decode($request->raw_body, true);
+            $subjectsList=[];
+
+            foreach ($data as $subjCode => $subject)
+            {
+                $subject = new PlanSubject();
+                $subject->setAttributes($data);
+
+                if ($subject->validate()) {
+                    $subjectsList[]=$subject;
+                }
+                else
+                {
+                    print_r($subject->getErrors());
+                }
+
             }
+
+            return $subjectsList;
+
         } else {
             throw new Exception("Repository exception");
         }
