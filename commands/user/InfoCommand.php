@@ -20,8 +20,7 @@ class InfoCommand extends BaseUserCommand
     protected $need_mysql = true;
     /**#@-*/
 
-
-    private $options;
+    const KEYBOARD_COLUMNS = 3;
 
     /**
      * [process_SelectLine description]
@@ -30,55 +29,66 @@ class InfoCommand extends BaseUserCommand
      */
     public function processOptions($text)
     {
+        //TODO: Use actual $infoArray from repository
+        $infoArray = [
+            'VPN' => 'Info de VPN',
+            'Asociaciones' => [
+                'ACM'=>'Info de ACM',
+                'ASCFI'=>'Info de ASCFI'
+            ],
+            'Horarios'=>'Info de horarios',
+            'Otros'=>[
+                'Yo que se'=>'Eso'
+            ]
+        ];
 
-        $opts = ['Asociaciones','Secretaria','WIFI','VPN','FTP'];
-        $cancel = ['Cancelar'];
-        $keyboard = [$opts,$cancel];
-        $titleKeyboard = 'Selecciona una opción';
-        $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
+        $opts = $this->getCurrentOptions($infoArray);
 
-        $this->getConversation();
-
-        $this->getRequest()->keyboard($keyboard);
-
-        if ( $this->isProcessed() || empty($text) )
+        if(!is_array($opts))
         {
-            return $this->getRequest()->sendMessage($titleKeyboard);
+            //We reached last level, send the info.
+            $this->stopConversation();
+            return $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($opts);
         }
-
-        if( !(in_array($text, $opts) || in_array($text, $cancel)) )
+        else
         {
-            return $this->getRequest()->sendMessage($msgErrorImputKeyboard);
-        }
+            $opts = array_keys($opts);
+            $cancel = ['Cancelar'];
+            $keyboard = array_chunk($opts, self::KEYBOARD_COLUMNS);
+            $keyboard[] = $cancel;
 
-        if (in_array($text, $cancel))
-        {
-            return $this->cancelConversation();
-        }
+            $this->getRequest()->keyboard($keyboard);
 
-        $this->options['opt'] = $text;
-        $outText = "";
-        // para llamar a alguna en cada caso
-        switch ($text) {
-            case $opts[0]:
-                $outText = $this->processAssciaciones();
-                break;
-            default:
-                break;
+            if (empty($text)) {
+                return $this->getRequest()->sendMessage('Selecciona una opción');
+            }
+
+            if (!(in_array($text, $opts) || in_array($text, $cancel))) {
+                return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
+            }
+
+            if (in_array($text, $cancel)) {
+                return $this->cancelConversation();
+            }
+
+            $this->getConversation()->notes['indexes'][] = $text;
+            return $this->processOptions(null);
         }
-        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
-        $this->stopConversation();
-        return $result;
     }
 
-
-
-    private function processAssciaciones()
+    private function getCurrentOptions($infoArray)
     {
-        $outText = "PRUEBA";
-        return $outText;
-    }
+        if(!isset($this->getConversation()->notes['indexes']))
+            $this->getConversation()->notes['indexes'] = [];
 
+        $opts = $infoArray;
+        foreach ($this->getConversation()->notes['indexes'] as $index)
+        {
+            $opts = $opts[$index];
+        }
+
+        return $opts;
+    }
 
     /**
      * [cancelConversation description]
