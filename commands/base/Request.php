@@ -78,7 +78,7 @@ class Request
         $this->data['text'] = $message;
         $result = \Longman\TelegramBot\Request::sendMessage($this->data);
 
-        $this->data = [];
+        $this->reset();
 
         return $result;
     }
@@ -89,9 +89,35 @@ class Request
         $this->data['caption'] = strlen($caption)>200 ? substr($caption, 0, 200) : $caption;
         $result = \Longman\TelegramBot\Request::sendPhoto($this->data);
 
-        $this->data = [];
+        $this->reset();
 
         return $result;
+    }
+
+    public const ACTION_TYPING = "typing";
+    public const ACTION_UPLOADING_PHOTO = 'upload_photo';
+    public const ACTION_RECORDING_VIDEO = 'record_video';
+    public const ACTION_UPLOADING_VIDEO = 'upload_video';
+    public const ACTION_RECORDING_AUDIO = 'record_audio';
+    public const ACTION_UPLOADING_AUDIO = 'upload_audio';
+    public const ACTION_UPLOADING_DOCUMENT = 'upload_document';
+    public const ACTION_FINDING_LOCATION = 'find_location';
+    public function sendAction($action)
+    {
+        $this->data['action'] = $action;
+        $result = \Longman\TelegramBot\Request::sendChatAction($this->data);
+
+        $this->reset();
+
+        return $result;
+    }
+
+    private function reset()
+    {
+        if(isset($this->data['chat_id']))
+            $this->data = ['chat_id'=>$this->data['chat_id']];
+        else
+            $this->data = [];
     }
 
 }
