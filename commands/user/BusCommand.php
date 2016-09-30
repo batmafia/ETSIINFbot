@@ -198,21 +198,4 @@ class BusCommand extends BaseUserCommand
         ][$location][$busLine];
     }
 
-
-    /**
-     * [cancelConversation description]
-     * @return [type] [description]
-     */
-    private function cancelConversation()
-    {
-        $msgCancel = "*Comando cancelado.*";
-        $msgHelp = "Más comandos en /help.";
-
-        $msgCancelConver = $msgCancel."\n".$msgHelp;
-
-        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($msgCancelConver);
-        $this->stopConversation();
-        return $result;
-    }
-
 }
