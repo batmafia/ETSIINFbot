@@ -31,8 +31,8 @@ class PlanSubject extends Model
     public function rules()
     {
         return [
-            [['codigo','nombre','nombre_ingles','curso','codigo_tipo_asignatura','nombre_tipo_asignatura','credects',], 'string'],
-            ['idiomas','each', 'string'],
+            [['codigo','nombre','nombre_ingles','curso','codigo_tipo_asignatura','nombre_tipo_asignatura','credects'], 'string'],
+            ['idiomas', 'each', 'string'],
             [['imparticion','departamentos'], 'each', 'rule'=>['validateModels']],
         ];
     }
