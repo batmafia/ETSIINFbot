@@ -32,7 +32,7 @@ class PlanSubject extends Model
     {
         return [
             [['codigo','nombre','nombre_ingles','curso','codigo_tipo_asignatura','nombre_tipo_asignatura','credects'], 'string'],
-            ['idiomas', 'each', 'string'],
+            ['idiomas', 'each', 'rule'=>['string']],
             [['imparticion','departamentos'], 'each', 'rule'=>['validateModels']],
         ];
     }
