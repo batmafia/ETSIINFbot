@@ -35,4 +35,24 @@ class SubjectRepository
         }
 
     }
+
+    public static function getSubjectsList($plan, $anio)
+    {
+        $request = Request::get
+        ("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/plan.json/$plan/asignaturas?anio=$anio")
+            ->expects(Mime::JSON)->send();
+        if (!$request->hasErrors()) {
+            $subjListObj = new SubjectList();
+            $data = \GuzzleHttp\json_decode($request->raw_body, true);
+            $subjListObj->setAttributes($data);
+
+            if ($subjListObj->validate()) {
+                return $subjListObj;
+            } else {
+                print_r($subjListObj->getErrors());
+            }
+        } else {
+            throw new Exception("Repository exception");
+        }
+    }
 }
