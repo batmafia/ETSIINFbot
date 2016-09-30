@@ -51,11 +51,11 @@ class SubjectRepository
 
             foreach ($data as $subjCode => $subject)
             {
-                $subject = new PlanSubject();
-                $subject->setAttributes($data);
+                $subject2 = new PlanSubject();
+                $subject2->setAttributes($subject);
 
-                if ($subject->validate()) {
-                    $subjectsList[]=$subject;
+                if ($subject2->validate()) {
+                    $subjectsList[]=$subject2;
                 }
                 else
                 {

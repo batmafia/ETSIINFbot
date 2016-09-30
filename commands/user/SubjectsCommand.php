@@ -28,12 +28,15 @@ class SubjectsCommand extends BaseUserCommand
     const ING_INF = 'GRADO EN INGENIERIA INFORMATICA';
     const ING_MATEINF = 'GRADO EN MATEMATICAS E INFORMATICA';
     const INF_DOBGRA = 'DOBLE GRADO EN INGENIERIA INFORMATICA Y EN ADE';
+    const UNKNOWN = 'Sin Especificar';
 
     private $planes = [
         self::ING_INF => '10II',
         self::ING_MATEINF => '10MI',
         self::INF_DOBGRA => '10ID'
     ];
+
+    public $ordenadas = [];
 
 
     public function processGetPlan($text)
@@ -62,37 +65,43 @@ class SubjectsCommand extends BaseUserCommand
 
 
 
-
-
-    public function processSelectCourse($text)
+    public function processShowCourse($text)
     {
         $selectedPlan = $this->getConversation()->notes['plan'];
-
-        // TODO: Obtain the $anio from other api.
         $subjectsOfPlan=SubjectRepository::getSubjectsList($this->planes[$selectedPlan],'201617');
 
-        $availableCourses=[];
-        foreach ($subjectsOfPlan as $subjectCod => $subject)
+
+
+        foreach($subjectsOfPlan as $s)
         {
-            if (!in_array($subject->curso,$availableCourses))
+            if ($s->curso !== "")
             {
-                $availableCourses[$subject->curso]=[];
+                $this->ordenadas[$s->curso][] = $s;
             }
-            $availableCourses[$subject->curso]=$subjectCod;
+            else
+            {
+                $this->ordenadas[self::UNKNOWN][] = $s;
+            }
+
         }
 
-        print_r($availableCourses);
-
+        // Courses for the keyboard.
+        $opts2 =[];
+        ksort($this->ordenadas);
+        foreach ($this->ordenadas as $key=>$k)
+        {
+            $opts2[]="$key";
+        }
 
         $cancel = ['Cancelar'];
-        $keyboard = [$availableCourses, $cancel];
+        $keyboard = [$opts2, $cancel];
 
         $this->getRequest()->keyboard($keyboard);
         if ($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->sendMessage('Selecciona el curso al cual pertenece la asignatura:');
         }
-        if( !(in_array($text, $availableCourses) || in_array($text, $cancel)) )
+        if( !(in_array($text, $opts2) || in_array($text, $cancel)) )
         {
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
@@ -106,30 +115,12 @@ class SubjectsCommand extends BaseUserCommand
         $this->stopConversation();
     }
 
-    public function processShowSubjects($text)
+    public function processShowSemesters($text)
     {
-        $this->getConversation();
+        $selectedCourse = $this->getConversation()->notes['course'];
 
+        // 
 
-
-        $cancel = ['Cancelar'];
-        $keyboard = [array_keys($this->planes), $cancel];
-
-        $this->getRequest()->keyboard($keyboard);
-        if ( $this->isProcessed() || empty($text) )
-        {
-            return $this->getRequest()->sendMessage('Selecciona tu plan de estudios:');
-        }
-        if( !(in_array($text, array_keys($this->planes)) || in_array($text, $cancel)) )
-        {
-            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
-        }
-        if (in_array($text, $cancel))
-        {
-            return $this->cancelConversation();
-        }
-        $this->getConversation()->notes['plan'] = $text;
-        return $this->nextStep();
     }
 
 
