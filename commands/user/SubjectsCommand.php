@@ -106,6 +106,32 @@ class SubjectsCommand extends BaseUserCommand
         $this->stopConversation();
     }
 
+    public function processShowSubjects($text)
+    {
+        $this->getConversation();
+
+
+
+        $cancel = ['Cancelar'];
+        $keyboard = [array_keys($this->planes), $cancel];
+
+        $this->getRequest()->keyboard($keyboard);
+        if ( $this->isProcessed() || empty($text) )
+        {
+            return $this->getRequest()->sendMessage('Selecciona tu plan de estudios:');
+        }
+        if( !(in_array($text, array_keys($this->planes)) || in_array($text, $cancel)) )
+        {
+            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
+        }
+        if (in_array($text, $cancel))
+        {
+            return $this->cancelConversation();
+        }
+        $this->getConversation()->notes['plan'] = $text;
+        return $this->nextStep();
+    }
+
 
 
     private function cancelConversation()

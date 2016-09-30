@@ -12,7 +12,7 @@ use yii\base\Model;
 
 class PlanImpartition extends Model
 {
-    public $coigo_duracion;
+    public $codigo_duracion;
     public $nombre_duracion;
     public $guia_pdf;
     public $guia_json;
@@ -32,7 +32,7 @@ class PlanImpartition extends Model
     public function rules()
     {
         return [
-            [['coigo_duracion','nombre_duracion','guia_pdf','guia_json'], 'string'],
+            [['codigo_duracion','nombre_duracion'], 'string'],
             [['guia_pdf','guia_json'],'url'],
             ['grupos_matricula', 'each', 'rule'=>['validateModels']],
         ];
