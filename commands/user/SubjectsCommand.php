@@ -37,6 +37,7 @@ class SubjectsCommand extends BaseUserCommand
     ];
 
     public $ordenadas = [];
+    public $porsemestre = [];
 
 
     public function processGetPlan($text)
@@ -70,8 +71,6 @@ class SubjectsCommand extends BaseUserCommand
         $selectedPlan = $this->getConversation()->notes['plan'];
         $subjectsOfPlan=SubjectRepository::getSubjectsList($this->planes[$selectedPlan],'201617');
 
-
-
         foreach($subjectsOfPlan as $s)
         {
             if ($s->curso !== "")
@@ -82,7 +81,6 @@ class SubjectsCommand extends BaseUserCommand
             {
                 $this->ordenadas[self::UNKNOWN][] = $s;
             }
-
         }
 
         // Courses for the keyboard.
@@ -112,16 +110,87 @@ class SubjectsCommand extends BaseUserCommand
 
         $this->getConversation()->notes['course'] = $text;
         return $this->nextStep();
-        $this->stopConversation();
     }
+
 
     public function processShowSemesters($text)
     {
         $selectedCourse = $this->getConversation()->notes['course'];
 
-        // 
+        foreach($this->ordenadas[$selectedCourse] as $sub){
+            foreach($sub->imparticion as $sem)
+            {
+                echo $sem->codigo_duracion."\n";
+                if ($sem->codigo_duracion !== "")
+                {
+                    $this->porsemestre[$sem->codigo_duracion][] = $sub;
+                }
+                else
+                {
+                    $this->porsemestre[self::UNKNOWN][] = $sub;
+                }
+            }
+        }
 
+        $opts3 =[];
+        ksort($this->porsemestre);
+        foreach ($this->porsemestre as $key=>$k)
+        {
+            $opts3[]="$key";
+        }
+
+        $cancel = ['Cancelar'];
+        $keyboard = [$opts3, $cancel];
+
+        $this->getRequest()->keyboard($keyboard);
+        if ($this->isProcessed() || empty($text))
+        {
+            return $this->getRequest()->sendMessage('Selecciona el semestre al cual pertenece la asignatura:');
+        }
+        if( !(in_array($text, $opts3) || in_array($text, $cancel)) )
+        {
+            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
+        }
+        if (in_array($text, $cancel))
+        {
+            return $this->cancelConversation();
+        }
+
+        $this->getConversation()->notes['semester'] = $text;
+        return $this->nextStep();
     }
+
+
+    public function processShowSubjects($text)
+    {
+        $selectedSemester= $this->getConversation()->notes['semester'];
+        foreach($this->porsemestre[$selectedSemester] as $subject){
+            echo $subject->nombre."\n";
+        }
+
+        $cancel = ['Cancelar'];
+        $keyboard = ['holi', $cancel];
+
+        $this->getRequest()->keyboard($keyboard);
+        if ($this->isProcessed() || empty($text))
+        {
+            return $this->getRequest()->sendMessage('Selecciona el semestre al cual pertenece la asignatura:');
+        }
+        if( !(in_array($text, 'holi') || in_array($text, $cancel)) )
+        {
+            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
+        }
+        if (in_array($text, $cancel))
+        {
+            return $this->cancelConversation();
+        }
+
+        $this->getConversation()->notes['subject'] = $text;
+        return $this->stopConversation();
+    }
+
+
+
 
 
 
