@@ -32,12 +32,16 @@ class InfoCommand extends BaseUserCommand
         //TODO: Use actual $infoArray from repository
         $infoArray = [
             'Asociaciones' => [
-                'ACM'=>'Info de ACM',
-                'ASCFI'=>'Info de ASCFI'
-            ],
-            'Asociaciones' => [
-                // https://www.fi.upm.es/?id=actividades/asociaciones
-                'ACM'=>'Info de ACM',
+                'Información ETSIINF'=>'https://www.fi.upm.es/?id=actividades/asociaciones',
+                'Información UPM'=>'http://www.upm.es/Estudiantes/Asociaciones',
+                'ACM' => [
+                    'Nombre'=>'ACM Capítulo de Estudiantes.',
+                    'Descripción'=>'Es una organización internacional científica y educativa dedicada a hacer progresar el arte, la ciencia, la ingeniería y las aplicaciones de la tecnología de la información, fomentando un intercambio abierto de información. A.C.M. agrupa a la práctica totalidad de la comunidad investigadora en el ámbito informático. Entre los propósitos de A.C.M. se encuentra promover el conocimiento de la ciencia, el diseño, la construcción del lenguaje y las aplicaciones de los ordenadores, proporcionando así un medio de comunicación e intercambio.',
+                    'Web'=>'http://acm.asoc.fi.upm.es/',
+                    'Correo'=>'acm@fi.upm.es',
+                    'Twitter'=>'@acmupm',
+                    'Telegram'=>'@acmupm'
+                ],
                 'Histrión'=>'Info de Histrión',
                 'ASCFI'=>'Info de ASCFI',
                 'Alfa - Omega'=>'Info de Alfa - Omega',
