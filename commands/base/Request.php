@@ -109,14 +109,14 @@ class Request
         return $result;
     }
 
-    public const ACTION_TYPING = "typing";
-    public const ACTION_UPLOADING_PHOTO = 'upload_photo';
-    public const ACTION_RECORDING_VIDEO = 'record_video';
-    public const ACTION_UPLOADING_VIDEO = 'upload_video';
-    public const ACTION_RECORDING_AUDIO = 'record_audio';
-    public const ACTION_UPLOADING_AUDIO = 'upload_audio';
-    public const ACTION_UPLOADING_DOCUMENT = 'upload_document';
-    public const ACTION_FINDING_LOCATION = 'find_location';
+    const ACTION_TYPING = "typing";
+    const ACTION_UPLOADING_PHOTO = 'upload_photo';
+    const ACTION_RECORDING_VIDEO = 'record_video';
+    const ACTION_UPLOADING_VIDEO = 'upload_video';
+    const ACTION_RECORDING_AUDIO = 'record_audio';
+    const ACTION_UPLOADING_AUDIO = 'upload_audio';
+    const ACTION_UPLOADING_DOCUMENT = 'upload_document';
+    const ACTION_FINDING_LOCATION = 'find_location';
     public function sendAction($action)
     {
         $this->data['action'] = $action;
