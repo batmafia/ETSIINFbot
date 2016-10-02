@@ -117,10 +117,12 @@ class SubjectsCommand extends BaseUserCommand
     {
         $selectedCourse = $this->getConversation()->notes['course'];
 
-        foreach($this->ordenadas[$selectedCourse] as $sub){
+        foreach($this->ordenadas[$selectedCourse] as $sub)
+        {
+
             foreach($sub->imparticion as $sem)
             {
-                echo $sem->codigo_duracion."\n";
+
                 if ($sem->codigo_duracion !== "")
                 {
                     $this->porsemestre[$sem->codigo_duracion][] = $sub;
@@ -129,6 +131,14 @@ class SubjectsCommand extends BaseUserCommand
                 {
                     $this->porsemestre[self::UNKNOWN][] = $sub;
                 }
+            }
+        }
+
+        foreach ($this->porsemestre as $k=>$value)
+        {
+            echo "\nAhora printeamos asignaturas del $k semestre:\n";
+            foreach ($value as $p){
+                echo $p->nombre."\n";
             }
         }
 
@@ -157,13 +167,15 @@ class SubjectsCommand extends BaseUserCommand
         }
 
         $this->getConversation()->notes['semester'] = $text;
+        echo $this->getConversation()->notes['semester'] = $text;
         return $this->nextStep();
     }
 
 
     public function processShowSubjects($text)
     {
-        $selectedSemester= $this->getConversation()->notes['semester'];
+        $selectedSemester = $this->getConversation()->notes['semester'];
+
         foreach($this->porsemestre[$selectedSemester] as $subject){
             echo $subject->nombre."\n";
         }
