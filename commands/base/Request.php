@@ -73,6 +73,12 @@ class Request
         return $this;
     }
 
+    public function caption($caption)
+    {
+        $this->data['caption'] = strlen($caption)>200 ? substr($caption, 0, 200) : $caption;
+        return $this;
+    }
+
     public function sendMessage($message)
     {
         $this->data['text'] = $message;
@@ -83,10 +89,9 @@ class Request
         return $result;
     }
 
-    public function sendPhoto($photoId, $caption='')
+    public function sendPhoto($photoId)
     {
         $this->data['photo'] = $photoId;
-        $this->data['caption'] = strlen($caption)>200 ? substr($caption, 0, 200) : $caption;
         $result = \Longman\TelegramBot\Request::sendPhoto($this->data);
 
         $this->reset();
@@ -94,14 +99,24 @@ class Request
         return $result;
     }
 
-    public const ACTION_TYPING = "typing";
-    public const ACTION_UPLOADING_PHOTO = 'upload_photo';
-    public const ACTION_RECORDING_VIDEO = 'record_video';
-    public const ACTION_UPLOADING_VIDEO = 'upload_video';
-    public const ACTION_RECORDING_AUDIO = 'record_audio';
-    public const ACTION_UPLOADING_AUDIO = 'upload_audio';
-    public const ACTION_UPLOADING_DOCUMENT = 'upload_document';
-    public const ACTION_FINDING_LOCATION = 'find_location';
+    public function sendDocument($file)
+    {
+        $result = \Longman\TelegramBot\Request::sendDocument($this->data, $file);
+
+        $this->data = [];
+        $this->reset();
+
+        return $result;
+    }
+
+    const ACTION_TYPING = "typing";
+    const ACTION_UPLOADING_PHOTO = 'upload_photo';
+    const ACTION_RECORDING_VIDEO = 'record_video';
+    const ACTION_UPLOADING_VIDEO = 'upload_video';
+    const ACTION_RECORDING_AUDIO = 'record_audio';
+    const ACTION_UPLOADING_AUDIO = 'upload_audio';
+    const ACTION_UPLOADING_DOCUMENT = 'upload_document';
+    const ACTION_FINDING_LOCATION = 'find_location';
     public function sendAction($action)
     {
         $this->data['action'] = $action;
