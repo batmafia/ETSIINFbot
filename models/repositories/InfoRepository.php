@@ -79,13 +79,11 @@ La Asociación se inspira fuertemente en el humanismo cristiano, de ahí tambié
 *Nombre*: Investigación y Desarrollo de la Informática Musical (I.D.I.M.).
 *Descripción*: Se centra sobre todo en la informática musical, aunque está abierta a todo tipo de música. Organizan diversos cursos de formación musical. Una de las principales metas es la formación de sus socios mediante cursos de muy diversos temas, suscripciones a importantes revistas de informática musical y concursos. Esta asociación dispone de un pequeño estudio de composición.
 *Web*: http://idim.asoc.fi.upm.es/',
-            'Club Deportivo' => '
-*Club Deportivo*
-*Nombre*: Club Deportivo.
-*Descripción*: Es uno de los diecinueve clubes de este tipo con que cuenta la U.P.M. y como tal participa en las competiciones organizadas por ésta. Participan en ligas por equipos de: baloncesto, voleibol, fútbol, fútbol sala, balonmano y rugby. Así mismo colabora con el área de deportes de la U.P.M. en la inscripción de participantes en competiciones individuales en deportes tan diversos como atletismo, natación, tenis, tiro con arco, squash, etc.
-*Web*: http://www.cdfim.com/
-*Correo*: cdfim@gmail.com
-*Twitter*: https://twitter.com/cdfim'
+            'A.E.T.O' => '
+*A.E.T.O*
+*Nombre*: Asociación de Estudiantes en Tiempo de Ocio
+*Correo*: aetoupm@gmail.com
+*Twitter*: https://twitter.com/AETOupm'
         ],
         'Secretaria' => [
             'Info' => '*Secretaría*
@@ -145,6 +143,23 @@ Los alumnos de la Facultad tienen la posibilidad de acceder a sus directorios de
             'Quejas y sugerencias' => 'https://www.fi.upm.es/?id=politicacalidad/quejasysugerencias'
 
         ],
+        'Delegación de Alumnos' => [
+            'Info' => '
+*Delegación de Alumnos*
+*Nombre*: Delegación de Alumnos.
+*Web*: https://www.da.etsiinf.upm.es
+*Web ETSIINF*: https://www.etsiinf.upm.es/?id=delegacion
+*Correo*: delegacion@da.fi.upm.es
+*Twitter*: https://twitter.com/daetsiinf',
+            'Mas cosas...' => 'Pues si cuando esta la web operativa' // @TODO
+        ],
+        'Club Deportivo' => '
+*Club Deportivo*
+*Nombre*: Club Deportivo.
+*Descripción*: Es uno de los diecinueve clubes de este tipo con que cuenta la U.P.M. y como tal participa en las competiciones organizadas por ésta. Participan en ligas por equipos de: baloncesto, voleibol, fútbol, fútbol sala, balonmano y rugby. Así mismo colabora con el área de deportes de la U.P.M. en la inscripción de participantes en competiciones individuales en deportes tan diversos como atletismo, natación, tenis, tiro con arco, squash, etc.
+*Web*: http://www.cdfim.com/
+*Correo*: cdfim@gmail.com
+*Twitter*: https://twitter.com/cdfim',
     ];
 
     /**
