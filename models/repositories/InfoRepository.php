@@ -35,7 +35,7 @@ Está abierta a todos los alumnos que tengan ganas de conocer gente nueva, apren
 *Correo*: acm@fi.upm.es
 *Twitter*: https://twitter.com/acmupm
 *Telegram*: @acmupm
-*Telegram Bot*: acmupm\\_bot',  // to skip _ -> \_ -> to skip \ -> \\_
+*Telegram Bot*: @acmupm\\_bot',  // to skip _ -> \_ -> to skip \ -> \\_
             'Histrión' => '
 *Histrión*
 *Nombre*: Agrupación de Teatro Histrión.
