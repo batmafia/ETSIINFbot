@@ -4,7 +4,7 @@ namespace app\commands\user;
 use app\commands\base\BaseUserCommand;
 
 /**
- * User "/bus" command
+ * User "/info" command
  */
 class InfoCommand extends BaseUserCommand
 {
