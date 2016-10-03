@@ -34,8 +34,8 @@ Está abierta a todos los alumnos que tengan ganas de conocer gente nueva, apren
 *Web*: http://acm.asoc.etsiinf.upm.es/
 *Correo*: acm@fi.upm.es
 *Twitter*: https://twitter.com/acmupm
-*Telegram*: @acmupm',
-//@ERROR *Telegram Bot*: acmupm_bot',
+*Telegram*: @acmupm
+*Telegram Bot*: acmupm_bot',  // to skip _ -> \_ -> to skip \ -> \\_
             'Histrión' => '
 *Histrión*
 *Nombre*: Agrupación de Teatro Histrión.
@@ -72,8 +72,8 @@ Emite 24 horas al día, durante todo el año, desde la propia ETSI Informáticos
 Por eso desde la Asociación Alfa-Omega intentamos complementar la formación recibida mediante actividades: charlas, vídeos, visitas culturales...
 La Asociación se inspira fuertemente en el humanismo cristiano, de ahí también las actividades religiosas que llevamos a cabo. No obstante la Asociación está abierta a todos los estudiantes, independientemente de sus creencias e ideologías.
 *Web*: http://www.alumnos.fi.upm.es/~alfaomega/
-*Correo*: alfaomega@alumnos.fi.upm.es',
-//@ERROR *Twitter*: https://twitter.com/AyO_FI',
+*Correo*: alfaomega@alumnos.fi.upm.es
+*Twitter*: https://twitter.com/AyO\\_FI', // to skip _ -> \_ -> to skip \ -> \\_
             'I.D.I.M.' => '
 *I.D.I.M.*
 *Nombre*: Investigación y Desarrollo de la Informática Musical (I.D.I.M.).
@@ -93,8 +93,8 @@ La Sección de Gestión Administrativa gestiona los trámites relacionados con l
 *Horario*: Mañanas: Lunes a Viernes: 9:00 - 14:00\nTardes: Lunes y Miercoles 15:30 - 17:30
 *Teléfono*: +34913367407
 *Correo*: secretaria@fi.upm.es
-*Trámites administrativos*: https://www.etsiinf.upm.es/?id=servicios/tramites',
-//@ERROR *Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195_Triptico_Secretaria_Alumnos.pdf',
+*Trámites administrativos*: https://www.etsiinf.upm.es/?id=servicios/tramites
+*Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195_Triptico_Secretaria_Alumnos.pdf',  // to skip _ -> \_ -> to skip \ -> \\_
             // https://www.etsiinf.upm.es/?id=servicios/tramites
             'Trámites' => 'https://www.etsiinf.upm.es/?id=servicios/tramites'
             // 'Trámites' => [
