@@ -74,13 +74,6 @@ La Asociación se inspira fuertemente en el humanismo cristiano, de ahí tambié
 *Web*: http://www.alumnos.fi.upm.es/~alfaomega/
 *Correo*: alfaomega@alumnos.fi.upm.es',
 //@ERROR *Twitter*: https://twitter.com/AyO_FI',
-            'C.I.T.F.I.' => '
-*C.I.T.F.I.*
-*Nombre*: Club de Informática y Telemática (C.I.T.F.I.).
-*Descripción*: Es una asociación abierta a todos los alumnos de la ETSI Informáticos que quieran realizar actividades complementarias al plan de estudios: cómo utilizar linux, hacer páginas web, topología de redes, seguridad electrónica, campeonatos de juegos en primera persona, y actividades en esta línea.
-*Web*: http://citfi.asoc.fi.upm.es/
-*Correo*: citfi@alumnos.fi.upm.es
-*Twitter*: https://twitter.com/citfi',
             'I.D.I.M.' => '
 *I.D.I.M.*
 *Nombre*: Investigación y Desarrollo de la Informática Musical (I.D.I.M.).
