@@ -35,7 +35,7 @@ Está abierta a todos los alumnos que tengan ganas de conocer gente nueva, apren
 *Correo*: acm@fi.upm.es
 *Twitter*: https://twitter.com/acmupm
 *Telegram*: @acmupm
-*Telegram Bot*: acmupm_bot',  // to skip _ -> \_ -> to skip \ -> \\_
+*Telegram Bot*: acmupm\\_bot',  // to skip _ -> \_ -> to skip \ -> \\_
             'Histrión' => '
 *Histrión*
 *Nombre*: Agrupación de Teatro Histrión.
@@ -94,7 +94,7 @@ La Sección de Gestión Administrativa gestiona los trámites relacionados con l
 *Teléfono*: +34913367407
 *Correo*: secretaria@fi.upm.es
 *Trámites administrativos*: https://www.etsiinf.upm.es/?id=servicios/tramites
-*Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195_Triptico_Secretaria_Alumnos.pdf',  // to skip _ -> \_ -> to skip \ -> \\_
+*Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195_Triptico_Secretaria\\_Alumnos.pdf',  // to skip _ -> \_ -> to skip \ -> \\_
             // https://www.etsiinf.upm.es/?id=servicios/tramites
             'Trámites' => 'https://www.etsiinf.upm.es/?id=servicios/tramites'
             // 'Trámites' => [
