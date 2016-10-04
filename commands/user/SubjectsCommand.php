@@ -307,7 +307,11 @@ class SubjectsCommand extends BaseUserCommand
         $extraInfo = $this->getConversation()->notes['extrainfo'];
 
         $subject=SubjectRepository::getSubject($selectedPlan,$selectedSubject,$selectedSemester,"2016-17");
+        $numProfesores = count($subject->profesores);
+        $profesoresKB = [];
+
         $mensaje ="";
+        $cancel = ['Cancelar'];
 
         if ($this->isProcessed() || empty($text))
         {
@@ -316,25 +320,93 @@ class SubjectsCommand extends BaseUserCommand
                 // TODO: Mirar el error SSL.
                 //$cap = "Aquí te enviamos la guia docente de $subject->nombre";
                 //$this->getRequest()->caption("$cap")->sendDocument($subject->guia);
-                $this->getRequest()->hideKeyboard()->markdown()->sendMessage("Aquí tienes la guia docente de *$subject->nombre:*\n$subject->guia");
+                $this->getRequest()->hideKeyboard()->sendMessage("Aquí tienes la guia docente de $subject->nombre\n$subject->guia");
                 return $this->stopConversation();
 
 
             } else if ($extraInfo == self::PROFESORES){
 
+                if ($numProfesores!==0){
+                    $mensaje = "Los siguientes profesores pueden ayudarte con $subject->nombre:\n\n";
+                    foreach ($subject->profesores as $profesor){
+                        if($profesor->coordinador == true){
+                            $mensaje.= "- *$profesor->nombre $profesor->apellidos* (coordinador)\n";
+                        }else{
+                            $mensaje.= "- *$profesor->nombre $profesor->apellidos*\n";
+                        }
 
-                foreach ($subject->profesores as $profesor){
-                    echo array_keys($subject->profesores);
+                        $profesoresKB[] = "$profesor->nombre $profesor->apellidos";
+
+                    }
+                    $mensaje .= "\n¿De qué profesor deseas obtener más información?";
                 }
 
-                $this->getRequest()->markdown()->hideKeyboard()->sendMessage("Texto en pruebas. Comando no disponible aun.");
-                return $this->stopConversation();
 
+                $keyboard = [$profesoresKB, $cancel];
+                $this->getRequest()->keyboard($keyboard);
+
+            }
+
+            $this->getRequest()->markdown()->sendMessage($mensaje);
+
+        }
+        if( !(in_array($text, $profesoresKB) || in_array($text, $cancel)) )
+        {
+            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
+        }
+        if (in_array($text, $cancel))
+        {
+            return $this->cancelConversation();
+        }
+
+
+        $this->getConversation()->notes['teacher'] = $text;
+        return $this->nextStep();
+
+
+    }
+
+
+    public function processShowTeacherInfo($text)
+    {
+
+        $selectedSemester = $this->getConversation()->notes['semester'];
+        $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
+        $selectedSubject = $this->getConversation()->notes['subject'];
+        $selectedTeacher = $this->getConversation()->notes['teacher'];
+
+        $subject=SubjectRepository::getSubject($selectedPlan,$selectedSubject,$selectedSemester,"2016-17");
+
+        if ($this->isProcessed() || empty($text))
+        {
+            foreach ($subject->profesores as $profesor){
+                if(("$profesor->nombre $profesor->apellidos")==$selectedTeacher){
+
+                    $mensaje = "El profesor $profesor->nombre $profesor->apellidos te puede atender ".
+                    "en su despacho $profesor->despacho o bien mediante email en la dirección ".
+                    "$profesor->email.";
+
+                    if (count($profesor->tutorias !== 0)){
+                        $mensaje .= "Sus horarios de tutorias son:\n";
+                        foreach ($profesor->tutorias as $tutoria){
+                            $mensaje .=$tutoria.getTutoriaMessage()."\n";
+                        }
+                    }
+
+
+                    $this->getRequest()->hideKeyboard()->sendMessage($mensaje);
+                    return $this->stopConversation();
+
+                }
             }
 
         }
 
+
+
         return $this->stopConversation();
     }
+
+
 
 }

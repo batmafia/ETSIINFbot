@@ -36,7 +36,7 @@ class Tutorial extends Model
         ];
     }
 
-    public function getMessage()
+    public function getTutoriaMessage()
     {
         $days = [
             '1'     =>  'lunes',
