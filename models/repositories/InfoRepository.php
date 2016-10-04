@@ -89,7 +89,7 @@ La Asociación se inspira fuertemente en el humanismo cristiano, de ahí tambié
             'Info' => '*Secretaría*
 La Sección de Gestión Administrativa gestiona los trámites relacionados con los expedientes de alumnos de Ingenieria, Grado, Máster y Doctorado, así como el Registro de la Escuela.
 *Web*: https://www.etsiinf.upm.es/?id=servicios/secretaria
-*Lugar*: Bloque 3, planta baja
+*Lugar*: Bloque 3, planta 1
 *Horario*: Mañanas: Lunes a Viernes: 9:00 - 14:00\nTardes: Lunes y Miercoles 15:30 - 17:30
 *Teléfono*: +34913367407
 *Correo*: secretaria@fi.upm.es
@@ -143,6 +143,13 @@ Los alumnos de la Facultad tienen la posibilidad de acceder a sus directorios de
             'Quejas y sugerencias' => 'https://www.fi.upm.es/?id=politicacalidad/quejasysugerencias'
 
         ],
+        'Biblioteca ETSIINF' => '
+*Biblioteca ETSIINF*
+*Lugar*: Bloque 3 planta 0
+*Lugar futuro*: Bloque 1 planta 2
+*Web*: http://www.fi.upm.es/?pagina=24
+*Correo*: biblioteca.etsiinf@upm.es
+*Twitter*: https://twitter.com/BibliotecaFIUPM',
         'Delegación de Alumnos' => [
             'Info' => '
 *Delegación de Alumnos*
@@ -151,7 +158,7 @@ Los alumnos de la Facultad tienen la posibilidad de acceder a sus directorios de
 *Web ETSIINF*: https://www.etsiinf.upm.es/?id=delegacion
 *Correo*: delegacion@da.fi.upm.es
 *Twitter*: https://twitter.com/daetsiinf',
-            'Mas cosas...' => 'Pues si cuando esta la web operativa' // @TODO
+            'Mas cosas...' => 'https://www.da.etsiinf.upm.es/ cuando @javier levane el server XD' // @TODO
         ],
         'Club Deportivo' => '
 *Club Deportivo*
