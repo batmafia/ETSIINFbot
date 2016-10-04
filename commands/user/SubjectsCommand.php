@@ -313,17 +313,21 @@ class SubjectsCommand extends BaseUserCommand
         {
             if ($extraInfo == self::GUIA_DOCENTE){
 
-                $cap = "Aquí te enviamos la guia docente de $subject->nombre";
-                $this->getRequest()->caption("$cap")->sendDocument($subject->guia);
+                // TODO: Mirar el error SSL.
+                //$cap = "Aquí te enviamos la guia docente de $subject->nombre";
+                //$this->getRequest()->caption("$cap")->sendDocument($subject->guia);
+                $this->getRequest()->hideKeyboard()->markdown()->sendMessage("Aquí tienes la guia docente de *$subject->nombre:*\n$subject->guia");
                 return $this->stopConversation();
 
 
             } else if ($extraInfo == self::PROFESORES){
 
+
                 foreach ($subject->profesores as $profesor){
-                    $mensaje .= "$profesor->nombre "."$profesor->apellido\n";
+                    echo array_keys($subject->profesores);
                 }
-                $this->getRequest()->markdown()->sendMessage($mensaje);
+
+                $this->getRequest()->markdown()->hideKeyboard()->sendMessage("Texto en pruebas. Comando no disponible aun.");
                 return $this->stopConversation();
 
             }
@@ -333,19 +337,4 @@ class SubjectsCommand extends BaseUserCommand
         return $this->stopConversation();
     }
 
-
-
-
-
-
-
-    private function cancelConversation()
-    {
-        $msgCancel = "*Comando cancelado.*";
-        $msgHelp = "Más comandos en /help.";
-        $msgCancelConver = $msgCancel."\n".$msgHelp;
-        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($msgCancelConver);
-        $this->stopConversation();
-        return $result;
-    }
 }

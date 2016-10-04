@@ -60,29 +60,6 @@ class Teacher extends Model
     }
 
 
-    public function getInfo(){
-
-        if($this->coordinador){
-            $message="El profesor $this->nombre $this->apellidos (coordinador de la asignatura) puedes encontrarle en el despacho $this->despacho o puedes contactar
-            con el mediante su correo electrónico $this->email\n";
-        }else{
-            $message="El profesor $this->nombre $this->apellidos puedes encontrarle en el despacho $this->despacho o puedes contactar
-            con el mediante su correo electrónico $this->email\n";
-        }
-
-        if (!empty($this->tutorias))
-        {
-            $message.="Las tutorias programadas son:\n";
-            foreach ($this->tutorias as $tutoria)
-            {
-                $message.= $tutoria->getMessage()."\n";
-            }
-        }
-
-        return $message;
-
-    }
-
     public function setAttributes($values, $safeOnly = true)
     {
         parent::setAttributes($values, $safeOnly);
