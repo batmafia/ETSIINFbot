@@ -36,8 +36,7 @@ class SubjectRepository
         }
 
     }
-<<<<<<< cbbe332223efc2638c280ab96b39bb2fbf1dd202
-=======
+
 
     public static function getSubjectsList($plan, $anio)
     {
@@ -70,5 +69,5 @@ class SubjectRepository
             throw new Exception("Repository exception");
         }
     }
->>>>>>> Added Models for the second API.
+
 }
