@@ -48,7 +48,7 @@ class Tutorial extends Model
 
         $dayOfWeek = $days[$this->dia];
 
-        $message = "Los $dayOfWeek de $this->hora_inicio a $this->hora_fin";
+        $message = "Los *$dayOfWeek* de *$this->hora_inicio* a *$this->hora_fin*";
 
         if($this->observaciones!==null){
             $message.="\nObservaciones: $this->observaciones";

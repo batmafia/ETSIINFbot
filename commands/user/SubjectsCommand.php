@@ -307,12 +307,6 @@ class SubjectsCommand extends BaseUserCommand
         $extraInfo = $this->getConversation()->notes['extrainfo'];
 
         $subject=SubjectRepository::getSubject($selectedPlan,$selectedSubject,$selectedSemester,"2016-17");
-        $numProfesores = count($subject->profesores);
-        $profesoresKB = [];
-
-        $mensaje ="";
-        $cancel = ['Cancelar'];
-
         if ($this->isProcessed() || empty($text))
         {
             if ($extraInfo == self::GUIA_DOCENTE){
@@ -326,29 +320,47 @@ class SubjectsCommand extends BaseUserCommand
 
             } else if ($extraInfo == self::PROFESORES){
 
-                if ($numProfesores!==0){
-                    $mensaje = "Los siguientes profesores pueden ayudarte con $subject->nombre:\n\n";
-                    foreach ($subject->profesores as $profesor){
-                        if($profesor->coordinador == true){
-                            $mensaje.= "- *$profesor->nombre $profesor->apellidos* (coordinador)\n";
-                        }else{
-                            $mensaje.= "- *$profesor->nombre $profesor->apellidos*\n";
-                        }
-
-                        $profesoresKB[] = "$profesor->nombre $profesor->apellidos";
-
-                    }
-                    $mensaje .= "\n¿De qué profesor deseas obtener más información?";
-                }
-
-
-                $keyboard = [$profesoresKB, $cancel];
-                $this->getRequest()->keyboard($keyboard);
-
+                return $this->nextStep();
             }
 
-            $this->getRequest()->markdown()->sendMessage($mensaje);
+        }
 
+    }
+
+    public function processGetTeacher($text){
+
+        $selectedSemester = $this->getConversation()->notes['semester'];
+        $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
+        $selectedSubject = $this->getConversation()->notes['subject'];
+        $subject=SubjectRepository::getSubject($selectedPlan,$selectedSubject,$selectedSemester,"2016-17");
+
+        $numProfesores = count($subject->profesores);
+        $profesoresKB = [];
+
+        if ($numProfesores!==0){
+            $mensaje = "Los siguientes profesores pueden ayudarte con $subject->nombre:\n\n";
+            foreach ($subject->profesores as $profesor){
+                if($profesor->coordinador == true){
+                    $mensaje.= "- *$profesor->nombre $profesor->apellidos* (coordinador)\n";
+                }else{
+                    $mensaje.= "- *$profesor->nombre $profesor->apellidos*\n";
+                }
+
+                $profesoresKB[] = "$profesor->nombre $profesor->apellidos";
+
+            }
+            $mensaje .= "\n¿De qué profesor deseas obtener más información?";
+        }else{
+            $mensaje = "No hay ningún profesor asignado.";
+        }
+
+        $cancel = ['Cancelar'];
+        $keyboard = [$profesoresKB, $cancel];
+        $this->getRequest()->keyboard($keyboard);
+
+        if ($this->isProcessed() || empty($text))
+        {
+            $this->getRequest()->markdown()->sendMessage($mensaje);
         }
         if( !(in_array($text, $profesoresKB) || in_array($text, $cancel)) )
         {
@@ -359,10 +371,8 @@ class SubjectsCommand extends BaseUserCommand
             return $this->cancelConversation();
         }
 
-
         $this->getConversation()->notes['teacher'] = $text;
         return $this->nextStep();
-
 
     }
 
@@ -382,19 +392,19 @@ class SubjectsCommand extends BaseUserCommand
             foreach ($subject->profesores as $profesor){
                 if(("$profesor->nombre $profesor->apellidos")==$selectedTeacher){
 
-                    $mensaje = "El profesor $profesor->nombre $profesor->apellidos te puede atender ".
-                    "en su despacho $profesor->despacho o bien mediante email en la dirección ".
-                    "$profesor->email.";
+                    $mensaje = "El profesor *$profesor->nombre $profesor->apellidos* te puede atender personalmente ".
+                    "en su despacho *$profesor->despacho* o bien vía email en la dirección ".
+                    "$profesor->email .\n";
 
                     if (count($profesor->tutorias !== 0)){
                         $mensaje .= "Sus horarios de tutorias son:\n";
                         foreach ($profesor->tutorias as $tutoria){
-                            $mensaje .=$tutoria.getTutoriaMessage()."\n";
+                            $mensaje .=$tutoria->getTutoriaMessage()."\n";
                         }
                     }
 
 
-                    $this->getRequest()->hideKeyboard()->sendMessage($mensaje);
+                    $this->getRequest()->hideKeyboard()->markdown()->sendMessage($mensaje);
                     return $this->stopConversation();
 
                 }
