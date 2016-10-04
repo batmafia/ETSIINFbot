@@ -115,15 +115,17 @@ Una vez que vea esta página ya puede pedir a su navegador las páginas que dese
 
 *Más información*: https://www.fi.upm.es/?pagina=262',
                 'WIFIUPM' => '
-...
+Poner tu correo institucional (...@alumnos.upm.es) y su clave.
 
 *Más información*: http://www.upm.es/UPM/InformaticaComunicaciones/wifi?id=7dc338900c392410VgnVCM10000009c7648a____&fmt=detail&prefmt=articulo',
                 'eduroam' => '
-...
+Poner tu correo institucional (...@alumnos.upm.es) y su clave.
 
 *Más información*: http://www.upm.es/UPM/InformaticaComunicaciones/wifi?id=e83fe60106778110VgnVCM10000009c7648a____&fmt=detail&prefmt=articulo'
             ],
             'VPN' => '
+*NOTA*: si tienes MacOS http://www.jpromero.com/2016/05/configuracion-vpn-etsiinf-upm.html
+
 *Tipo de conexión*: Point-to-Point Tunnelling Protocol (PPTP)
 *Pasarela o Gateway*: otilio.fi.upm.es si se conecta desde fuera de la facultad;10.10.1.2 si se conecta desde la red de portatiles o FIWIFI
 *Usuario o User Name*: usuario de la facultad que se proporciona en el centro de cálculo y que coincide con el número de matricula.
@@ -141,7 +143,6 @@ Los alumnos de la Facultad tienen la posibilidad de acceder a sus directorios de
 *Más información*: https://www.fi.upm.es/?pagina=372',
             'Seguridad informática' => 'https://www.fi.upm.es/?id=seguridad',
             'Quejas y sugerencias' => 'https://www.fi.upm.es/?id=politicacalidad/quejasysugerencias'
-
         ],
         'Biblioteca ETSIINF' => '
 *Biblioteca ETSIINF*
