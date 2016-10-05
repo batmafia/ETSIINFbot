@@ -90,11 +90,11 @@ La Asociación se inspira fuertemente en el humanismo cristiano, de ahí tambié
 La Sección de Gestión Administrativa gestiona los trámites relacionados con los expedientes de alumnos de Ingenieria, Grado, Máster y Doctorado, así como el Registro de la Escuela.
 *Web*: https://www.etsiinf.upm.es/?id=servicios/secretaria
 *Lugar*: Bloque 3, planta 1
-*Horario*: Mañanas: Lunes a Viernes: 9:00 - 14:00\nTardes: Lunes y Miercoles 15:30 - 17:30
+*Horario de mañanas*: Lunes a Viernes: 9:00 - 14:00'."\n".'*Horario de Tardes*: Lunes y Miercoles 15:30 - 17:30
 *Teléfono*: +34913367407
 *Correo*: secretaria@fi.upm.es
 *Trámites administrativos*: https://www.etsiinf.upm.es/?id=servicios/tramites
-*Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195_Triptico_Secretaria\\_Alumnos.pdf',  // to skip _ -> \_ -> to skip \ -> \\_
+*Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195\\_Triptico\\_Secretaria\\_Alumnos.pdf',  // to skip _ -> \_ -> to skip \ -> \\_
             // https://www.etsiinf.upm.es/?id=servicios/tramites
             'Trámites' => 'https://www.etsiinf.upm.es/?id=servicios/tramites'
             // 'Trámites' => [
@@ -117,11 +117,11 @@ Una vez que vea esta página ya puede pedir a su navegador las páginas que dese
                 'WIFIUPM' => '
 Poner tu correo institucional (...@alumnos.upm.es) y su clave.
 
-*Más información*: http://www.upm.es/UPM/InformaticaComunicaciones/wifi?id=7dc338900c392410VgnVCM10000009c7648a____&fmt=detail&prefmt=articulo',
+*Más información*: http://www.upm.es/UPM/InformaticaComunicaciones/wifi?id=7dc338900c392410VgnVCM10000009c7648a\\_\\_\\_\\_&fmt=detail&prefmt=articulo',
                 'eduroam' => '
 Poner tu correo institucional (...@alumnos.upm.es) y su clave.
 
-*Más información*: http://www.upm.es/UPM/InformaticaComunicaciones/wifi?id=e83fe60106778110VgnVCM10000009c7648a____&fmt=detail&prefmt=articulo'
+*Más información*: http://www.upm.es/UPM/InformaticaComunicaciones/wifi?id=e83fe60106778110VgnVCM10000009c7648a\\_\\_\\_\\_&fmt=detail&prefmt=articulo'
             ],
             'VPN' => '
 *NOTA*: si tienes MacOS http://www.jpromero.com/2016/05/configuracion-vpn-etsiinf-upm.html
