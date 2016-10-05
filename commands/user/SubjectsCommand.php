@@ -49,7 +49,10 @@ class SubjectsCommand extends BaseUserCommand
         $this->getConversation();
 
         $cancel = ['Cancelar'];
-        $keyboard = [array_keys($this->planes), $cancel];
+
+        $keyboard = array_chunk(array_keys($this->planes), 1);
+        $keyboard [] = $cancel;
+
 
         $this->getRequest()->keyboard($keyboard);
         if ( $this->isProcessed() || empty($text) )
@@ -97,8 +100,11 @@ class SubjectsCommand extends BaseUserCommand
             $opts2[]="$key";
         }
 
+
+
         $cancel = ['Cancelar'];
-        $keyboard = [$opts2, $cancel];
+        $keyboard = array_chunk($opts2, 2);
+        $keyboard [] = $cancel;
 
         $this->getRequest()->keyboard($keyboard);
         if ($this->isProcessed() || empty($text))
@@ -169,7 +175,8 @@ class SubjectsCommand extends BaseUserCommand
         }
 
         $cancel = ['Cancelar'];
-        $keyboard = [$opts3, $cancel];
+        $keyboard = array_chunk($opts3, 2);
+        $keyboard [] = $cancel;
 
         $this->getRequest()->keyboard($keyboard);
         if ($this->isProcessed() || empty($text))
@@ -241,7 +248,8 @@ class SubjectsCommand extends BaseUserCommand
         }
 
         $cancel = ['Cancelar'];
-        $keyboard = [$opts4, $cancel];
+        $keyboard = array_chunk($opts4, 2);
+        $keyboard [] = $cancel;
 
         $this->getRequest()->keyboard($keyboard);
         if ($this->isProcessed() || empty($text))
@@ -355,7 +363,9 @@ class SubjectsCommand extends BaseUserCommand
         }
 
         $cancel = ['Cancelar'];
-        $keyboard = [$profesoresKB, $cancel];
+        $keyboard = array_chunk($profesoresKB, 2);
+        $keyboard [] = $cancel;
+
         $this->getRequest()->keyboard($keyboard);
 
         if ($this->isProcessed() || empty($text))
