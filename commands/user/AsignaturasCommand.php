@@ -12,17 +12,17 @@ use app\commands\base\BaseUserCommand;
 use yii\base\Exception;
 
 /**
- * User "/subjects" command
+ * User "/asignaturas" command
  */
-class SubjectsCommand extends BaseUserCommand
+class AsignaturasCommand extends BaseUserCommand
 {
     /**
      * {@inheritdoc}
      */
     public $enabled = true;
-    protected $name = 'subjects';
+    protected $name = 'asignaturas';
     protected $description = 'Consulta información sobre las asignaturas, sus profesores y las tutorias.';
-    protected $usage = '/subjects';
+    protected $usage = '/asignaturas';
     protected $version = '0.1.0';
     protected $need_mysql = true;
 
@@ -391,11 +391,6 @@ class SubjectsCommand extends BaseUserCommand
 
         $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, "2016-17");
 
-
-        $keyboard = [['Sí'],['No, salir']];
-        $this->getRequest()->keyboard($keyboard);
-
-
         if ($this->isProcessed() || empty($text)) {
             foreach ($subject->profesores as $profesor) {
                 if (("$profesor->nombre $profesor->apellidos") == $selectedTeacher) {
@@ -404,21 +399,25 @@ class SubjectsCommand extends BaseUserCommand
                         "en su despacho *$profesor->despacho* o bien vía email en la dirección " .
                         "$profesor->email .\n";
 
-                    if (count($profesor->tutorias !== 0)) {
+                    if (count($profesor->tutorias) !== 0) {
                         $mensaje .= "Sus horarios de tutorias son:\n";
                         foreach ($profesor->tutorias as $tutoria) {
                             $mensaje .= $tutoria->getTutoriaMessage() . "\n";
                         }
-                        $mensaje .= "\n\n¿Deseas consultar algo más?";
 
-
-                        return $this->getRequest()->markdown()->sendMessage($mensaje);
+                    }else{
+                        $mensaje .="*El profesor no ha especificado un horario de tutorias válido.*\n".
+                            "Si tienes alguna duda ponte en contacto vía email.";
                     }
+
+                    $this->getRequest()->markdown()->hideKeyboard()->sendMessage($mensaje);
+                    return $this->stopConversation();
                 }
             }
         }
 
-        if( !(in_array($text, $keyboard)) )
+
+        /*if( !(in_array($text, $keyboard)) )
         {
             if ($text === "No, salir")
             {
@@ -431,7 +430,7 @@ class SubjectsCommand extends BaseUserCommand
                 $this->getRequest()->markdown()->hideKeyboard()->sendMessage("Lo sentimos, método no implementado aún. Se finaliza la conversacion.");
                 return $this->stopConversation();
             }
-        }
+        }*/
 
 
     }

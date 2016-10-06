@@ -53,7 +53,9 @@ class Teacher extends Model
     public function rules()
     {
         return [
-            [['nombre','apellidos','email','despacho'], 'string', 'min' => 1],
+            [['nombre','apellidos','despacho'], 'required'],
+            [['nombre','apellidos','despacho'], 'string'],
+            ['email', 'email'],
             ['coordinador', 'boolean'],
             ['tutorias', 'safe'],
         ];
