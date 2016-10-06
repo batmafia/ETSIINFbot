@@ -70,4 +70,17 @@ class SubjectRepository
         }
     }
 
+    public static function getGuia($guiaPDFUrl){
+
+        $request = Request::get($guiaPDFUrl)->withoutStrictSSL()->send();
+        if (!$request->hasErrors()) {
+            $data = $request->raw_body;
+            return $data;
+
+        } else {
+            throw new Exception("Repository exception");
+        }
+
+    }
+
 }

@@ -9,6 +9,8 @@
 namespace app\commands\user;
 use app\models\repositories\SubjectRepository;
 use app\commands\base\BaseUserCommand;
+use yii\base\Exception;
+
 /**
  * User "/subjects" command
  */
@@ -102,7 +104,7 @@ class SubjectsCommand extends BaseUserCommand
 
 
 
-        $cancel = ['Cancelar'];
+        $cancel = ['Cancelar','Atrás'];
         $keyboard = array_chunk($opts2, 2);
         $keyboard [] = $cancel;
 
@@ -117,7 +119,14 @@ class SubjectsCommand extends BaseUserCommand
         }
         if (in_array($text, $cancel))
         {
-            return $this->cancelConversation();
+            if ($text === "Cancelar")
+            {
+                return $this->cancelConversation();
+            }
+            else
+            {
+                return $this->previousStep();
+            }
         }
 
         $this->getConversation()->notes['course'] = $text;
@@ -174,7 +183,7 @@ class SubjectsCommand extends BaseUserCommand
             $opts3[]="$key";
         }
 
-        $cancel = ['Cancelar'];
+        $cancel = ['Cancelar','Atrás'];
         $keyboard = array_chunk($opts3, 2);
         $keyboard [] = $cancel;
 
@@ -189,7 +198,14 @@ class SubjectsCommand extends BaseUserCommand
         }
         if (in_array($text, $cancel))
         {
-            return $this->cancelConversation();
+            if ($text === "Cancelar")
+            {
+                return $this->cancelConversation();
+            }
+            else
+            {
+                return $this->previousStep();
+            }
         }
 
         $this->getConversation()->notes['semester'] = $text;
@@ -247,7 +263,7 @@ class SubjectsCommand extends BaseUserCommand
             $opts4[]="$k";
         }
 
-        $cancel = ['Cancelar'];
+        $cancel = ['Cancelar','Atrás'];
         $keyboard = array_chunk($opts4, 2);
         $keyboard [] = $cancel;
 
@@ -262,7 +278,14 @@ class SubjectsCommand extends BaseUserCommand
         }
         if (in_array($text, $cancel))
         {
-            return $this->cancelConversation();
+            if ($text === "Cancelar")
+            {
+                return $this->cancelConversation();
+            }
+            else
+            {
+                return $this->previousStep();
+            }
         }
 
 
@@ -277,7 +300,28 @@ class SubjectsCommand extends BaseUserCommand
         $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
         $selectedSubject = $this->getConversation()->notes['subject'];
 
-        $subject=SubjectRepository::getSubject($selectedPlan,$selectedSubject,$selectedSemester,"2016-17");
+        try {
+
+            $subject=SubjectRepository::getSubject($selectedPlan,$selectedSubject,$selectedSemester,"2016-17");
+
+        } catch (\Exception $exception){
+
+            if($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n".
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias ".
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n".
+                    "*Por favor, selecciona otra asignatura de la lista.*\n\n");
+
+                return $this->previousStep();
+            }
+            else
+            {
+                throw $exception;
+            }
+
+        }
+
         $numProfesores = count($subject->profesores);
 
         $message = "La asignatura *$subject->nombre* pertenece al departamento de *$subject->depto*, ".
@@ -285,7 +329,7 @@ class SubjectsCommand extends BaseUserCommand
             "Selecciona mediante el teclado una opción.\n";
 
 
-        $cancel = ['Cancelar'];
+        $cancel = ['Cancelar','Atrás'];
         $keyboard = [[self::GUIA_DOCENTE],[self::PROFESORES], $cancel];
         $this->getRequest()->keyboard($keyboard);
         if ($this->isProcessed() || empty($text))
@@ -298,7 +342,14 @@ class SubjectsCommand extends BaseUserCommand
         }
         if (in_array($text, $cancel))
         {
-            return $this->cancelConversation();
+            if ($text === "Cancelar")
+            {
+                return $this->cancelConversation();
+            }
+            else
+            {
+                return $this->previousStep();
+            }
         }
 
         $this->getConversation()->notes['extrainfo'] = $text;
@@ -320,8 +371,9 @@ class SubjectsCommand extends BaseUserCommand
             if ($extraInfo == self::GUIA_DOCENTE){
 
                 // TODO: Mirar el error SSL.
+                //$guiaPDF=SubjectRepository::getGuia($subject->guia);
                 //$cap = "Aquí te enviamos la guia docente de $subject->nombre";
-                //$this->getRequest()->caption("$cap")->sendDocument($subject->guia);
+                //$this->getRequest()->caption("$cap")->sendDocument($guiaPDF);
                 $this->getRequest()->hideKeyboard()->sendMessage("Aquí tienes la guia docente de $subject->nombre\n$subject->guia");
                 return $this->stopConversation();
 
@@ -362,7 +414,7 @@ class SubjectsCommand extends BaseUserCommand
             $mensaje = "No hay ningún profesor asignado.";
         }
 
-        $cancel = ['Cancelar'];
+        $cancel = ['Cancelar','Atrás'];
         $keyboard = array_chunk($profesoresKB, 2);
         $keyboard [] = $cancel;
 
@@ -378,7 +430,14 @@ class SubjectsCommand extends BaseUserCommand
         }
         if (in_array($text, $cancel))
         {
-            return $this->cancelConversation();
+            if ($text === "Cancelar")
+            {
+                return $this->cancelConversation();
+            }
+            else
+            {
+                return $this->previousStep();
+            }
         }
 
         $this->getConversation()->notes['teacher'] = $text;
