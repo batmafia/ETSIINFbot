@@ -31,7 +31,7 @@ class Tutorial extends Model
     public function rules()
     {
         return [
-            [['dia','hora_inicio','hora_fin'], 'string'],
+            [['dia','hora_inicio','hora_fin'], 'string','min' => 1],
             ['observaciones','safe']
         ];
     }
