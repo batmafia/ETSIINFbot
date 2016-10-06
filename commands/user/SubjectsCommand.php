@@ -33,7 +33,7 @@ class SubjectsCommand extends BaseUserCommand
 
 
     const PROFESORES = 'Profesores y Tutorías';
-    const GUIA_DOCENTE='Guía Docente';
+    const GUIA_DOCENTE = 'Guía Docente';
 
     private $planes = [
         self::ING_INF => '10II',
@@ -57,16 +57,13 @@ class SubjectsCommand extends BaseUserCommand
 
 
         $this->getRequest()->keyboard($keyboard);
-        if ( $this->isProcessed() || empty($text) )
-        {
+        if ($this->isProcessed() || empty($text)) {
             return $this->getRequest()->sendMessage('Selecciona tu plan de estudios:');
         }
-        if( !(in_array($text, array_keys($this->planes)) || in_array($text, $cancel)) )
-        {
+        if (!(in_array($text, array_keys($this->planes)) || in_array($text, $cancel))) {
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
-        if (in_array($text, $cancel))
-        {
+        if (in_array($text, $cancel)) {
             return $this->cancelConversation();
         }
         $this->getConversation()->notes['plan'] = $text;
@@ -74,57 +71,44 @@ class SubjectsCommand extends BaseUserCommand
     }
 
 
-
     public function processShowCourse($text)
     {
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $subjectsOfPlan=SubjectRepository::getSubjectsList($this->planes[$selectedPlan],'201617');
+        $subjectsOfPlan = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], '201617');
 
-        foreach($subjectsOfPlan as $s)
-        {
-            if ($s->curso !== "")
-            {
+        foreach ($subjectsOfPlan as $s) {
+            if ($s->curso !== "") {
                 $this->ordenadas[$s->curso][] = $s;
-            }
-            else
-            {
+            } else {
                 // NO METEMOS LAS QUE NO TENGAN CURSO
                 //$this->ordenadas[self::UNKNOWN][] = $s;
             }
         }
 
         // Courses for the keyboard.
-        $opts2 =[];
+        $opts2 = [];
         ksort($this->ordenadas);
 
-        foreach ($this->ordenadas as $key=>$k)
-        {
-            $opts2[]="$key";
+        foreach ($this->ordenadas as $key => $k) {
+            $opts2[] = "$key";
         }
 
 
-
-        $cancel = ['Cancelar','Atrás'];
+        $cancel = ['Cancelar', 'Atrás'];
         $keyboard = array_chunk($opts2, 2);
         $keyboard [] = $cancel;
 
         $this->getRequest()->keyboard($keyboard);
-        if ($this->isProcessed() || empty($text))
-        {
+        if ($this->isProcessed() || empty($text)) {
             return $this->getRequest()->sendMessage('Selecciona el curso al cual pertenece la asignatura:');
         }
-        if( !(in_array($text, $opts2) || in_array($text, $cancel)) )
-        {
+        if (!(in_array($text, $opts2) || in_array($text, $cancel))) {
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
-        if (in_array($text, $cancel))
-        {
-            if ($text === "Cancelar")
-            {
+        if (in_array($text, $cancel)) {
+            if ($text === "Cancelar") {
                 return $this->cancelConversation();
-            }
-            else
-            {
+            } else {
                 return $this->previousStep();
             }
         }
@@ -139,34 +123,25 @@ class SubjectsCommand extends BaseUserCommand
         $selectedCourse = $this->getConversation()->notes['course'];
 
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $subjectsOfPlan=SubjectRepository::getSubjectsList($this->planes[$selectedPlan],'201617');
+        $subjectsOfPlan = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], '201617');
 
-        foreach($subjectsOfPlan as $s)
-        {
-            if ($s->curso !== "")
-            {
+        foreach ($subjectsOfPlan as $s) {
+            if ($s->curso !== "") {
                 $this->ordenadas[$s->curso][] = $s;
-            }
-            else
-            {
+            } else {
                 // NO METEMOS LAS QUE NO TENGAN CURSO
-               // $this->ordenadas[self::UNKNOWN][] = $s;
+                // $this->ordenadas[self::UNKNOWN][] = $s;
             }
         }
 
 
-        foreach($this->ordenadas[$selectedCourse] as $sub)
-        {
+        foreach ($this->ordenadas[$selectedCourse] as $sub) {
 
-            foreach($sub->imparticion as $sem)
-            {
+            foreach ($sub->imparticion as $sem) {
 
-                if ($sem->codigo_duracion !== "")
-                {
+                if ($sem->codigo_duracion !== "") {
                     $this->porsemestre[$sem->codigo_duracion][] = $sub;
-                }
-                else
-                {
+                } else {
                     // NO METEMOS LAS QUE NO TENGAN SEMESTRE
                     // $this->porsemestre[self::UNKNOWN][] = $sub;
                 }
@@ -174,36 +149,28 @@ class SubjectsCommand extends BaseUserCommand
         }
 
 
-
-        $opts3 =[];
+        $opts3 = [];
         ksort($this->porsemestre);
 
-        foreach ($this->porsemestre as $key=>$k)
-        {
-            $opts3[]="$key";
+        foreach ($this->porsemestre as $key => $k) {
+            $opts3[] = "$key";
         }
 
-        $cancel = ['Cancelar','Atrás'];
+        $cancel = ['Cancelar', 'Atrás'];
         $keyboard = array_chunk($opts3, 2);
         $keyboard [] = $cancel;
 
         $this->getRequest()->keyboard($keyboard);
-        if ($this->isProcessed() || empty($text))
-        {
+        if ($this->isProcessed() || empty($text)) {
             return $this->getRequest()->sendMessage('Selecciona el semestre al cual pertenece la asignatura:');
         }
-        if( !(in_array($text, $opts3) || in_array($text, $cancel)) )
-        {
+        if (!(in_array($text, $opts3) || in_array($text, $cancel))) {
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
-        if (in_array($text, $cancel))
-        {
-            if ($text === "Cancelar")
-            {
+        if (in_array($text, $cancel)) {
+            if ($text === "Cancelar") {
                 return $this->cancelConversation();
-            }
-            else
-            {
+            } else {
                 return $this->previousStep();
             }
         }
@@ -219,77 +186,60 @@ class SubjectsCommand extends BaseUserCommand
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedCourse = $this->getConversation()->notes['course'];
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $subjectsOfPlan=SubjectRepository::getSubjectsList($this->planes[$selectedPlan],'201617');
+        $subjectsOfPlan = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], '201617');
 
-        foreach($subjectsOfPlan as $s)
-        {
-            if ($s->curso !== "")
-            {
+        foreach ($subjectsOfPlan as $s) {
+            if ($s->curso !== "") {
                 $this->ordenadas[$s->curso][] = $s;
-            }
-            else
-            {
+            } else {
                 // NO METEMOS LAS QUE NO TENGAN CURSO
                 // $this->ordenadas[self::UNKNOWN][] = $s;
             }
         }
 
 
-        foreach($this->ordenadas[$selectedCourse] as $sub)
-        {
+        foreach ($this->ordenadas[$selectedCourse] as $sub) {
 
-            foreach($sub->imparticion as $sem)
-            {
+            foreach ($sub->imparticion as $sem) {
 
-                if ($sem->codigo_duracion !== "")
-                {
+                if ($sem->codigo_duracion !== "") {
                     $this->porsemestre[$sem->codigo_duracion][] = $sub;
-                }
-                else
-                {
+                } else {
                     // NO METEMOS LAS QUE NO TENGAN SEMESTRE
                     // $this->porsemestre[self::UNKNOWN][] = $sub;
                 }
             }
         }
 
-        foreach($this->porsemestre[$selectedSemester] as $sub)
-        {
-            $this->subjectlist[$sub->codigo]=$sub->nombre;
+        foreach ($this->porsemestre[$selectedSemester] as $sub) {
+            $this->subjectlist[$sub->codigo] = $sub->nombre;
         }
 
-        foreach ($this->subjectlist as $key=>$k)
-        {
-            $opts4[]="$k";
+        foreach ($this->subjectlist as $key => $k) {
+            $opts4[] = "$k";
         }
 
-        $cancel = ['Cancelar','Atrás'];
+        $cancel = ['Cancelar', 'Atrás'];
         $keyboard = array_chunk($opts4, 2);
         $keyboard [] = $cancel;
 
         $this->getRequest()->keyboard($keyboard);
-        if ($this->isProcessed() || empty($text))
-        {
+        if ($this->isProcessed() || empty($text)) {
             return $this->getRequest()->sendMessage('Selecciona la asignatura de la cual necesitas información:');
         }
-        if( !(in_array($text, $opts4) || in_array($text, $cancel)) )
-        {
+        if (!(in_array($text, $opts4) || in_array($text, $cancel))) {
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
-        if (in_array($text, $cancel))
-        {
-            if ($text === "Cancelar")
-            {
+        if (in_array($text, $cancel)) {
+            if ($text === "Cancelar") {
                 return $this->cancelConversation();
-            }
-            else
-            {
+            } else {
                 return $this->previousStep();
             }
         }
 
 
-        $this->getConversation()->notes['subject'] = array_search($text,$this->subjectlist);
+        $this->getConversation()->notes['subject'] = array_search($text, $this->subjectlist);
         return $this->nextStep();
     }
 
@@ -302,21 +252,18 @@ class SubjectsCommand extends BaseUserCommand
 
         try {
 
-            $subject=SubjectRepository::getSubject($selectedPlan,$selectedSubject,$selectedSemester,"2016-17");
+            $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, "2016-17");
 
-        } catch (\Exception $exception){
+        } catch (\Exception $exception) {
 
-            if($exception->getMessage() == "Unable to parse response as JSON")
-            {
-                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n".
-                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias ".
-                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n".
+            if ($exception->getMessage() == "Unable to parse response as JSON") {
+                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
                     "*Por favor, selecciona otra asignatura de la lista.*\n\n");
 
                 return $this->previousStep();
-            }
-            else
-            {
+            } else {
                 throw $exception;
             }
 
@@ -324,30 +271,24 @@ class SubjectsCommand extends BaseUserCommand
 
         $numProfesores = count($subject->profesores);
 
-        $message = "La asignatura *$subject->nombre* pertenece al departamento de *$subject->depto*, ".
-            "tiene un peso de *$subject->ects ects* y tienes a *$numProfesores profesores* dispuestos a ayudarte. ".
+        $message = "La asignatura *$subject->nombre* pertenece al departamento de *$subject->depto*, " .
+            "tiene un peso de *$subject->ects ECTS* y tienes a *$numProfesores profesores* dispuestos a ayudarte. " .
             "Selecciona mediante el teclado una opción.\n";
 
 
-        $cancel = ['Cancelar','Atrás'];
-        $keyboard = [[self::GUIA_DOCENTE],[self::PROFESORES], $cancel];
+        $cancel = ['Cancelar', 'Atrás'];
+        $keyboard = [[self::GUIA_DOCENTE], [self::PROFESORES], $cancel];
         $this->getRequest()->keyboard($keyboard);
-        if ($this->isProcessed() || empty($text))
-        {
+        if ($this->isProcessed() || empty($text)) {
             return $this->getRequest()->markdown()->sendMessage($message);
         }
-        if( !($text == self::GUIA_DOCENTE || $text== self::PROFESORES || in_array($text, $cancel)) )
-        {
+        if (!($text == self::GUIA_DOCENTE || $text == self::PROFESORES || in_array($text, $cancel))) {
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
-        if (in_array($text, $cancel))
-        {
-            if ($text === "Cancelar")
-            {
+        if (in_array($text, $cancel)) {
+            if ($text === "Cancelar") {
                 return $this->cancelConversation();
-            }
-            else
-            {
+            } else {
                 return $this->previousStep();
             }
         }
@@ -365,10 +306,9 @@ class SubjectsCommand extends BaseUserCommand
         $selectedSubject = $this->getConversation()->notes['subject'];
         $extraInfo = $this->getConversation()->notes['extrainfo'];
 
-        $subject=SubjectRepository::getSubject($selectedPlan,$selectedSubject,$selectedSemester,"2016-17");
-        if ($this->isProcessed() || empty($text))
-        {
-            if ($extraInfo == self::GUIA_DOCENTE){
+        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, "2016-17");
+        if ($this->isProcessed() || empty($text)) {
+            if ($extraInfo == self::GUIA_DOCENTE) {
 
                 // TODO: Mirar el error SSL.
                 //$guiaPDF=SubjectRepository::getGuia($subject->guia);
@@ -378,7 +318,7 @@ class SubjectsCommand extends BaseUserCommand
                 return $this->stopConversation();
 
 
-            } else if ($extraInfo == self::PROFESORES){
+            } else if ($extraInfo == self::PROFESORES) {
 
                 return $this->nextStep();
             }
@@ -387,55 +327,50 @@ class SubjectsCommand extends BaseUserCommand
 
     }
 
-    public function processGetTeacher($text){
+    public function processGetTeacher($text)
+    {
 
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
         $selectedSubject = $this->getConversation()->notes['subject'];
-        $subject=SubjectRepository::getSubject($selectedPlan,$selectedSubject,$selectedSemester,"2016-17");
+        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, "2016-17");
 
         $numProfesores = count($subject->profesores);
         $profesoresKB = [];
 
-        if ($numProfesores!==0){
-            $mensaje = "Los siguientes profesores pueden ayudarte con $subject->nombre:\n\n";
-            foreach ($subject->profesores as $profesor){
-                if($profesor->coordinador == true){
-                    $mensaje.= "- *$profesor->nombre $profesor->apellidos* (coordinador)\n";
-                }else{
-                    $mensaje.= "- *$profesor->nombre $profesor->apellidos*\n";
+        if ($numProfesores !== 0) {
+            $mensaje = "Los siguientes profesores pueden ayudarte con *$subject->nombre*:\n\n";
+            foreach ($subject->profesores as $profesor) {
+                if ($profesor->coordinador == true) {
+                    $mensaje .= "- *$profesor->nombre $profesor->apellidos* (coordinador) ($profesor->despacho)\n";
+                } else {
+                    $mensaje .= "- *$profesor->nombre $profesor->apellidos ($profesor->despacho)*\n";
                 }
 
                 $profesoresKB[] = "$profesor->nombre $profesor->apellidos";
 
             }
             $mensaje .= "\n¿De qué profesor deseas obtener más información?";
-        }else{
+        } else {
             $mensaje = "No hay ningún profesor asignado.";
         }
 
-        $cancel = ['Cancelar','Atrás'];
+        $cancel = ['Cancelar', 'Atrás'];
         $keyboard = array_chunk($profesoresKB, 2);
         $keyboard [] = $cancel;
 
         $this->getRequest()->keyboard($keyboard);
 
-        if ($this->isProcessed() || empty($text))
-        {
+        if ($this->isProcessed() || empty($text)) {
             $this->getRequest()->markdown()->sendMessage($mensaje);
         }
-        if( !(in_array($text, $profesoresKB) || in_array($text, $cancel)) )
-        {
+        if (!(in_array($text, $profesoresKB) || in_array($text, $cancel))) {
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
-        if (in_array($text, $cancel))
-        {
-            if ($text === "Cancelar")
-            {
+        if (in_array($text, $cancel)) {
+            if ($text === "Cancelar") {
                 return $this->cancelConversation();
-            }
-            else
-            {
+            } else {
                 return $this->previousStep();
             }
         }
@@ -454,38 +389,50 @@ class SubjectsCommand extends BaseUserCommand
         $selectedSubject = $this->getConversation()->notes['subject'];
         $selectedTeacher = $this->getConversation()->notes['teacher'];
 
-        $subject=SubjectRepository::getSubject($selectedPlan,$selectedSubject,$selectedSemester,"2016-17");
+        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, "2016-17");
 
-        if ($this->isProcessed() || empty($text))
-        {
-            foreach ($subject->profesores as $profesor){
-                if(("$profesor->nombre $profesor->apellidos")==$selectedTeacher){
 
-                    $mensaje = "El profesor *$profesor->nombre $profesor->apellidos* te puede atender personalmente ".
-                    "en su despacho *$profesor->despacho* o bien vía email en la dirección ".
-                    "$profesor->email .\n";
+        $keyboard = [['Sí'],['No, salir']];
+        $this->getRequest()->keyboard($keyboard);
 
-                    if (count($profesor->tutorias !== 0)){
+
+        if ($this->isProcessed() || empty($text)) {
+            foreach ($subject->profesores as $profesor) {
+                if (("$profesor->nombre $profesor->apellidos") == $selectedTeacher) {
+
+                    $mensaje = "El profesor *$profesor->nombre $profesor->apellidos* te puede atender personalmente " .
+                        "en su despacho *$profesor->despacho* o bien vía email en la dirección " .
+                        "$profesor->email .\n";
+
+                    if (count($profesor->tutorias !== 0)) {
                         $mensaje .= "Sus horarios de tutorias son:\n";
-                        foreach ($profesor->tutorias as $tutoria){
-                            $mensaje .=$tutoria->getTutoriaMessage()."\n";
+                        foreach ($profesor->tutorias as $tutoria) {
+                            $mensaje .= $tutoria->getTutoriaMessage() . "\n";
                         }
+                        $mensaje .= "\n\n¿Deseas consultar algo más?";
+
+
+                        return $this->getRequest()->markdown()->sendMessage($mensaje);
                     }
-
-
-                    $this->getRequest()->hideKeyboard()->markdown()->sendMessage($mensaje);
-                    return $this->stopConversation();
-
                 }
             }
+        }
 
+        if( !(in_array($text, $keyboard)) )
+        {
+            if ($text === "No, salir")
+            {
+                $this->getRequest()->markdown()->hideKeyboard()->sendMessage("Comando finalizado.");
+                return $this->stopConversation();
+            }
+            else
+            {
+                //TODO: BUCLE EN PROFESORES.
+                $this->getRequest()->markdown()->hideKeyboard()->sendMessage("Lo sentimos, método no implementado aún. Se finaliza la conversacion.");
+                return $this->stopConversation();
+            }
         }
 
 
-
-        return $this->stopConversation();
     }
-
-
-
 }
