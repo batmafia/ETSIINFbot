@@ -11,11 +11,8 @@
 namespace app\commands\user;
 
 use app\commands\base\BaseUserCommand;
-use app\models\Chat;
-use app\models\Message;
-use app\models\User;
-use Longman\TelegramBot\Conversation;
-use Longman\TelegramBot\DB;
+use app\models\core\Chat;
+use app\models\core\Message;
 use Longman\TelegramBot\Request;
 
 /**
