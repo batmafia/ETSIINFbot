@@ -67,7 +67,7 @@ class AsignaturasCommand extends BaseUserCommand
         $this->getRequest()->keyboard($keyboard);
         if ($this->isProcessed() || empty($text))
         {
-            return $this->getRequest()->sendMessage('Selecciona tu plan de estudios:');
+            return $this->getRequest()->markdown()->sendMessage("_Actualmente algunos datos no están disponibles por errores en la API de la UPM_.\n\nSelecciona tu plan de estudios:");
         }
         if (!(in_array($text, array_keys($this->planes)) || in_array($text, $cancel)))
         {
