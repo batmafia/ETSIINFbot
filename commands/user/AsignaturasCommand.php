@@ -9,7 +9,6 @@
 namespace app\commands\user;
 use app\models\repositories\SubjectRepository;
 use app\commands\base\BaseUserCommand;
-use yii\base\Exception;
 
 /**
  * User "/asignaturas" command
@@ -27,9 +26,9 @@ class AsignaturasCommand extends BaseUserCommand
     protected $need_mysql = true;
 
 
-    const ING_INF = 'GRADO EN INGENIERIA INFORMATICA';
-    const ING_MATEINF = 'GRADO EN MATEMATICAS E INFORMATICA';
-    const INF_DOBGRA = 'DOBLE GRADO EN INGENIERIA INFORMATICA Y EN ADE';
+    const ING_INF = 'Grado en Ingeniería Informática';
+    const ING_MATEINF = 'Grado en Matemáticas e Informática';
+    const INF_DOBGRA = 'Doble Grado en Ingeniería Informática y en ADE';
 
     const PROFESORES = 'Profesores y Tutorías';
     const GUIA_DOCENTE = 'Guía Docente';
@@ -74,7 +73,6 @@ class AsignaturasCommand extends BaseUserCommand
         return $this->nextStep();
     }
 
-
     public function processShowCourse($text)
     {
         $selectedPlan = $this->getConversation()->notes['plan'];
@@ -101,6 +99,7 @@ class AsignaturasCommand extends BaseUserCommand
         $keyboard [] = $cancel;
 
         $this->getRequest()->keyboard($keyboard);
+
         if ($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->sendMessage('Selecciona el curso al cual pertenece la asignatura:');
@@ -126,7 +125,6 @@ class AsignaturasCommand extends BaseUserCommand
         $this->getConversation()->notes['course'] = $text;
         return $this->nextStep();
     }
-
 
     public function processShowSemesters($text)
     {
@@ -193,7 +191,6 @@ class AsignaturasCommand extends BaseUserCommand
         return $this->nextStep();
     }
 
-
     public function processShowSubjects($text)
     {
 
@@ -227,16 +224,19 @@ class AsignaturasCommand extends BaseUserCommand
             $this->subjectlist[$sub->codigo] = $sub->nombre;
         }
 
+        $opts4 = [];
         foreach ($this->subjectlist as $key => $k)
         {
             $opts4[] = "$k";
         }
 
-        $cancel = [self::CANCELAR, self::ATRAS];
+
+        $cancel = [self::CANCELAR,self::ATRAS];
         $keyboard = array_chunk($opts4, 2);
         $keyboard [] = $cancel;
 
         $this->getRequest()->keyboard($keyboard);
+
         if ($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->sendMessage('Selecciona la asignatura de la cual necesitas información:');
@@ -325,7 +325,6 @@ class AsignaturasCommand extends BaseUserCommand
         $this->getConversation()->notes['extrainfo'] = $text;
         return $this->nextStep();
     }
-
 
     public function processShowExtraInfo($text)
     {
@@ -427,7 +426,6 @@ class AsignaturasCommand extends BaseUserCommand
 
     }
 
-
     public function processShowTeacherInfo($text)
     {
 
@@ -462,11 +460,12 @@ class AsignaturasCommand extends BaseUserCommand
                         $mensaje .="*El profesor no ha especificado un horario de tutorias válido.*\n".
                             "Si tienes alguna duda ponte en contacto vía email.";
                     }
-
-                    $this->getRequest()->markdown()->hideKeyboard()->sendMessage($mensaje);
-                    return $this->stopConversation();
                 }
             }
         }
+
+        $this->getRequest()->markdown()->hideKeyboard()->sendMessage($mensaje);
+        return $this->stopConversation();
     }
+
 }
