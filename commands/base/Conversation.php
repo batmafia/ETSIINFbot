@@ -9,6 +9,8 @@
 namespace app\commands\base;
 
 
+use Longman\TelegramBot\ConversationDB;
+
 class Conversation extends \Longman\TelegramBot\Conversation
 {
     function __construct($user_id, $chat_id, $command)
@@ -23,8 +25,30 @@ class Conversation extends \Longman\TelegramBot\Conversation
     function update()
     {
         if(!$this->exists())
+        {
             $this->start();
+        }
 
         return parent::update();
     }
+
+    function start()
+    {
+        if (!$this->exists() && $this->command) {
+            if (ConversationDB::insertConversation(
+                $this->user_id,
+                $this->chat_id,
+                $this->command
+            )) {
+                $notes = $this->notes;
+                $result =  $this->load();
+                $this->notes = $notes;
+
+                return $result;
+            }
+        }
+
+        return false;
+    }
+
 }

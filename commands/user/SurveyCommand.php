@@ -129,7 +129,7 @@ class SurveyCommand extends BaseUserCommand
             $out_text .= "\n" . ucfirst($k).': ' . $this->getConversation()->notes[$k];
         }
 
-        $result = $this->getRequest()->hideKeyboard()->sendPhoto($this->getConversation()->notes['photo_id'], $out_text);
+        $result = $this->getRequest()->hideKeyboard()->caption($out_text)->sendPhoto($this->getConversation()->notes['photo_id']);
         $this->stopConversation();
 
         return $result;

@@ -9,6 +9,12 @@ use yii\web\Controller;
 class WebHookController extends Controller
 {
 
+    function init()
+    {
+        set_time_limit ( 300 );
+        parent::init();
+    }
+
     public $enableCsrfValidation = false;
 
     public function actionIndex(){

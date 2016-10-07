@@ -26,8 +26,8 @@ class WhoisCommand extends BaseAdminCommand
      * {@inheritdoc}
      */
     protected $name = 'whois';
-    protected $description = 'Lookup user or group info';
-    protected $usage = '/whois <id> or /whois <search string>';
+    protected $description = 'Muestra la información de un usuario o de un grupo.';
+    protected $usage = '/whois <id> o /whois <Término de búsqueda>';
     protected $version = '1.1.0';
     protected $need_mysql = true;
     /**#@-*/
@@ -60,7 +60,7 @@ class WhoisCommand extends BaseAdminCommand
         }
 
         if ($text === '') {
-            $text = 'Provide the id to lookup: /whois <id>';
+            $text = 'Especifica el ID a buscar: /whois <id>';
         } else {
             $user_id = $text;
 
@@ -103,15 +103,15 @@ class WhoisCommand extends BaseAdminCommand
 
             if ($chat != null) {
                 if ($chat->isPrivateChat()) {
-                    $text = 'User ID: ' . $user_id . "\n";
-                    $text .= 'Name: ' . $chat->getFirstName() . ' ' . $chat->getLastName() . "\n";
+                    $text = 'ID de Usuario: ' . $user_id . "\n";
+                    $text .= 'Nombre: ' . $chat->getFirstName() . ' ' . $chat->getLastName() . "\n";
 
                     if ($chat->getUsername() != '') {
                         $text .= 'Username: @' . $chat->getUsername() . "\n";
                     }
 
-                    $text .= 'First time seen: ' . $created_at . "\n";
-                    $text .= 'Last activity: ' . $updated_at . "\n";
+                    $text .= 'Primera vez visto: ' . $created_at . "\n";
+                    $text .= 'Última actividad: ' . $updated_at . "\n";
 
                     //Code from Whoami command
                     $limit = 10;
@@ -140,16 +140,16 @@ class WhoisCommand extends BaseAdminCommand
                         return Request::sendPhoto($data);
                     }
                 } elseif ($chat->isGroupChat()) {
-                    $text = 'Chat ID: ' . $user_id . (!empty($old_id) ? ' (previously: '.$old_id.')' : ''). "\n";
-                    $text .= 'Type: ' . ucfirst($chat->getType()) . "\n";
-                    $text .= 'Title: ' . $chat->getTitle() . "\n";
-                    $text .= 'First time added to group: ' . $created_at . "\n";
-                    $text .= 'Last activity: ' . $updated_at . "\n";
+                    $text = 'ID del chat: ' . $user_id . (!empty($old_id) ? ' (anteriormente: '.$old_id.')' : ''). "\n";
+                    $text .= 'Tipo: ' . ucfirst($chat->getType()) . "\n";
+                    $text .= 'Titulo: ' . $chat->getTitle() . "\n";
+                    $text .= 'Primera vez añadido al grupo: ' . $created_at . "\n";
+                    $text .= 'Última actividad: ' . $updated_at . "\n";
                 }
             } elseif (is_array($results) && count($results) > 1) {
-                $text = 'Multiple chats matched!';
+                $text = '¡Multiples chats encontrados!';
             } else {
-                $text = 'Chat not found!';
+                $text = 'Chats no encontrados.';
             }
         }
 

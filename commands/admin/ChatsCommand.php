@@ -24,8 +24,8 @@ class ChatsCommand extends BaseAdminCommand
      * {@inheritdoc}
      */
     protected $name = 'chats';
-    protected $description = 'List or search all chats stored by the bot';
-    protected $usage = '/chats, /chats * or /chats <search string>';
+    protected $description = 'Muestra una lista o una búsqueda de los chats guardados por el bot.';
+    protected $usage = '/chats, /chats * o /chats <término de búsqueda>';
     protected $version = '1.0.2';
     protected $need_mysql = true;
     /**#@-*/
@@ -57,9 +57,9 @@ class ChatsCommand extends BaseAdminCommand
         if ($text === '') {
             $text_back = '';
         } elseif ($text == '*') {
-            $text_back = 'List of all bot chats:' . "\n";
+            $text_back = 'Listado de todos los chats del bot:' . "\n";
         } else {
-            $text_back = 'Chat search results:' . "\n";
+            $text_back = 'Resultados de la búsqueda de chats:' . "\n";
         }
 
         foreach ($results as $result) {
@@ -94,15 +94,15 @@ class ChatsCommand extends BaseAdminCommand
         }
 
         if (($user_chats + $group_chats + $super_group_chats) === 0) {
-            $text_back = 'No chats found..';
+            $text_back = 'No se han encontrado chats...';
         } else {
-            $text_back .= "\n" . 'Private Chats: ' . $user_chats;
-            $text_back .= "\n" . 'Group: ' . $group_chats;
-            $text_back .= "\n" . 'Super Group: ' . $super_group_chats;
+            $text_back .= "\n" . 'Chats Privados: ' . $user_chats;
+            $text_back .= "\n" . 'Grupos: ' . $group_chats;
+            $text_back .= "\n" . 'Super Grupos: ' . $super_group_chats;
             $text_back .= "\n" . 'Total: ' . ($user_chats + $group_chats + $super_group_chats);
 
             if ($text === '') {
-                $text_back .= "\n\n" . 'List all chats: /' . $this->name .' *' . "\n" . 'Search for chats: /' . $this->name .' <search string>';
+                $text_back .= "\n\n" . 'Muestra todos los chats: /' . $this->name .' *' . "\n" . 'Buscar chats: /' . $this->name .' <Término de búsqueda>';
             }
         }
 

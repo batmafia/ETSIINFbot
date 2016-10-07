@@ -22,8 +22,8 @@ class HelpCommand extends BaseUserCommand
      * {@inheritdoc}
      */
     protected $name = 'help';
-    protected $description = 'Show bot commands help';
-    protected $usage = '/help or /help <command>';
+    protected $description = 'Muestra la ayuda de comandos del bot.';
+    protected $usage = '/help o /help <comando>';
     protected $version = '1.0.1';
     /**#@-*/
 
@@ -46,21 +46,23 @@ class HelpCommand extends BaseUserCommand
         //If no command parameter is passed, show the list
         if ($command === '') {
             $text = $this->telegram->getBotName() . ' v. ' . $this->telegram->getVersion() . "\n\n";
-            $text .= 'Commands List:' . "\n";
+            $text .= "Bienvenido al bot de la escuela ". $this->message->getChat()->getFirstName() .
+                ", espero serte útil.\n\n";
+            $text .= 'Aquí tienes la lista de comandos:' . "\n";
             foreach ($commands as $command) {
                 $text .= '/' . $command->getName() . ' - ' . $command->getDescription() . "\n";
             }
 
-            $text .= "\n" . 'For exact command help type: /help <command>';
+            $text .= "\n" . 'Para obtener la ayuda de un comando en concreto, escribe: /help <comando>';
         } else {
             $command = str_replace('/', '', $command);
             if (isset($commands[$command])) {
                 $command = $commands[$command];
-                $text = 'Command: ' . $command->getName() . ' v' . $command->getVersion() . "\n";
-                $text .= 'Description: ' . $command->getDescription() . "\n";
-                $text .= 'Usage: ' . $command->getUsage();
+                $text = 'Comando: ' . $command->getName() . ' v' . $command->getVersion() . "\n";
+                $text .= 'Descripción: ' . $command->getDescription() . "\n";
+                $text .= 'Uso: ' . $command->getUsage();
             } else {
-                $text = 'No help available: Command /' . $command . ' not found';
+                $text = 'No hay ayuda disponible, el comando /' . $command . ' no ha sido encontrado.';
             }
         }
 

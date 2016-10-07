@@ -35,6 +35,12 @@ class Request
         return $this;
     }
 
+    public function markdown()
+    {
+        $this->data['parse_mode'] = 'Markdown';
+        return $this;
+    }
+
     public function locationKeyboard()
     {
         $this->data['reply_markup'] = new ReplyKeyboardMarkup([
@@ -67,25 +73,66 @@ class Request
         return $this;
     }
 
+    public function caption($caption)
+    {
+        $this->data['caption'] = strlen($caption)>200 ? substr($caption, 0, 200) : $caption;
+        return $this;
+    }
+
     public function sendMessage($message)
     {
         $this->data['text'] = $message;
         $result = \Longman\TelegramBot\Request::sendMessage($this->data);
 
-        $this->data = [];
+        $this->reset();
 
         return $result;
     }
 
-    public function sendPhoto($photoId, $caption='')
+    public function sendPhoto($photoId)
     {
         $this->data['photo'] = $photoId;
-        $this->data['caption'] = strlen($caption)>200 ? substr($caption, 0, 200) : $caption;
         $result = \Longman\TelegramBot\Request::sendPhoto($this->data);
 
-        $this->data = [];
+        $this->reset();
 
         return $result;
+    }
+
+    public function sendDocument($file)
+    {
+        $result = \Longman\TelegramBot\Request::sendDocument($this->data, $file);
+
+        $this->data = [];
+        $this->reset();
+
+        return $result;
+    }
+
+    const ACTION_TYPING = "typing";
+    const ACTION_UPLOADING_PHOTO = 'upload_photo';
+    const ACTION_RECORDING_VIDEO = 'record_video';
+    const ACTION_UPLOADING_VIDEO = 'upload_video';
+    const ACTION_RECORDING_AUDIO = 'record_audio';
+    const ACTION_UPLOADING_AUDIO = 'upload_audio';
+    const ACTION_UPLOADING_DOCUMENT = 'upload_document';
+    const ACTION_FINDING_LOCATION = 'find_location';
+    public function sendAction($action)
+    {
+        $this->data['action'] = $action;
+        $result = \Longman\TelegramBot\Request::sendChatAction($this->data);
+
+        $this->reset();
+
+        return $result;
+    }
+
+    private function reset()
+    {
+        if(isset($this->data['chat_id']))
+            $this->data = ['chat_id'=>$this->data['chat_id']];
+        else
+            $this->data = [];
     }
 
 }

@@ -22,8 +22,8 @@ class SendtoallCommand extends BaseAdminCommand
      * {@inheritdoc}
      */
     protected $name = 'sendtoall';
-    protected $description = 'Send the message to all the user\'s bot';
-    protected $usage = '/sendtoall <message to send>';
+    protected $description = 'Envia el mensaje a todos los usuarios del bot.';
+    protected $usage = '/sendtoall <Mensaje a enviar>';
     protected $version = '1.2.1';
     protected $need_mysql = true;
     /**#@-*/
@@ -56,7 +56,7 @@ class SendtoallCommand extends BaseAdminCommand
             $tot = 0;
             $fail = 0;
 
-            $text = 'Message sent to:' . "\n";
+            $text = 'Mensaje enviado a:' . "\n";
             foreach ($results as $result) {
                 $status = '';
                 $type = '';
@@ -80,10 +80,10 @@ class SendtoallCommand extends BaseAdminCommand
 
                 $text .= $tot . ') ' . $status . ' ' . $type . ' ' . $name . "\n";
             }
-            $text .= 'Delivered: ' . ($tot - $fail) . '/' . $tot . "\n";
+            $text .= 'Entregado: ' . ($tot - $fail) . '/' . $tot . "\n";
 
             if ($tot === 0) {
-                $text = 'No users or chats found..';
+                $text = 'No se han encontrado usuarios o chats.';
             }
         }
 

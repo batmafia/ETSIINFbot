@@ -43,10 +43,15 @@ class TelegramBot extends Telegram  implements Configurable
         parent::addCommandsPath(Yii::$app->basePath."/commands/system");
         parent::addCommandsPath(Yii::$app->basePath."/commands/user");
 
-        if($this->isAdmin())
+        if($this->isModerator() || $this->isAdmin())
         {
-            parent::addCommandsPath(Yii::$app->basePath."/commands/admin");
+            parent::addCommandsPath(Yii::$app->basePath."/commands/moderator");
+            if($this->isAdmin())
+            {
+                parent::addCommandsPath(Yii::$app->basePath."/commands/admin");
+            }
         }
+
     }
 
     private function initializeDB()
@@ -59,9 +64,7 @@ class TelegramBot extends Telegram  implements Configurable
 
     public function getCommandObject($command)
     {
-        $which = ['System'];
-        ($this->isAdmin()) && $which[] = 'Admin';
-        $which[] = 'User';
+        $which = ['System','User', 'Moderator', 'Admin'];
 
         foreach ($which as $auth) {
             $command_namespace =  'app\commands\\' . $auth . '\\' . $this->ucfirstUnicode($command) . 'Command';
@@ -85,6 +88,25 @@ class TelegramBot extends Telegram  implements Configurable
         $this->update = $update;
         $this->addCommands();
         return parent::processUpdate($update);
+    }
+
+    public function isModerator($user_id = null)
+    {
+        if ($user_id === null && $this->update !== null) {
+            if (($message = $this->update->getMessage()) && ($from = $message->getFrom())) {
+                $user_id = $from->getId();
+            } elseif (($inline_query = $this->update->getInlineQuery()) && ($from = $inline_query->getFrom())) {
+                $user_id = $from->getId();
+            } elseif (($chosen_inline_result = $this->update->getChosenInlineResult()) && ($from = $chosen_inline_result->getFrom())) {
+                $user_id = $from->getId();
+            } elseif (($callback_query = $this->update->getCallbackQuery()) && ($from = $callback_query->getFrom())) {
+                $user_id = $from->getId();
+            } elseif (($edited_message = $this->update->getEditedMessage()) && ($from = $edited_message->getFrom())) {
+                $user_id = $from->getId();
+            }
+        }
+
+        return ($user_id === null) ? false : in_array($user_id, Yii::$app->params['moderators']);
     }
 
 }

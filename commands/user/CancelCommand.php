@@ -26,7 +26,7 @@ class CancelCommand extends BaseUserCommand
      * {@inheritdoc}
      */
     protected $name = 'cancel';
-    protected $description = 'Cancel the currently active conversation';
+    protected $description = 'Cancela la coversación actualmente activa con el bot.';
     protected $usage = '/cancel';
     protected $version = '0.1.1';
     protected $need_mysql = true;
@@ -37,7 +37,7 @@ class CancelCommand extends BaseUserCommand
      */
     public function execute()
     {
-        $text = 'No active conversation!';
+        $text = '¡No existen conversaciones activas!';
 
         //Cancel current conversation if any
         $conversation = new Conversation(
@@ -47,7 +47,7 @@ class CancelCommand extends BaseUserCommand
 
         if ($conversation_command = $conversation->getCommand()) {
             $conversation->cancel();
-            $text = 'Conversation "' . $conversation_command . '" cancelled!';
+            $text = '¡Conversación "' . $conversation_command . '" cancelada!';
         }
 
         return $this->getRequest()->hideKeyboard()->sendMessage($text);
@@ -58,7 +58,7 @@ class CancelCommand extends BaseUserCommand
      */
     public function executeNoDb()
     {
-        return $this->sendMessage('Nothing to cancel.');
+        return $this->sendMessage('No hay nada que cancelar.');
     }
 
 }

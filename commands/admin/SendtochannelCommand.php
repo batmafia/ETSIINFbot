@@ -24,8 +24,8 @@ class SendtochannelCommand extends BaseAdminCommand
      * {@inheritdoc}
      */
     protected $name = 'sendtochannel';
-    protected $description = 'Send message to a channel';
-    protected $usage = '/sendtochannel <message to send>';
+    protected $description = 'Envia el mensaje a un canal.';
+    protected $usage = '/sendtochannel <Mensaje a enviar>';
     protected $version = '0.1.4';
     protected $need_mysql = true;
     /**#@-*/
@@ -71,7 +71,7 @@ class SendtochannelCommand extends BaseAdminCommand
                     $this->conversation->notes['state'] = -1;
                     $this->conversation->update();
 
-                    $data['text'] = 'Insert the channel name: (@yourchannel)';
+                    $data['text'] = 'Escribe el nombre del canal: (@tucanal)';
                     $data['reply_markup'] = new ReplyKeyBoardHide(['selective' => true]);
                     $result = Request::sendMessage($data);
 
@@ -103,7 +103,7 @@ class SendtochannelCommand extends BaseAdminCommand
                         ]
                     );
                     $data['reply_markup'] = $reply_keyboard_markup;
-                    $data['text'] = 'Select a channel';
+                    $data['text'] = 'Selecciona un canal';
                     if ($type != 'Message' || !in_array($text, $channels)) {
                         $data['text'] = 'Select a channel from the keyboard:';
                     }
@@ -121,7 +121,7 @@ class SendtochannelCommand extends BaseAdminCommand
                     $this->conversation->update();
 
                     $data['reply_markup'] = new ReplyKeyBoardHide(['selective' => true]);
-                    $data['text'] = 'Insert the content you want to share: text, photo, audio...';
+                    $data['text'] = 'Inserta el contenido que quieres compartir: Texto, Foto, Audio...';
                     $result = Request::sendMessage($data);
                     break;
                 }
@@ -166,7 +166,7 @@ class SendtochannelCommand extends BaseAdminCommand
                     $this->conversation->notes['state'] = 3;
                     $this->conversation->update();
 
-                    $data['text'] = 'Insert caption:';
+                    $data['text'] = 'Escribe una descripción:';
                     $data['reply_markup'] = new ReplyKeyBoardHide(['selective' => true]);
                     $result = Request::sendMessage($data);
                     break;
@@ -179,7 +179,7 @@ class SendtochannelCommand extends BaseAdminCommand
                     $this->conversation->notes['state'] = 4;
                     $this->conversation->update();
 
-                    $data['text'] = 'Message will look like this:';
+                    $data['text'] = 'El mensaje se verá así:';
                     $result = Request::sendMessage($data);
 
                     if ($this->conversation->notes['message_type'] != 'command') {
@@ -188,11 +188,11 @@ class SendtochannelCommand extends BaseAdminCommand
                         }
                         $result = $this->sendBack(new Message($this->conversation->notes['message'], 'thisbot'), $data);
 
-                        $data['text'] = 'Would you post it?';
-                        if ($this->conversation->notes['last_message_id'] != $message->getMessageId() && !($text == 'Yes' || $text == 'No')) {
-                            $data['text'] = 'Would you post it?' . "\n" . 'Press Yes or No';
+                        $data['text'] = '¿Deseas enviarlo?';
+                        if ($this->conversation->notes['last_message_id'] != $message->getMessageId() && !($text == 'Si' || $text == 'No')) {
+                            $data['text'] = '¿Deseas enviarlo?' . "\n" . 'Elige Si o No';
                         }
-                        $keyboard = [['Yes', 'No']];
+                        $keyboard = [['Si', 'No']];
                         $reply_keyboard_markup = new ReplyKeyboardMarkup(
                             [
                                 'keyboard' => $keyboard ,
@@ -208,7 +208,7 @@ class SendtochannelCommand extends BaseAdminCommand
                 }
 
                 $this->conversation->notes['post_message'] = false;
-                if ($text == 'Yes') {
+                if ($text == 'Si') {
                     $this->conversation->notes['post_message'] = true;
                 }
                 $this->conversation->notes['last_message_id'] = $message->getMessageId();
@@ -223,7 +223,7 @@ class SendtochannelCommand extends BaseAdminCommand
                         $this->conversation->notes['caption']
                     );
                 } else {
-                    $data['text'] = 'Abort by user, message not sent..';
+                    $data['text'] = 'Cancelado por el usuario, mensaje no enviado.';
                 }
 
                 $this->conversation->stop();
@@ -271,11 +271,11 @@ class SendtochannelCommand extends BaseAdminCommand
         ];
 
         if ($this->sendBack($message, $data)->isOk()) {
-            $response = 'Message sent successfully to: ' . $channel;
+            $response = 'Mensaje enviado correctamente a: ' . $channel;
         } else {
-            $response = 'Message not sent to: ' .  $channel . "\n" .
-                    '- Does the channel exist?' . "\n" .
-                    '- Is the bot an admin of the channel?';
+            $response = 'Mensaje no enviado a: ' .  $channel . "\n" .
+                    '- ¿Existe el canal?' . "\n" .
+                    '- ¿Es el bot administrador del canal?';
         }
         return $response;
     }

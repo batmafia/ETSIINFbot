@@ -18,7 +18,11 @@ abstract class BaseRegularCommand extends BaseCommand
     {
         parent::__construct($telegram, $update);
 
-        $this->request = new Request($this->getMessage()->getChat()->getId());
+        $chatId = null;
+        if($this->getMessage() !== null && $this->getMessage()->getChat() !== null)
+            $chatId = $this->getMessage()->getChat()->getId();
+
+        $this->request = new Request($chatId);
     }
 
 
@@ -43,6 +47,9 @@ abstract class BaseRegularCommand extends BaseCommand
                 case 'text':
                     $args[] = $this->getMessage()->getText(true);
                     break;
+                case 'message':
+                    $args[] = $this->getMessage();
+                    break;
                 default:
                     $args[] = $this->getMessage()->{"get".ucfirst($parameter->getName())}();
                     break;
@@ -56,7 +63,7 @@ abstract class BaseRegularCommand extends BaseCommand
         return $result;
     }
 
-    private function resetCommand()
+    public function resetCommand()
     {
         $this->processed = true;
         return $this->preExecute();
@@ -70,7 +77,7 @@ abstract class BaseRegularCommand extends BaseCommand
 
     public function previousStep()
     {
-        $this->setStepIndex($this->getStepIndex()-1);
+        $this->setStepIndex(max($this->getStepIndex()-1, 0));
         return $this->resetCommand();
     }
 
@@ -88,6 +95,15 @@ abstract class BaseRegularCommand extends BaseCommand
             return 0;
 
         return $this->conversation->notes['step_index'];
+    }
+
+    public function cancelConversation()
+    {
+        $msgCancelConver = "*Comando cancelado.*\n".
+                            "Más comandos en /help.";
+
+        $this->stopConversation();
+        return $this->getRequest()->hideKeyboard()->markdown()->sendMessage($msgCancelConver);
     }
 
     /**

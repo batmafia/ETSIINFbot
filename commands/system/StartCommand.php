@@ -10,38 +10,19 @@
 
 namespace app\commands\system;
 
-use app\commands\base\BaseSystemCommand;
-use Longman\TelegramBot\Request;
+use app\commands\user\HelpCommand;
 
 /**
  * Start command
  */
-class StartCommand extends BaseSystemCommand
+class StartCommand extends HelpCommand
 {
     /**#@+
      * {@inheritdoc}
      */
     protected $name = 'start';
-    protected $description = 'Start command';
+    protected $description = 'Comando de inicio';
     protected $usage = '/start';
-    protected $version = '1.0.1';
-    /**#@-*/
+    protected $version = '1.0.2';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function execute()
-    {
-        $message = $this->getMessage();
-
-        $chat_id = $message->getChat()->getId();
-        $text = 'Hi there!' . "\n" . 'Type /help to see all commands!';
-
-        $data = [
-            'chat_id' => $chat_id,
-            'text'    => $text,
-        ];
-
-        return Request::sendMessage($data);
-    }
 }
