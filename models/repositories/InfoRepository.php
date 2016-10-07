@@ -34,6 +34,7 @@ Está abierta a todos los alumnos que tengan ganas de conocer gente nueva, apren
 *Web*: http://acm.asoc.etsiinf.upm.es/
 *Correo*: acm@fi.upm.es
 *Twitter*: https://twitter.com/acmupm
+*Facebook*: https://es-es.facebook.com/acmupm
 *Telegram*: @acmupm
 *Telegram Bot*: @acmupm\\_bot',  // to skip _ -> \_ -> to skip \ -> \\_
             'Histrión' => '
