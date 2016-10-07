@@ -11,7 +11,9 @@
 namespace app\commands\user;
 
 use app\commands\base\BaseUserCommand;
+use app\models\Chat;
 use app\models\Message;
+use app\models\User;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Request;
@@ -108,19 +110,20 @@ class BroadcastCommand extends BaseUserCommand
         return $this->nextStep();
     }
 
-    public function processSend()
+    public function processSend($chat)
     {
         $number = 0;
 
-        $chats = DB::selectChats(true, true, true, null, null);
-        foreach ($chats as $row)
+        $ids = Chat::find()->select("chat.id")->joinWith("users")->where('broadcast')->andWhere("chat.id<>:id",['id'=>$chat->getId()])->all();
+
+        foreach ($ids as $id)
         {
-            $n = $this->sendMessages($row['chat_id']);
+            $n = $this->sendMessages($id->id);
             $number++;
         }
 
         $this->stopConversation();
-        return $this->getRequest()->hideKeyboard()->sendMessage("-\n-\nEnviado a $number personas.");
+        return $this->getRequest()->hideKeyboard()->sendMessage("Enviado a $number personas.");
     }
 
     private function sendMessages($chatId)
