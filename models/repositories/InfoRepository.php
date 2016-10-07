@@ -19,14 +19,6 @@ Está abierta a todos los alumnos que tengan ganas de conocer gente nueva, apren
 *Web*: http://tunadeinformatica.com/
 *Correo*: tuna@tunadeinformatica.com
 *Twitter*: https://twitter.com/tunainformatica',
-            // 'ACM' => [
-            //     'Nombre' => 'ACM Capítulo de Estudiantes.',
-            //     'Descripción' => 'Es una organización internacional científica y educativa dedicada a hacer progresar el arte, la ciencia, la ingeniería y las aplicaciones de la tecnología de la información, fomentando un intercambio abierto de información. A.C.M. agrupa a la práctica totalidad de la comunidad investigadora en el ámbito informático. Entre los propósitos de A.C.M. se encuentra promover el conocimiento de la ciencia, el diseño, la construcción del lenguaje y las aplicaciones de los ordenadores, proporcionando así un medio de comunicación e intercambio.',
-            //     'Web' => 'http://acm.asoc.etsiinf.upm.es/',
-            //     'Correo' => 'acm@fi.upm.es',
-            //     'Twitter' => 'https://twitter.com/acmupm',
-            //     'Telegram' => '@acmupm'
-            // ],
             'ACM' => '
 *ACM*
 *Nombre*: ACM Capítulo de Estudiantes.
@@ -109,18 +101,18 @@ La Sección de Gestión Administrativa gestiona los trámites relacionados con l
         ],
         'Servicios' => [
             'Reserva salas' => 'https://www.fi.upm.es/aulas/view-schedule.php?sid=5',
-            'WIFI' => [  // @TODO
+            'WIFI' => [
                 'FIWIFI' => '
 La conexión al portal cautivo de la Facultad. Para realizar esta conexión sólo deberá realizar una petición de una página web en su navegador. Su solicitud será redirigida a una página web en la que se le pedirá que se autentique. Tras introducir correctamente el usuario y contraseña asignado por la Facultad (aquel que se usa para acceder a los ordenadores de las salas) será redirigido a una página web que le indicará que se ha conectado correctamente. La autentificación de este sistema es la misma que la del Acceso VPN y por tanto, si no se ha hecho ya, debe seguirse el mismo procedimiento de solicitud.
 Una vez que vea esta página ya puede pedir a su navegador las páginas que desee. Conviene que no pierda la página anterior, para que cuando desee finalizar su sesión pulse Terminar Sesión y finalice.
 
 *Más información*: https://www.fi.upm.es/?pagina=262',
                 'WIFIUPM' => '
-Poner tu correo institucional (...@alumnos.upm.es) y su clave.
+Poner tu correo institucional (...@alumnos.upm.es) y tu clave.
 
 *Más información*: http://www.upm.es/UPM/InformaticaComunicaciones/wifi?id=7dc338900c392410VgnVCM10000009c7648a\\_\\_\\_\\_&fmt=detail&prefmt=articulo',
                 'eduroam' => '
-Poner tu correo institucional (...@alumnos.upm.es) y su clave.
+Poner tu correo institucional (...@alumnos.upm.es) y tu clave.
 
 *Más información*: http://www.upm.es/UPM/InformaticaComunicaciones/wifi?id=e83fe60106778110VgnVCM10000009c7648a\\_\\_\\_\\_&fmt=detail&prefmt=articulo'
             ],
@@ -152,16 +144,13 @@ Los alumnos de la Facultad tienen la posibilidad de acceder a sus directorios de
 *Web*: http://www.fi.upm.es/?pagina=24
 *Correo*: biblioteca.etsiinf@upm.es
 *Twitter*: https://twitter.com/BibliotecaFIUPM',
-        'Delegación de Alumnos' => [
-            'Info' => '
+        'Delegación de Alumnos' => '
 *Delegación de Alumnos*
 *Nombre*: Delegación de Alumnos.
 *Web*: https://www.da.etsiinf.upm.es
 *Web ETSIINF*: https://www.etsiinf.upm.es/?id=delegacion
 *Correo*: delegacion@da.fi.upm.es
 *Twitter*: https://twitter.com/daetsiinf',
-            'Mas cosas...' => 'https://www.da.etsiinf.upm.es/ cuando @javier levane el server XD' // @TODO
-        ],
         'Club Deportivo' => '
 *Club Deportivo*
 *Nombre*: Club Deportivo.
