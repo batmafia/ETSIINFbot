@@ -6,7 +6,7 @@ class m161007_145401_Notification extends Migration
 {
     public function up()
     {
-
+        $this->addColumn("user", "broadcast", $this->boolean()->defaultValue(true));
     }
 
     public function down()
