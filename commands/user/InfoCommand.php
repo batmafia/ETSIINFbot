@@ -23,6 +23,9 @@ class InfoCommand extends BaseUserCommand
 
     const KEYBOARD_COLUMNS = 3;
 
+    const CANCEL = 'Cancelar';
+    const BACK = 'Volver';
+
     /**
      * [process_SelectLine description]
      * @param  [type] $text [description]
@@ -37,28 +40,34 @@ class InfoCommand extends BaseUserCommand
         if(!is_array($opts))
         {
             //We reached last level, send the info.
-            $this->stopConversation();
-            return $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($opts);
+            $this->getRequest()->hideKeyboard()->markdown()->sendMessage($opts);
+            return $this->previousStep();
         }
         else
         {
             $opts = array_keys($opts);
-            $cancel = ['Cancelar'];
             $keyboard = array_chunk($opts, self::KEYBOARD_COLUMNS);
-            $keyboard[] = $cancel;
+            $keyboard[] = [self::BACK, self::CANCEL];
 
             $this->getRequest()->keyboard($keyboard);
 
-            if (empty($text)) {
+            if ($this->isProcessed() || empty($text)) {
                 return $this->getRequest()->sendMessage('Selecciona una opción');
             }
 
-            if (!(in_array($text, $opts) || in_array($text, $cancel))) {
-                return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
+            if($text === self::BACK)
+            {
+                return $this->previousStep();
             }
 
-            if (in_array($text, $cancel)) {
+            if ($text === self::CANCEL)
+            {
                 return $this->cancelConversation();
+            }
+
+            if (!(in_array($text, $opts)))
+            {
+                return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
             }
 
             $this->getConversation()->notes['indexes'][] = $text;
@@ -80,4 +89,9 @@ class InfoCommand extends BaseUserCommand
         return $opts;
     }
 
+    function previousStep()
+    {
+        array_pop($this->getConversation()->notes['indexes']);
+        return $this->resetCommand();
+    }
 }
