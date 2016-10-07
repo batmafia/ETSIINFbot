@@ -8,5 +8,8 @@ return [
         'Svg153' => 5341682,
         'mrgarri' => 444646
     ],
+    'moderators' => [
+        'pmoso' => 268290292
+    ],
     'version' => '0.1'
 ];
