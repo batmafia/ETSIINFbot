@@ -87,7 +87,7 @@ La Sección de Gestión Administrativa gestiona los trámites relacionados con l
 *Teléfono*: +34913367407
 *Correo*: secretaria@fi.upm.es
 *Trámites administrativos*: https://www.etsiinf.upm.es/?id=servicios/tramites
-*Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195\\_Triptico\\_Secretaria\\_Alumnos.pdf", // to skip _ -> \_ -> to skip \ -> \\_
+*Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195\\_Triptico\\_Secretaria\\_Alumnos.pdf",  // to skip _ -> \_ -> to skip \ -> \\_
             // https://www.etsiinf.upm.es/?id=servicios/tramites
             'Trámites' => 'https://www.etsiinf.upm.es/?id=servicios/tramites'
             // 'Trámites' => [
