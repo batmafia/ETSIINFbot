@@ -101,7 +101,6 @@ class AsignaturasCommand extends BaseUserCommand
     public function processShowCourse($text)
     {
         $selectedPlan = $this->getConversation()->notes['plan'];
-        echo $this->getActualYear(0);
         $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear(0));
 
         $opts2 = array_keys($ordenadas);
