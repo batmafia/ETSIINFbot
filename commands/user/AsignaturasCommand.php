@@ -45,31 +45,14 @@ class AsignaturasCommand extends BaseUserCommand
     public $subjectlist = [];
 
 
-    private function getActualYear($apiOption)
+    private function getActualYear()
     {
-
         $year = intval(date("Y"));
-        $year2 = intval(date("y"));
 
-        if (intval(date("m")) > 7)
-        {
-            $year2=$year2+1;
-        }
-        else
-        {
-            $year=$year-1;
-        }
+        if (intval(date("m")) <= 7)
+            $year--;
 
-        if ($apiOption===0)
-        {
-            return "$year$year2";
-        }
-        else if ($apiOption===1)
-        {
-            return "$year-$year2";
-        }
-
-
+        return $year;
     }
 
     public function processGetPlan($text)
@@ -101,7 +84,7 @@ class AsignaturasCommand extends BaseUserCommand
     public function processShowCourse($text)
     {
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear(0));
+        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear());
 
         $opts2 = array_keys($ordenadas);
 
@@ -142,7 +125,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedCourse = $this->getConversation()->notes['course'];
 
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear(0));
+        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear());
 
         $opts3 = array_keys($ordenadas[$selectedCourse]);
 
@@ -183,7 +166,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedCourse = $this->getConversation()->notes['course'];
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear(0));
+        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear());
         $asignaturas = $ordenadas[$selectedCourse][$selectedSemester];
 
         $opts4 = array_keys($asignaturas);
@@ -230,7 +213,7 @@ class AsignaturasCommand extends BaseUserCommand
 
         try
         {
-            $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear(1));
+            $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
         }
         catch (\Exception $exception)
         {
@@ -291,7 +274,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSubject = $this->getConversation()->notes['subject'];
         $extraInfo = $this->getConversation()->notes['extrainfo'];
 
-        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear(1));
+        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
 
         if ($this->isProcessed() || empty($text))
         {
@@ -320,7 +303,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
         $selectedSubject = $this->getConversation()->notes['subject'];
-        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear(1));
+        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
 
         $profesoresKB = [];
 
@@ -391,7 +374,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSubject = $this->getConversation()->notes['subject'];
         $selectedTeacher = $this->getConversation()->notes['teacher'];
 
-        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear(1));
+        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
 
         if ($this->isProcessed() || empty($text))
         {
