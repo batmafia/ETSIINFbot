@@ -60,7 +60,7 @@ abstract class BaseRegularCommand extends BaseCommand
         return $result;
     }
 
-    private function resetCommand()
+    public function resetCommand()
     {
         $this->processed = true;
         return $this->preExecute();
@@ -74,7 +74,7 @@ abstract class BaseRegularCommand extends BaseCommand
 
     public function previousStep()
     {
-        $this->setStepIndex($this->getStepIndex()-1);
+        $this->setStepIndex(max($this->getStepIndex()-1, 0));
         return $this->resetCommand();
     }
 
