@@ -79,15 +79,15 @@ La Asociación se inspira fuertemente en el humanismo cristiano, de ahí tambié
 *Twitter*: https://twitter.com/AETOupm'
         ],
         'Secretaria' => [
-            'Info' => '*Secretaría*
+            'Info' => "*Secretaría*
 La Sección de Gestión Administrativa gestiona los trámites relacionados con los expedientes de alumnos de Ingenieria, Grado, Máster y Doctorado, así como el Registro de la Escuela.
 *Web*: https://www.etsiinf.upm.es/?id=servicios/secretaria
 *Lugar*: Bloque 3, planta 1
-*Horario de mañanas*: Lunes a Viernes: 9:00 - 14:00'."\n".'*Horario de Tardes*: Lunes y Miercoles 15:30 - 17:30
+*Horario de mañanas*: Lunes a Viernes: 9:00 - 14:00\n*Horario de Tardes*: Lunes y Miercoles 15:30 - 17:30
 *Teléfono*: +34913367407
 *Correo*: secretaria@fi.upm.es
 *Trámites administrativos*: https://www.etsiinf.upm.es/?id=servicios/tramites
-*Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195\\_Triptico\\_Secretaria\\_Alumnos.pdf',  // to skip _ -> \_ -> to skip \ -> \\_
+*Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195\\_Triptico\\_Secretaria\\_Alumnos.pdf",  // to skip _ -> \_ -> to skip \ -> \\_
             // https://www.etsiinf.upm.es/?id=servicios/tramites
             'Trámites' => 'https://www.etsiinf.upm.es/?id=servicios/tramites'
             // 'Trámites' => [
