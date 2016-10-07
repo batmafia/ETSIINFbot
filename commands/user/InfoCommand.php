@@ -24,7 +24,7 @@ class InfoCommand extends BaseUserCommand
     const KEYBOARD_COLUMNS = 3;
 
     const CANCEL = 'Cancelar';
-    const BACK = 'Volver';
+    const BACK = 'Atrás';
 
     /**
      * [process_SelectLine description]
@@ -47,7 +47,7 @@ class InfoCommand extends BaseUserCommand
         {
             $opts = array_keys($opts);
             $keyboard = array_chunk($opts, self::KEYBOARD_COLUMNS);
-            $keyboard[] = [self::BACK, self::CANCEL];
+            $keyboard[] = [self::CANCEL, self::BACK];
 
             $this->getRequest()->keyboard($keyboard);
 
