@@ -42,10 +42,35 @@ class AsignaturasCommand extends BaseUserCommand
         self::INF_DOBGRA => '10ID'
     ];
 
-    public $ordenadas = [];
-    public $porsemestre = [];
     public $subjectlist = [];
 
+
+    private function getActualYear($apiOption)
+    {
+
+        $year = intval(date("Y"));
+        $year2 = intval(date("y"));
+
+        if (intval(date("m")) > 7)
+        {
+            $year2=$year2+1;
+        }
+        else
+        {
+            $year=$year-1;
+        }
+
+        if ($apiOption===0)
+        {
+            return "$year$year2";
+        }
+        else if ($apiOption===1)
+        {
+            return "$year-$year2";
+        }
+
+
+    }
 
     public function processGetPlan($text)
     {
@@ -76,23 +101,10 @@ class AsignaturasCommand extends BaseUserCommand
     public function processShowCourse($text)
     {
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $subjectsOfPlan = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], '201617');
+        echo $this->getActualYear(0);
+        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear(0));
 
-        foreach ($subjectsOfPlan as $s)
-        {
-            if ($s->curso !== "")
-            {
-                $this->ordenadas[$s->curso][] = $s;
-            }
-        }
-
-        $opts2 = [];
-        ksort($this->ordenadas);
-
-        foreach ($this->ordenadas as $key => $k)
-        {
-            $opts2[] = "$key";
-        }
+        $opts2 = array_keys($ordenadas);
 
         $cancel = [self::CANCELAR, self::ATRAS];
         $keyboard = array_chunk($opts2, 2);
@@ -122,7 +134,7 @@ class AsignaturasCommand extends BaseUserCommand
             }
         }
 
-        $this->getConversation()->notes['course'] = $text;
+        $this->getConversation()->notes['course'] = " ".$text;
         return $this->nextStep();
     }
 
@@ -131,34 +143,9 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedCourse = $this->getConversation()->notes['course'];
 
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $subjectsOfPlan = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], '201617');
+        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear(0));
 
-        foreach ($subjectsOfPlan as $s)
-        {
-            if ($s->curso !== "")
-            {
-                $this->ordenadas[$s->curso][] = $s;
-            }
-        }
-
-        foreach ($this->ordenadas[$selectedCourse] as $sub)
-        {
-            foreach ($sub->imparticion as $sem)
-            {
-                if ($sem->codigo_duracion !== "")
-                {
-                    $this->porsemestre[$sem->codigo_duracion][] = $sub;
-                }
-            }
-        }
-
-        $opts3 = [];
-        ksort($this->porsemestre);
-
-        foreach ($this->porsemestre as $key => $k)
-        {
-            $opts3[] = "$key";
-        }
+        $opts3 = array_keys($ordenadas[$selectedCourse]);
 
         $cancel = [self::CANCELAR, self::ATRAS];
         $keyboard = array_chunk($opts3, 2);
@@ -197,39 +184,10 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedCourse = $this->getConversation()->notes['course'];
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $subjectsOfPlan = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], '201617');
+        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear(0));
+        $asignaturas = $ordenadas[$selectedCourse][$selectedSemester];
 
-        foreach ($subjectsOfPlan as $s)
-        {
-            if ($s->curso !== "")
-            {
-                $this->ordenadas[$s->curso][] = $s;
-            }
-        }
-
-
-        foreach ($this->ordenadas[$selectedCourse] as $sub)
-        {
-            foreach ($sub->imparticion as $sem)
-            {
-                if ($sem->codigo_duracion !== "")
-                {
-                    $this->porsemestre[$sem->codigo_duracion][] = $sub;
-                }
-            }
-        }
-
-        foreach ($this->porsemestre[$selectedSemester] as $sub)
-        {
-            $this->subjectlist[$sub->codigo] = $sub->nombre;
-        }
-
-        $opts4 = [];
-        foreach ($this->subjectlist as $key => $k)
-        {
-            $opts4[] = "$k";
-        }
-
+        $opts4 = array_keys($asignaturas);
 
         $cancel = [self::CANCELAR,self::ATRAS];
         $keyboard = array_chunk($opts4, 2);
@@ -260,7 +218,7 @@ class AsignaturasCommand extends BaseUserCommand
         }
 
 
-        $this->getConversation()->notes['subject'] = array_search($text, $this->subjectlist);
+        $this->getConversation()->notes['subject'] = $asignaturas[$text]->codigo;
         return $this->nextStep();
     }
 
@@ -273,7 +231,7 @@ class AsignaturasCommand extends BaseUserCommand
 
         try
         {
-            $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, "2016-17");
+            $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear(1));
         }
         catch (\Exception $exception)
         {
@@ -334,7 +292,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSubject = $this->getConversation()->notes['subject'];
         $extraInfo = $this->getConversation()->notes['extrainfo'];
 
-        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, "2016-17");
+        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear(1));
 
         if ($this->isProcessed() || empty($text))
         {
@@ -363,7 +321,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
         $selectedSubject = $this->getConversation()->notes['subject'];
-        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, "2016-17");
+        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear(1));
 
         $profesoresKB = [];
 
@@ -434,7 +392,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSubject = $this->getConversation()->notes['subject'];
         $selectedTeacher = $this->getConversation()->notes['teacher'];
 
-        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, "2016-17");
+        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear(1));
 
         if ($this->isProcessed() || empty($text))
         {

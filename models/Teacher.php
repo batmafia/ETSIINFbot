@@ -61,12 +61,6 @@ class Teacher extends Model
         ];
     }
 
-    public function validateModels($attribute, $value)
-    {
-        return $this->{$attribute}->validate();
-    }
-
-
     public function setAttributes($values, $safeOnly = true)
     {
         parent::setAttributes($values, $safeOnly);

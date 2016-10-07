@@ -32,7 +32,7 @@ class Tutorial extends Model
     {
         return [
             [['dia','hora_inicio','hora_fin'], 'required'],
-            [['dia','hora_inicio','hora_fin'], 'string'],
+            [['dia','hora_inicio','hora_fin','observaciones'], 'string'],
             ['observaciones','safe']
         ];
     }
