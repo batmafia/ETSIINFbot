@@ -169,7 +169,10 @@ class AsignaturasCommand extends BaseUserCommand
         $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear());
         $asignaturas = $ordenadas[$selectedCourse][$selectedSemester];
 
-        $opts4 = array_keys($asignaturas);
+        foreach ($asignaturas as $asignatura)
+        {
+            $opts4[$asignatura->codigo] =  "$asignatura->nombre";
+        }
 
         $cancel = [self::CANCELAR,self::ATRAS];
         $keyboard = array_chunk($opts4, 2);
@@ -200,7 +203,7 @@ class AsignaturasCommand extends BaseUserCommand
         }
 
 
-        $this->getConversation()->notes['subject'] = $asignaturas[$text]->codigo;
+        $this->getConversation()->notes['subject'] = array_search($text,$opts4);
         return $this->nextStep();
     }
 
