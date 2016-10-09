@@ -44,37 +44,28 @@ class SubjectRepository
     public static function getPlansFromCenter($center, $studyType, $studySubType, $year)
     {
         $year2 = substr($year + 1, -2);
-        $request = Request::get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json/
-        $center/planes/$studyType?subtipo_estudio=$studySubType&anio=$year$year2")
+        $request = Request::get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json/$center/planes/$studyType?subtipo_estudio=$studySubType&anio=$year$year2")
             ->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
 
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
             $availablePlans = [];
 
-
             foreach ($data as $plan)
             {
-                $PlanjObj = new CenterPlan();
-                $PlanjObj->setAttributes($plan);
 
-                if ($plan->validate()) {
+                $myplan = new CenterPlan();
+                $myplan->setAttributes($plan);
 
-
-                }
-                else
-                {
+                if ($myplan->validate()) {
+                    $availablePlans[]=$myplan;
+                } else {
                     print_r($plan->getErrors());
                 }
-
             }
 
+            return $availablePlans;
 
-            if ($plan->validate()) {
-                return $plan;
-            } else {
-                print_r($plan->getErrors());
-            }
         } else {
             throw new Exception("Repository exception");
         }
