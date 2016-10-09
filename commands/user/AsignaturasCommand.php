@@ -122,7 +122,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedCourse = $this->getConversation()->notes['course'];
 
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear());
+        $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
 
         $opts3 = array_keys($ordenadas[$selectedCourse]);
 
@@ -163,7 +163,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedCourse = $this->getConversation()->notes['course'];
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear());
+        $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
         $asignaturas = $ordenadas[$selectedCourse][$selectedSemester];
 
         foreach ($asignaturas as $asignatura)
@@ -207,9 +207,12 @@ class AsignaturasCommand extends BaseUserCommand
     public function processShowInfoSubject($text)
     {
 
+        $selectedCourse = $this->getConversation()->notes['course'];
         $selectedSemester = $this->getConversation()->notes['semester'];
-        $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
+        $selectedPlan = $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
+
+        echo "$selectedSemester $selectedPlan $selectedSubject";
 
         try
         {
@@ -231,6 +234,7 @@ class AsignaturasCommand extends BaseUserCommand
                 throw $exception;
             }
         }
+
 
         $numProfesores = count($subject->profesores);
 
@@ -270,7 +274,7 @@ class AsignaturasCommand extends BaseUserCommand
     {
 
         $selectedSemester = $this->getConversation()->notes['semester'];
-        $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
+        $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
         $extraInfo = $this->getConversation()->notes['extrainfo'];
 
@@ -302,7 +306,7 @@ class AsignaturasCommand extends BaseUserCommand
     {
 
         $selectedSemester = $this->getConversation()->notes['semester'];
-        $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
+        $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
         $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
 
@@ -371,7 +375,7 @@ class AsignaturasCommand extends BaseUserCommand
     {
 
         $selectedSemester = $this->getConversation()->notes['semester'];
-        $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
+        $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
         $selectedTeacher = $this->getConversation()->notes['teacher'];
 
