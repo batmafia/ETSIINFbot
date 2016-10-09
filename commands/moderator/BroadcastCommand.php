@@ -13,6 +13,7 @@ namespace app\commands\user;
 use app\commands\base\BaseUserCommand;
 use app\models\core\Chat;
 use app\models\core\Message;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 
 /**
@@ -115,8 +116,13 @@ class BroadcastCommand extends BaseUserCommand
 
         foreach ($ids as $id)
         {
-            $n = $this->sendMessages($id->id);
-            $number++;
+            try
+            {
+                $n = $this->sendMessages($id->id);
+                $number++;
+            }
+            catch(TelegramException $te){}
+
         }
 
         $this->stopConversation();
