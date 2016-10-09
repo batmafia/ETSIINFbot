@@ -46,7 +46,7 @@ class BroadcastCommand extends BaseUserCommand
     public function processStart()
     {
         $this->getConversation();
-        $this->nextStep();
+        return $this->nextStep();
     }
 
     public function processRequests($message, $text)

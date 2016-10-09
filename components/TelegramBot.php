@@ -4,6 +4,7 @@ namespace app\Components;
 use Longman\TelegramBot\ConversationDB;
 use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\Update;
+use Longman\TelegramBot\Request;
 use \Longman\TelegramBot\Telegram;
 use Yii;
 use \yii\base\Configurable;
@@ -107,6 +108,39 @@ class TelegramBot extends Telegram  implements Configurable
         }
 
         return ($user_id === null) ? false : in_array($user_id, Yii::$app->params['moderators']);
+    }
+
+    public function handleGetUpdates($limit = null, $timeout = null)
+    {
+        if (!DB::isDbConnected()) {
+            return new \Longman\TelegramBot\Entities\ServerResponse([
+                'ok'          => false,
+                'description' => 'getUpdates needs MySQL connection!',
+            ], $this->bot_name);
+        }
+
+        //DB Query
+        $last_update = DB::selectTelegramUpdate(1);
+
+        //As explained in the telegram bot api documentation
+        $offset = (isset($last_update[0]['id'])) ? $last_update[0]['id'] + 1 : null;
+
+        $response = Request::getUpdates([
+            'offset'  => $offset,
+            'limit'   => $limit,
+            'timeout' => $timeout,
+        ]);
+
+        $ok = $response->isOk();
+
+        if ($ok) {
+            //Process all updates
+            foreach ((array) $response->getResult() as $result) {
+                $ok &= $this->processUpdate($result)->isOk();
+            }
+        }
+
+        return $response;
     }
 
 }
