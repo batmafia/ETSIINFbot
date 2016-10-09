@@ -81,7 +81,7 @@ class BroadcastCommand extends BaseUserCommand
         }
 
         $this->getConversation()->notes['messages'][] = $message->getMessageId();
-        $this->getRequest()->sendMessage("Mensaje añadido");
+        return $this->getRequest()->sendMessage("Mensaje añadido");
     }
 
     public function processPreview($text, $chat)
