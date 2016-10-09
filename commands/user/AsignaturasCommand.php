@@ -237,8 +237,8 @@ class AsignaturasCommand extends BaseUserCommand
 
         $numProfesores = count($subject->profesores);
 
-        $message = "La asignatura *$subject->nombre* pertenece al departamento de *$subject->depto*, " .
-            "tiene un peso de *$subject->ects ECTS* y tienes a *$numProfesores profesores* dispuestos a ayudarte. " .
+        $message = "La asignatura *$subject->nombre ($subject->caracter)* pertenece al departamento de *$subject->depto*, " .
+            "tiene un peso de *$subject->ects ECTS* y tienes a *$numProfesores profesores* dispuestos a ayudarte.\n" .
             "Selecciona mediante el teclado una opción.\n";
 
 
