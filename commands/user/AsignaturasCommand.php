@@ -206,8 +206,6 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processShowInfoSubject($text)
     {
-
-        $selectedCourse = $this->getConversation()->notes['course'];
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
@@ -250,9 +248,12 @@ class AsignaturasCommand extends BaseUserCommand
         {
             return $this->getRequest()->markdown()->sendMessage($message);
         }
-        if (!($text == self::GUIA_DOCENTE || $text == self::PROFESORES || in_array($text, $cancel)))
+        if (text == self::GUIA_DOCENTE) {
+            return $this->nextStep('sendGuide');
+        }
+        if($text == self::PROFESORES)
         {
-            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
+            return $this->nextStep('teacher');
         }
         if (in_array($text, $cancel))
         {
@@ -266,43 +267,28 @@ class AsignaturasCommand extends BaseUserCommand
             }
         }
 
-        $this->getConversation()->notes['extrainfo'] = $text;
-        return $this->nextStep();
+        return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
     }
 
-    public function processShowExtraInfo($text)
+    public function processSendGuide()
     {
 
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
-        $extraInfo = $this->getConversation()->notes['extrainfo'];
 
         $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
 
-        if ($this->isProcessed() || empty($text))
-        {
-            if ($extraInfo == self::GUIA_DOCENTE)
-            {
-
-                // TODO: Mirar el error SSL.
-                //$guiaPDF=SubjectRepository::getGuia($subject->guia);
-                //$cap = "Aquí te enviamos la guia docente de $subject->nombre";
-                //$this->getRequest()->caption("$cap")->sendDocument($guiaPDF);
-                $result = $this->getRequest()->hideKeyboard()->sendMessage("Aquí tienes la guia docente de $subject->nombre\n$subject->guia");
-                $this->stopConversation();
-                return $result;
-
-
-            }
-            else if ($extraInfo == self::PROFESORES)
-            {
-                return $this->nextStep();
-            }
-        }
+        // TODO: Mirar el error SSL.
+        //$guiaPDF=SubjectRepository::getGuia($subject->guia);
+        //$cap = "Aquí te enviamos la guia docente de $subject->nombre";
+        //$this->getRequest()->caption("$cap")->sendDocument($guiaPDF);
+        $result = $this->getRequest()->hideKeyboard()->sendMessage("Aquí tienes la guia docente de $subject->nombre\n$subject->guia");
+        $this->stopConversation();
+        return $result;
     }
 
-    public function processGetTeacher($text)
+    public function processTeacher($text)
     {
 
         $selectedSemester = $this->getConversation()->notes['semester'];
@@ -371,7 +357,7 @@ class AsignaturasCommand extends BaseUserCommand
 
     }
 
-    public function processShowTeacherInfo($text)
+    public function processTeacherInfo($text)
     {
 
         $selectedSemester = $this->getConversation()->notes['semester'];
