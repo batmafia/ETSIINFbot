@@ -33,9 +33,10 @@ abstract class BaseRegularCommand extends BaseCommand
             $this->conversation = $conversation;
 
         $step = $this->getStepIndex();
-        $executes = array_values(array_filter(get_class_methods(get_class($this)), function($name)
+        $prefix = 'process'.implode(array_map($this->getStepBranches(), function ($word){ return ucfirst($word); }));
+        $executes = array_values(array_filter(get_class_methods(get_class($this)), function($name) use($prefix)
         {
-            return substr($name, 0, 7) === 'process';
+            return substr($name, 0, strlen($prefix)) === $prefix;
         }));
 
         $args = [];
@@ -69,15 +70,33 @@ abstract class BaseRegularCommand extends BaseCommand
         return $this->preExecute();
     }
 
-    public function nextStep()
+    public function nextStep($branch=null)
     {
-        $this->setStepIndex($this->getStepIndex()+1);
+        if($branch === null)
+        {
+            $this->getStepBranches()[] = $branch;
+            $this->getConversation()->notes['stack_frame'][] = $this->getStepIndex();
+            $this->setStepIndex(0);
+        }
+        else
+        {
+            $this->setStepIndex($this->getStepIndex() + 1);
+        }
+
         return $this->resetCommand();
     }
 
     public function previousStep()
     {
-        $this->setStepIndex(max($this->getStepIndex()-1, 0));
+        if($this->getStepIndex() === 0)
+        {
+            end($this->getStepBranches());
+            $this->setStepIndex(end($this->getConversation()->notes['stack_frame']));
+        }
+        else
+        {
+            $this->setStepIndex($this->getStepIndex()-1);
+        }
         return $this->resetCommand();
     }
 
@@ -95,6 +114,14 @@ abstract class BaseRegularCommand extends BaseCommand
             return 0;
 
         return $this->conversation->notes['step_index'];
+    }
+
+    private function getStepBranches()
+    {
+        if(!isset($this->conversation->notes['step_branch']))
+            $this->conversation->notes['step_branch'] = [];
+
+        return $this->conversation->notes['step_branch'];
     }
 
     public function cancelConversation()
