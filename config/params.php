@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'name' => 'ETSIINF Bot',
+    'name' => 'etsiinfbot',
     'admins' => [
         'Fril' => 4103888,
         'diegofpb' => 85785,
