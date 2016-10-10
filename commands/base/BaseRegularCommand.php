@@ -33,7 +33,7 @@ abstract class BaseRegularCommand extends BaseCommand
             $this->conversation = $conversation;
 
         $step = $this->getStepIndex();
-        $prefix = 'process'.implode(array_map($this->getStepBranches(), function ($word){ return ucfirst($word); }));
+        $prefix = 'process'.implode(array_map("ucfirst", $this->getStepBranches()));
         $executes = array_values(array_filter(get_class_methods(get_class($this)), function($name) use($prefix)
         {
             return substr($name, 0, strlen($prefix)) === $prefix;
