@@ -22,6 +22,12 @@ class Request
         return $this;
     }
 
+    public function replyTo($messageId)
+    {
+        $this->data['reply_to_message_id'] = $messageId;
+        return $this;
+    }
+
     public function keyboard($keyboard)
     {
         $this->data['reply_markup'] = new ReplyKeyboardMarkup(

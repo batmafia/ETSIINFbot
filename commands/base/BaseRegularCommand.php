@@ -18,11 +18,15 @@ abstract class BaseRegularCommand extends BaseCommand
     {
         parent::__construct($telegram, $update);
 
-        $chatId = null;
-        if($this->getMessage() !== null && $this->getMessage()->getChat() !== null)
-            $chatId = $this->getMessage()->getChat()->getId();
+        $this->request = new Request;
 
-        $this->request = new Request($chatId);
+        if($this->getMessage() !== null && $this->getMessage()->getChat() !== null)
+        {
+            $this->request->chatId($this->getMessage()->getChat()->getId());
+            if($this->getMessage()->getChat()->isGroupChat() || $this->getMessage()->getChat()->isSuperGroup())
+                $this->request->replyTo($this->getMessage()->getMessageId());
+        }
+
     }
 
 
