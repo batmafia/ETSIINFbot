@@ -36,6 +36,10 @@ $config = [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
+                [
+                    'class' => 'app\components\TelegramLog',
+                    'levels' => ['error', 'warning']
+                ]
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
