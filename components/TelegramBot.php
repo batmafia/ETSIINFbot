@@ -110,6 +110,23 @@ class TelegramBot extends Telegram  implements Configurable
         return ($user_id === null) ? false : in_array($user_id, Yii::$app->params['moderators']);
     }
 
+    public function handle()
+    {
+        $this->input = Request::getInput();
+
+        if (empty($this->input)) {
+            throw new TelegramException('Input is empty!');
+        }
+        $post = json_decode($this->input, true);
+        if (empty($post)) {
+            throw new TelegramException('Invalid JSON!');
+        }
+
+        $ret = $this->processUpdate(new Update($post, $this->bot_name));
+
+        return !$ret || $ret->isOk();
+    }
+
     public function handleGetUpdates($limit = null, $timeout = null)
     {
         if (!DB::isDbConnected()) {
@@ -136,7 +153,8 @@ class TelegramBot extends Telegram  implements Configurable
         if ($ok) {
             //Process all updates
             foreach ((array) $response->getResult() as $result) {
-                $ok &= $this->processUpdate($result)->isOk();
+                $ret = $this->processUpdate($result);
+                $ok &= !ret || $ret->isOk();
             }
         }
 
