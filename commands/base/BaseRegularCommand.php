@@ -72,9 +72,11 @@ abstract class BaseRegularCommand extends BaseCommand
 
     public function nextStep($branch=null)
     {
-        if($branch === null)
+        if($branch !== null)
         {
-            $this->getStepBranches()[] = $branch;
+            $branches = $this->getStepBranches();
+            $branches[] = $branch;
+            $this->setStepBranches($branches);
             $this->getConversation()->notes['stack_frame'][] = $this->getStepIndex();
             $this->setStepIndex(0);
         }
@@ -90,7 +92,9 @@ abstract class BaseRegularCommand extends BaseCommand
     {
         if($this->getStepIndex() === 0)
         {
-            end($this->getStepBranches());
+            $branch = $this->getStepBranches();
+            end($branch);
+            $this->setStepBranches($branch);
             $this->setStepIndex(end($this->getConversation()->notes['stack_frame']));
         }
         else
@@ -105,23 +109,28 @@ abstract class BaseRegularCommand extends BaseCommand
         $index = intval($index);
 
         if($index >= 0)
-            $this->conversation->notes['step_index'] = $index;
+            $this->getConversation()->notes['step_index'] = $index;
     }
 
     private function getStepIndex()
     {
-        if(!isset($this->conversation->notes['step_index']))
+        if(!isset($this->getConversation()->notes['step_index']))
             return 0;
 
-        return $this->conversation->notes['step_index'];
+        return $this->getConversation()->notes['step_index'];
     }
 
     private function getStepBranches()
     {
-        if(!isset($this->conversation->notes['step_branch']))
-            $this->conversation->notes['step_branch'] = [];
+        if(!isset($this->getConversation()->notes['step_branch']))
+            return [];
 
-        return $this->conversation->notes['step_branch'];
+        return $this->getConversation()->notes['step_branch'];
+    }
+
+    private function setStepBranches($branches)
+    {
+        $this->getConversation()->notes['step_branch'] = $branches;
     }
 
     public function cancelConversation()

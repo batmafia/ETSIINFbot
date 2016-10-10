@@ -244,11 +244,11 @@ class AsignaturasCommand extends BaseUserCommand
         $cancel = [self::CANCELAR, self::ATRAS];
         $keyboard = [[self::GUIA_DOCENTE], [self::PROFESORES], $cancel];
         $this->getRequest()->keyboard($keyboard);
-        if ($this->isProcessed() || empty($text))
+        if($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->markdown()->sendMessage($message);
         }
-        if (text == self::GUIA_DOCENTE) {
+        if($text == self::GUIA_DOCENTE) {
             return $this->nextStep('sendGuide');
         }
         if($text == self::PROFESORES)
