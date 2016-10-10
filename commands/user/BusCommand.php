@@ -138,29 +138,7 @@ class BusCommand extends BaseUserCommand
 
             foreach($stop->getLinesByNumber($lineId) as $line)
             {
-                $waitTimeMinutes = $line->getWaitMinutes();
-                $msg = "";
-                switch (true)
-                {
-                    case ($waitTimeMinutes == 0):
-                        # TODO: mirar si es una parada intermedia (Llegando a la parada )o no (Saliendo de la parada)
-                        $msg .= "*En la parada*";
-                        break;
-                    case ($waitTimeMinutes  <= 60):
-                        $msg .= "En *$waitTimeMinutes minuto";
-                        if($waitTimeMinutes > 1)
-                            $msg .= "s";
-                        $msg .= "*";
-                        break;
-                    case ($waitTimeMinutes > 60):
-                        $hours = floor($waitTimeMinutes/60);
-                        $mins = $waitTimeMinutes%60;
-                        $msg .= "A las *$hours:$mins*";
-                        break;
-                    default:
-                        $msg .= "$waitTimeMinutes NO VALIDO";
-                        break;
-                }
+                $msg = $line->getWaitHumanTime();
                 $outText .= " - ".$msg.".\n";
             }
         }
