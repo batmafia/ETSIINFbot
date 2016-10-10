@@ -31,22 +31,22 @@ class NewchatmemberCommand extends BaseSystemCommand
      */
     public function execute()
     {
-        $message = $this->getMessage();
-
-        $chat_id = $message->getChat()->getId();
-        $member = $message->getNewChatMember();
-
-        if ($message->botAddedInChat()) {
-            $text = 'Hi there!';
-        } else {
-            $text = 'Hi ' . $member->tryMention() . '!';
-        }
-
-        $data = [
-            'chat_id' => $chat_id,
-            'text'    => $text,
-        ];
-
-        return Request::sendMessage($data);
+//        $message = $this->getMessage();
+//
+//        $chat_id = $message->getChat()->getId();
+//        $member = $message->getNewChatMember();
+//
+//        if ($message->botAddedInChat()) {
+//            $text = 'Hi there!';
+//        } else {
+//            $text = 'Hi ' . $member->tryMention() . '!';
+//        }
+//
+//        $data = [
+//            'chat_id' => $chat_id,
+//            'text'    => $text,
+//        ];
+//
+//        return Request::sendMessage($data);
     }
 }
