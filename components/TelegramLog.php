@@ -23,7 +23,7 @@ class TelegramLog extends Target
     {
         $text = implode("\n", array_map([$this, 'formatMessage'], $this->messages)) . "\n";
 
-        foreach (Yii::$app->params['admins'] as $id) {
+        foreach (\Yii::$app->params['admins'] as $id) {
             $req = new Request($id);
             $req->sendMessage($text);
         }
