@@ -288,8 +288,9 @@ class AsignaturasCommand extends BaseUserCommand
                 //$guiaPDF=SubjectRepository::getGuia($subject->guia);
                 //$cap = "Aquí te enviamos la guia docente de $subject->nombre";
                 //$this->getRequest()->caption("$cap")->sendDocument($guiaPDF);
-                $this->getRequest()->hideKeyboard()->sendMessage("Aquí tienes la guia docente de $subject->nombre\n$subject->guia");
-                return $this->stopConversation();
+                $result = $this->getRequest()->hideKeyboard()->sendMessage("Aquí tienes la guia docente de $subject->nombre\n$subject->guia");
+                $this->stopConversation();
+                return $result;
 
 
             }
@@ -407,8 +408,9 @@ class AsignaturasCommand extends BaseUserCommand
             }
         }
 
-        $this->getRequest()->markdown()->hideKeyboard()->sendMessage($mensaje);
-        return $this->stopConversation();
+        $result = $this->getRequest()->markdown()->hideKeyboard()->sendMessage($mensaje);
+        $this->stopConversation();
+        return $result;
     }
 
 }
