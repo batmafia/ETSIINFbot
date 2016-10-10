@@ -154,7 +154,7 @@ class TelegramBot extends Telegram  implements Configurable
             //Process all updates
             foreach ((array) $response->getResult() as $result) {
                 $ret = $this->processUpdate($result);
-                $ok &= !ret || $ret->isOk();
+                $ok &= !$ret || $ret->isOk();
             }
         }
 
