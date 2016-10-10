@@ -93,7 +93,7 @@ abstract class BaseRegularCommand extends BaseCommand
         if($this->getStepIndex() === 0)
         {
             $branch = $this->getStepBranches();
-            end($branch);
+            array_pop($branch);
             $this->setStepBranches($branch);
             $this->setStepIndex(end($this->getConversation()->notes['stack_frame']));
         }
