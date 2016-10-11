@@ -7,6 +7,7 @@
  */
 
 namespace app\commands\user;
+use app\commands\base\Request;
 use app\models\repositories\SubjectRepository;
 use app\commands\base\BaseUserCommand;
 
@@ -46,6 +47,8 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processGetPlan($text)
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
         $this->getConversation();
 
         // ETSIINF = 10; PSC = Primer y Segundo Ciclo; GRA = Grado
@@ -79,6 +82,8 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processShowCourse($text)
     {
+
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $selectedPlan = $this->getConversation()->notes['plan'];
         $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
@@ -119,6 +124,8 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processShowSemesters($text)
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
         $selectedCourse = $this->getConversation()->notes['course'];
 
         $selectedPlan = $this->getConversation()->notes['plan'];
@@ -159,6 +166,7 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processShowSubjects($text)
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedCourse = $this->getConversation()->notes['course'];
@@ -206,6 +214,7 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processShowInfoSubject($text)
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $selectedCourse = $this->getConversation()->notes['course'];
         $selectedSemester = $this->getConversation()->notes['semester'];
@@ -272,6 +281,8 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processShowExtraInfo($text)
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
 
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $this->getConversation()->notes['plan'];
@@ -304,6 +315,8 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processGetTeacher($text)
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
 
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $this->getConversation()->notes['plan'];
@@ -373,6 +386,8 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processShowTeacherInfo($text)
     {
+
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $this->getConversation()->notes['plan'];

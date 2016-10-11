@@ -10,6 +10,7 @@
 
 
 namespace app\commands\user;
+use app\commands\base\Request;
 use app\models\repositories\BusRepository;
 use app\commands\base\BaseUserCommand;
 
@@ -120,6 +121,8 @@ class BusCommand extends BaseUserCommand
      */
     public function processSendLineInfo()
     {
+
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $lineId = $this->getConversation()->notes['line'];
         $location = $this->getConversation()->notes['location'];
