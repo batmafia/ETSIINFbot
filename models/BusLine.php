@@ -84,7 +84,7 @@ class BusLine extends Model
                 $hours = floor($waitTimeMinutes/60);
                 $mins = $waitTimeMinutes%60;
                 if (strlen((string)$mins) == 1)
-                    $mins = "0".$mins;
+                    $mins = "0$mins";
                 $msg .= "A las *$hours:$mins*";
                 break;
             default:
