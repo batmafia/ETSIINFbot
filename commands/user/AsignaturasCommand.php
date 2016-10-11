@@ -332,7 +332,7 @@ class AsignaturasCommand extends BaseUserCommand
 
         if ($this->isProcessed() || empty($text))
         {
-            $this->getRequest()->markdown()->sendMessage($mensaje);
+            return $this->getRequest()->markdown()->sendMessage($mensaje);
         }
 
         if (!(in_array($text, $profesoresKB) || in_array($text, $cancel)))
