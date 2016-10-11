@@ -6,7 +6,7 @@
  * Time: 21:52
  */
 
-namespace app\models;
+namespace app\models\metroligero;
 use yii\base\Model;
 class MetroligeroApiResponse extends Model
 {
