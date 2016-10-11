@@ -23,12 +23,16 @@ class StatsController extends Controller
         $data = [];
         foreach ($result as $r)
         {
-            $name = explode("-", $r['day'])[2];
-            $data['series'][$name]['name'] = $name;
-            $data['series'][$name]['id'] = $name;
+            $name = date("d M", strtotime($r['day']));
+            $serie = [
+                'name'=>$name,
+                'id'=>$name,
+                'type'=>'column'
+            ];
 
+            $data['days'][] = $name;
             $data['requests'][] = ['name'=>$name, 'y'=>intval($r['requests']), 'drilldown'=>$name];
-            $data['users'][] = ['name'=>$name, 'y'=>intval($r['users']), 'drilldown'=>$name];
+            $data['users'][] = ['name'=>$name, 'y'=>intval($r['users'])];
 
             $result2 = \Yii::$app->getDb()->createCommand(
                 "SELECT
@@ -36,13 +40,16 @@ class StatsController extends Controller
                     case when LOCATE('@', text) OR LOCATE(' ', text) then LEFT(text, LOCATE('@', text)+LOCATE(' ', text)-1) else text end as command
                 FROM message
                 WHERE LEFT(text, 1) = '/' AND DATE(date) = \"".$r['day']."\"
-                GROUP BY command"
+                GROUP BY command
+                ORDER BY count ASC"
             )->queryAll();
 
             foreach ($result2 as $r2)
             {
-                $data['series'][$name]['data'][] = [$r2['command'], intval($r2['count'])];
+                $serie['data'][] = [$r2['command'], intval($r2['count'])];
             }
+
+            $data['series'][] = $serie;
         }
 
         return $this->render('index', $data);

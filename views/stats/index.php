@@ -10,9 +10,10 @@ echo \miloschuman\highcharts\Highcharts::widget([
         'modules/drilldown'
     ],
     'options' => [
-        'title' => ['text' => 'Uso del mes'],
+        'title' => ['text' => 'Uso del último mes'],
         'xAxis' => [
-            'type' => 'categories'
+            'type'=>'category'
+//            'categories'=>$days
         ],
         'yAxis' => [
             'title' => ['text' => 'Unidades'],
