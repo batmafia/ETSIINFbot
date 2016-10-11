@@ -37,8 +37,6 @@ class BusCommand extends BaseUserCommand
     const ETSIINF = 'ETSIINF';
     const MADRID = 'Madrid';
 
-
-
     /**
      * [process_SelectLine description]
      * @param  [type] $text [description]
@@ -126,10 +124,9 @@ class BusCommand extends BaseUserCommand
         $stopId = $this->getStopId($lineId, $location);
         $stop = BusRepository::getBusStop($stopId);
         $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
-        #$stopIcon = "\xF0\x9F\x9A\x8F"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68F
 
-
-        if (empty($stop->getLinesByNumber($lineId))) {
+        if (empty($stop->getLinesByNumber($lineId)))
+        {
             $outText = "$busIcon *No hay próximas llegadas* para el bus *$lineId* a la parada *$stop->stopName* \n";
         }
         else
@@ -139,7 +136,7 @@ class BusCommand extends BaseUserCommand
             foreach($stop->getLinesByNumber($lineId) as $line)
             {
                 $msg = $line->getWaitHumanTime();
-                $outText .= " - ".$msg.".\n";
+                $outText .= " - $msg\n";
             }
         }
 
