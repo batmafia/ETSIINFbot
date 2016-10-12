@@ -7,6 +7,7 @@
  */
 namespace app\models\repositories;
 
+use app\models\CenterPlan;
 use app\models\PlanImpartition;
 use app\models\PlanSubject;
 use app\models\Subject;
@@ -38,6 +39,39 @@ class SubjectRepository
         }
 
     }
+
+
+    public static function getPlansFromCenter($center, $studyType, $studySubType, $year)
+    {
+        $year2 = substr($year + 1, -2);
+        $request = Request::get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json/$center/planes/$studyType?subtipo_estudio=$studySubType&anio=$year$year2")
+            ->expects(Mime::JSON)->send();
+        if (!$request->hasErrors()) {
+
+            $data = \GuzzleHttp\json_decode($request->raw_body, true);
+            $availablePlans = [];
+
+            foreach ($data as $plan)
+            {
+
+                $myplan = new CenterPlan();
+                $myplan->setAttributes($plan);
+
+                if ($myplan->validate()) {
+                    $availablePlans[]=$myplan;
+                } else {
+                    print_r($plan->getErrors());
+                }
+            }
+
+            return $availablePlans;
+
+        } else {
+            throw new Exception("Repository exception");
+        }
+
+    }
+
 
 
     public static function getSubjectsList($plan, $year)

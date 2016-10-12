@@ -4,6 +4,7 @@ namespace app\Components;
 use Longman\TelegramBot\ConversationDB;
 use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\Update;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use \Longman\TelegramBot\Telegram;
 use Yii;
@@ -154,7 +155,7 @@ class TelegramBot extends Telegram  implements Configurable
             //Process all updates
             foreach ((array) $response->getResult() as $result) {
                 $ret = $this->processUpdate($result);
-                $ok &= !ret || $ret->isOk();
+                $ok &= !$ret || $ret->isOk();
             }
         }
 

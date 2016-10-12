@@ -25,22 +25,11 @@ class AsignaturasCommand extends BaseUserCommand
     protected $version = '0.1.0';
     protected $need_mysql = true;
 
-
-    const ING_INF = 'Grado en Ingeniería Informática';
-    const ING_MATEINF = 'Grado en Matemáticas e Informática';
-    const INF_DOBGRA = 'Doble Grado en Ingeniería Informática y en ADE';
-
     const PROFESORES = 'Profesores y Tutorías';
     const GUIA_DOCENTE = 'Guía Docente';
 
     const CANCELAR = 'Cancelar';
     const ATRAS = 'Atrás';
-
-    private $planes = [
-        self::ING_INF => '10II',
-        self::ING_MATEINF => '10MI',
-        self::INF_DOBGRA => '10ID'
-    ];
 
     public $subjectlist = [];
 
@@ -59,8 +48,15 @@ class AsignaturasCommand extends BaseUserCommand
     {
         $this->getConversation();
 
+        // ETSIINF = 10; PSC = Primer y Segundo Ciclo; GRA = Grado
+        $plans = SubjectRepository::getPlansFromCenter('10','PSC','GRA',$this->getActualYear());
+
+        foreach ($plans as $plan){
+            $options[$plan->codigo] =  "$plan->nombre";
+        }
+
         $cancel = [self::CANCELAR];
-        $keyboard = array_chunk(array_keys($this->planes), 1);
+        $keyboard = array_chunk(($options), 1);
         $keyboard [] = [self::CANCELAR];
 
 
@@ -69,7 +65,7 @@ class AsignaturasCommand extends BaseUserCommand
         {
             return $this->getRequest()->markdown()->sendMessage("_Actualmente algunos datos no están disponibles por errores en la API de la UPM_.\n\nSelecciona tu plan de estudios:");
         }
-        if (!(in_array($text, array_keys($this->planes)) || in_array($text, $cancel)))
+        if (!(in_array($text, $options) || in_array($text, $cancel)))
         {
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
@@ -77,14 +73,15 @@ class AsignaturasCommand extends BaseUserCommand
         {
             return $this->cancelConversation();
         }
-        $this->getConversation()->notes['plan'] = $text;
+        $this->getConversation()->notes['plan'] = array_search($text,$options);
         return $this->nextStep();
     }
 
     public function processShowCourse($text)
     {
+
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear());
+        $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
 
         $opts2 = array_keys($ordenadas);
 
@@ -125,7 +122,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedCourse = $this->getConversation()->notes['course'];
 
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear());
+        $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
 
         $opts3 = array_keys($ordenadas[$selectedCourse]);
 
@@ -166,7 +163,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedCourse = $this->getConversation()->notes['course'];
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $ordenadas = SubjectRepository::getSubjectsList($this->planes[$selectedPlan], $this->getActualYear());
+        $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
         $asignaturas = $ordenadas[$selectedCourse][$selectedSemester];
 
         foreach ($asignaturas as $asignatura)
@@ -210,9 +207,12 @@ class AsignaturasCommand extends BaseUserCommand
     public function processShowInfoSubject($text)
     {
 
+        $selectedCourse = $this->getConversation()->notes['course'];
         $selectedSemester = $this->getConversation()->notes['semester'];
-        $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
+        $selectedPlan = $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
+
+        echo "$selectedSemester $selectedPlan $selectedSubject";
 
         try
         {
@@ -235,10 +235,11 @@ class AsignaturasCommand extends BaseUserCommand
             }
         }
 
+
         $numProfesores = count($subject->profesores);
 
-        $message = "La asignatura *$subject->nombre* pertenece al departamento de *$subject->depto*, " .
-            "tiene un peso de *$subject->ects ECTS* y tienes a *$numProfesores profesores* dispuestos a ayudarte. " .
+        $message = "La asignatura *$subject->nombre ($subject->caracter)* pertenece al departamento de *$subject->depto*, " .
+            "tiene un peso de *$subject->ects ECTS* y tienes a *$numProfesores profesores* dispuestos a ayudarte.\n" .
             "Selecciona mediante el teclado una opción.\n";
 
 
@@ -273,7 +274,7 @@ class AsignaturasCommand extends BaseUserCommand
     {
 
         $selectedSemester = $this->getConversation()->notes['semester'];
-        $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
+        $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
         $extraInfo = $this->getConversation()->notes['extrainfo'];
 
@@ -305,7 +306,7 @@ class AsignaturasCommand extends BaseUserCommand
     {
 
         $selectedSemester = $this->getConversation()->notes['semester'];
-        $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
+        $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
         $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
 
@@ -374,7 +375,7 @@ class AsignaturasCommand extends BaseUserCommand
     {
 
         $selectedSemester = $this->getConversation()->notes['semester'];
-        $selectedPlan = $this->planes[$this->getConversation()->notes['plan']];
+        $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
         $selectedTeacher = $this->getConversation()->notes['teacher'];
 

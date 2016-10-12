@@ -18,7 +18,7 @@ class StartController extends Controller
      * This command starts the bot.
      * Yet to be implemented
      */
-    public function actionHook($address = 'https://batmafia.frildoren.com')
+    public function actionHook($address = 'https://batmafia.frildoren.com/?r=web-hook')
     {
         $result = \Yii::$app->bot->setWebhook($address);
 
