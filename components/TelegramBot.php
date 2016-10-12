@@ -4,6 +4,7 @@ namespace app\Components;
 use Longman\TelegramBot\ConversationDB;
 use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\Update;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use \Longman\TelegramBot\Telegram;
 use Yii;
