@@ -16,17 +16,16 @@ class StatsController extends Controller
 
     public function actionIndex()
     {
-
+        $notIds = implode(array_merge(\Yii::$app->params['admins'], \Yii::$app->params['moderators']), ",");
         $result = \Yii::$app->getDb()->createCommand(
             "SELECT 
                 DATE(date) AS day,
                 COUNT(*) AS requests,
                 COUNT(DISTINCT user_id) AS users
-            FROM
-                message
+            FROM message
             WHERE
                 DATE(date) > NOW() - INTERVAL 30 DAY
-                AND user_id NOT IN (".implode(\Yii::$app->params['admins'], ",").")
+                AND user_id NOT IN (".$notIds.")
                     AND LEFT(text, 1) = '/'
             GROUP BY day;"
         )->queryAll();
@@ -44,7 +43,7 @@ class StatsController extends Controller
             $serie = [
                 'name'=>$name,
                 'id'=>$name,
-                'type'=>'column'
+                'type'=>'pie'
             ];
 
             $data['days'][] = $name;
@@ -57,7 +56,7 @@ class StatsController extends Controller
                     case when LOCATE('@', text) OR LOCATE(' ', text) then LEFT(text, LOCATE('@', text)+LOCATE(' ', text)-1) else text end as command
                 FROM message
                 WHERE LEFT(text, 1) = '/' AND DATE(date) = \"".$r['day']."\"
-                AND user_id NOT IN (".implode(\Yii::$app->params['admins'], ",").")
+                AND user_id NOT IN (".$notIds.")
                 GROUP BY command
                 ORDER BY count ASC"
             )->queryAll();
