@@ -69,9 +69,12 @@ class MetroligeroCommand extends BaseUserCommand
         $this->getRequest()->keyboard($keyboard);
         if ($this->isProcessed() || empty($text))
         {
-            if($this->getConversation()->notes['location']=="Montepríncipe"){
+            if($this->getConversation()->notes['location']=="Montepríncipe")
+            {
                 return $this->getRequest()->sendMessage('¿Hacia dónde te diriges?');
-            }else{
+            }
+            else
+            {
                 return $this->nextStep();
             }
 
