@@ -69,9 +69,12 @@ class MetroligeroCommand extends BaseUserCommand
         $this->getRequest()->keyboard($keyboard);
         if ($this->isProcessed() || empty($text))
         {
-            if($this->getConversation()->notes['location']=="Montepríncipe"){
+            if($this->getConversation()->notes['location']=="Montepríncipe")
+            {
                 return $this->getRequest()->sendMessage('¿Hacia dónde te diriges?');
-            }else{
+            }
+            else
+            {
                 return $this->nextStep();
             }
 
@@ -106,14 +109,25 @@ class MetroligeroCommand extends BaseUserCommand
 
         $metroIcon = "\xF0\x9F\x9A\x89"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
 
-        $FirstWaitTime = $llegadas->getFirstStopMinutes();
-        $SecondWaitTime = $llegadas->getSecondStopMinutes();
-        if ($FirstWaitTime == 0) {
+        $arrivals = $llegadas->getArrivals();
+
+        if ($arrivals[0] == 0 && $arrivals[1] == 0)
+        {
+            $outText = "$metroIcon *No hay más llegadas previstas para hoy.*";
+        }
+        else if ($arrivals[0] == 0 && $arrivals[1] != 0)
+        {
             $outText = "$metroIcon El primer tren *está entrando en la estación*"
-                     . " y el siguiente llegará en *".$SecondWaitTime." min*.";
-        } else {
-            $outText = "$metroIcon El primer tren llegará en *".$FirstWaitTime." min*"
-                     . " y el siguiente en *".$SecondWaitTime." min*.";
+                . " y el siguiente llegará en *$arrivals[1] minutos*.";
+        }
+        else if($arrivals[0] != 0 && $arrivals[1] == 0)
+        {
+            $outText = "$metroIcon El último tren llegará en *$arrivals[1] minutos*.";
+        }
+        else if ($arrivals[0] != 0 && $arrivals[1] != 0)
+        {
+            $outText = "$metroIcon El primer tren llegará en *$arrivals[0] minutos*"
+                . " y el siguiente en *$arrivals[1] minutos*.";
         }
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
