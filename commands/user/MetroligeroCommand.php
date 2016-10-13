@@ -9,6 +9,8 @@
 namespace app\commands\user;
 use app\models\repositories\MetroligeroRepository;
 use app\commands\base\BaseUserCommand;
+use app\commands\base\Request;
+
 /**
  * User "/metroligero" command
  */
@@ -23,12 +25,12 @@ class MetroligeroCommand extends BaseUserCommand
     protected $usage = '/metroligero';
     protected $version = '0.1.0';
     protected $need_mysql = true;
-    
-    
+
+
     const COLONIA_JARDIN = 'Colonia Jardin';
     const MONTEPRINCIPE = 'Montepríncipe';
     const PUERTA_BOADILLA = 'Puerta Boadilla';
-    
+
     private $stops = [
         self::COLONIA_JARDIN => '201',
         self::MONTEPRINCIPE => '353',
@@ -38,10 +40,10 @@ class MetroligeroCommand extends BaseUserCommand
     public function processLocation($text)
     {
         $this->getConversation();
-        
+
         $cancel = ['Cancelar'];
         $keyboard = [array_keys($this->stops), $cancel];
-        
+
         $this->getRequest()->keyboard($keyboard);
         if ( $this->isProcessed() || empty($text) )
         {
@@ -65,7 +67,7 @@ class MetroligeroCommand extends BaseUserCommand
         $opts = [self::COLONIA_JARDIN, self::PUERTA_BOADILLA];
         $cancel = ['Cancelar'];
         $keyboard = [$opts, $cancel];
-        
+
         $this->getRequest()->keyboard($keyboard);
         if ($this->isProcessed() || empty($text))
         {
