@@ -91,6 +91,8 @@ class MetroligeroCommand extends BaseUserCommand
 
     public function processSendLineInfo()
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
         $location1 = $this->getConversation()->notes['location'];
         if(empty($this->getConversation()->notes['location2']))
         {

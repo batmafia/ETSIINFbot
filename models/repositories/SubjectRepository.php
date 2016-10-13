@@ -7,10 +7,9 @@
  */
 namespace app\models\repositories;
 
-use app\models\CenterPlan;
-use app\models\PlanImpartition;
-use app\models\PlanSubject;
-use app\models\Subject;
+use app\models\subjects\CenterPlan;
+use app\models\subjects\PlanSubject;
+use app\models\subjects\Subject;
 use Httpful\Mime;
 use Httpful\Request;
 use yii\base\Exception;

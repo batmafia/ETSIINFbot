@@ -11,6 +11,7 @@
 namespace app\commands\user;
 
 use app\commands\base\BaseUserCommand;
+use app\commands\base\Request;
 use app\models\repositories\MenuRepository;
 
 /**
@@ -51,6 +52,7 @@ class MenuCommand extends BaseUserCommand
 
         if($selectedMenu !== null)
         {
+            $this->getRequest()->sendAction(Request::ACTION_UPLOADING_DOCUMENT);
             $hbIcon = "\xF0\x9F\x8D\x94";
             $cap = $menus[$selectedMenu]->caption;
             return $this->getRequest()->caption("$hbIcon $cap")->sendDocument($menus[$selectedMenu]->link);

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\bus;
 
 use yii\base\Model;
 

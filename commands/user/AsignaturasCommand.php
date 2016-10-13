@@ -7,6 +7,7 @@
  */
 
 namespace app\commands\user;
+use app\commands\base\Request;
 use app\models\repositories\SubjectRepository;
 use app\commands\base\BaseUserCommand;
 
@@ -46,6 +47,8 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processGetPlan($text)
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
         $this->getConversation();
 
         // ETSIINF = 10; PSC = Primer y Segundo Ciclo; GRA = Grado
@@ -79,6 +82,8 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processShowCourse($text)
     {
+
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $selectedPlan = $this->getConversation()->notes['plan'];
         $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
@@ -119,6 +124,8 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processShowSemesters($text)
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
         $selectedCourse = $this->getConversation()->notes['course'];
 
         $selectedPlan = $this->getConversation()->notes['plan'];
@@ -159,6 +166,7 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processShowSubjects($text)
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedCourse = $this->getConversation()->notes['course'];
@@ -206,6 +214,7 @@ class AsignaturasCommand extends BaseUserCommand
 
     public function processShowInfoSubject($text)
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $selectedCourse = $this->getConversation()->notes['course'];
         $selectedSemester = $this->getConversation()->notes['semester'];
@@ -244,13 +253,16 @@ class AsignaturasCommand extends BaseUserCommand
         $cancel = [self::CANCELAR, self::ATRAS];
         $keyboard = [[self::GUIA_DOCENTE], [self::PROFESORES], $cancel];
         $this->getRequest()->keyboard($keyboard);
-        if ($this->isProcessed() || empty($text))
+        if($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->markdown()->sendMessage($message);
         }
-        if (!($text == self::GUIA_DOCENTE || $text == self::PROFESORES || in_array($text, $cancel)))
+        if($text == self::GUIA_DOCENTE) {
+            return $this->nextStep('sendGuide');
+        }
+        if($text == self::PROFESORES)
         {
-            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
+            return $this->nextStep('teacher');
         }
         if (in_array($text, $cancel))
         {
@@ -264,44 +276,33 @@ class AsignaturasCommand extends BaseUserCommand
             }
         }
 
-        $this->getConversation()->notes['extrainfo'] = $text;
-        return $this->nextStep();
+        return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
     }
 
-    public function processShowExtraInfo($text)
+    public function processSendGuide()
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
 
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
-        $extraInfo = $this->getConversation()->notes['extrainfo'];
 
         $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
 
-        if ($this->isProcessed() || empty($text))
-        {
-            if ($extraInfo == self::GUIA_DOCENTE)
-            {
-
-                // TODO: Mirar el error SSL.
-                //$guiaPDF=SubjectRepository::getGuia($subject->guia);
-                //$cap = "Aquí te enviamos la guia docente de $subject->nombre";
-                //$this->getRequest()->caption("$cap")->sendDocument($guiaPDF);
-                $result = $this->getRequest()->hideKeyboard()->sendMessage("Aquí tienes la guia docente de $subject->nombre\n$subject->guia");
-                $this->stopConversation();
-                return $result;
-
-
-            }
-            else if ($extraInfo == self::PROFESORES)
-            {
-                return $this->nextStep();
-            }
-        }
+        // TODO: Mirar el error SSL.
+        //$guiaPDF=SubjectRepository::getGuia($subject->guia);
+        //$cap = "Aquí te enviamos la guia docente de $subject->nombre";
+        //$this->getRequest()->caption("$cap")->sendDocument($guiaPDF);
+        $result = $this->getRequest()->hideKeyboard()->sendMessage("Aquí tienes la guia docente de $subject->nombre\n$subject->guia");
+        $this->stopConversation();
+        return $result;
     }
 
-    public function processGetTeacher($text)
+    public function processTeacher($text)
     {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
 
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $this->getConversation()->notes['plan'];
@@ -369,8 +370,10 @@ class AsignaturasCommand extends BaseUserCommand
 
     }
 
-    public function processShowTeacherInfo($text)
+    public function processTeacherInfo($text)
     {
+
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $this->getConversation()->notes['plan'];
