@@ -7,8 +7,8 @@
  */
 
 namespace app\models\repositories;
-use app\models\MetroligeroApiResponse;
-use app\models\MetroligeroStop;
+use app\models\metroligero\MetroligeroApiResponse;
+use app\models\metroligero\MetroligeroStop;
 use Httpful\Mime;
 use Httpful\Request;
 use yii\base\Exception;

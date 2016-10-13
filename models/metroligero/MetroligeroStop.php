@@ -6,7 +6,7 @@
  * Time: 23:28
  */
 
-namespace app\models;
+namespace app\models\metroligero;
 use yii\base\Model;
 class MetroligeroStop extends Model
 {
