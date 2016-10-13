@@ -37,8 +37,6 @@ class BusCommand extends BaseUserCommand
     const ETSIINF = 'ETSIINF';
     const MADRID = 'Madrid';
 
-
-
     /**
      * [process_SelectLine description]
      * @param  [type] $text [description]
@@ -126,10 +124,9 @@ class BusCommand extends BaseUserCommand
         $stopId = $this->getStopId($lineId, $location);
         $stop = BusRepository::getBusStop($stopId);
         $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
-        #$stopIcon = "\xF0\x9F\x9A\x8F"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68F
 
-
-        if (empty($stop->getLinesByNumber($lineId))) {
+        if (empty($stop->getLinesByNumber($lineId)))
+        {
             $outText = "$busIcon *No hay próximas llegadas* para el bus *$lineId* a la parada *$stop->stopName* \n";
         }
         else
@@ -138,30 +135,8 @@ class BusCommand extends BaseUserCommand
 
             foreach($stop->getLinesByNumber($lineId) as $line)
             {
-                $waitTimeMinutes = $line->getWaitMinutes();
-                $msg = "";
-                switch (true)
-                {
-                    case ($waitTimeMinutes == 0):
-                        # TODO: mirar si es una parada intermedia (Llegando a la parada )o no (Saliendo de la parada)
-                        $msg .= "*En la parada*";
-                        break;
-                    case ($waitTimeMinutes  <= 60):
-                        $msg .= "En *$waitTimeMinutes minuto";
-                        if($waitTimeMinutes > 1)
-                            $msg .= "s";
-                        $msg .= "*";
-                        break;
-                    case ($waitTimeMinutes > 60):
-                        $hours = floor($waitTimeMinutes/60);
-                        $mins = $waitTimeMinutes%60;
-                        $msg .= "A las *$hours:$mins*";
-                        break;
-                    default:
-                        $msg .= "$waitTimeMinutes NO VALIDO";
-                        break;
-                }
-                $outText .= " - ".$msg.".\n";
+                $msg = $line->getWaitHumanTime();
+                $outText .= " - $msg\n";
             }
         }
 

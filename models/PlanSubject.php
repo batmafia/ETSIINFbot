@@ -31,11 +31,16 @@ class PlanSubject extends Model
     public function rules()
     {
         return [
+            ['nombre', 'filter', 'filter' => function($name)
+            {
+                return mb_convert_case($name, MB_CASE_TITLE, "UTF-8");
+            }],
             [['codigo','nombre','nombre_ingles','curso','codigo_tipo_asignatura','nombre_tipo_asignatura','credects'], 'string'],
             ['idiomas', 'each', 'rule'=>['string']],
             [['imparticion','departamentos'], 'each', 'rule'=>['validateModels']],
         ];
     }
+
 
     public function validateModels($attribute, $value)
     {
