@@ -10,15 +10,23 @@ class Request
 
     public $data = [];
 
-    function __construct($chatId)
+    function __construct($chatId=null)
     {
         \Longman\TelegramBot\Request::initialize(\Yii::$app->bot);
-        $this->data['chat_id'] = $chatId;
+
+        if($chatId !== null)
+            $this->chatId($chatId);
     }
 
     public function chatId($chatId)
     {
         $this->data['chat_id'] = $chatId;
+        return $this;
+    }
+
+    public function replyTo($messageId)
+    {
+        $this->data['reply_to_message_id'] = $messageId;
         return $this;
     }
 
