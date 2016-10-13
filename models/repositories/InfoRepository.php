@@ -6,6 +6,66 @@ class InfoRepository
 {
 
     private static $infoArray = [
+        'Secretaria' => [
+            'Info' => "*Secretaría*
+La Sección de Gestión Administrativa gestiona los trámites relacionados con los expedientes de alumnos de Ingenieria, Grado, Máster y Doctorado, así como el Registro de la Escuela.
+*Web*: https://www.etsiinf.upm.es/?id=servicios/secretaria
+*Lugar*: Bloque 3, planta 1
+*Horario de mañanas*: Lunes a Viernes: 9:00 - 14:00\n*Horario de Tardes*: Lunes y Miercoles 15:30 - 17:30
+*Teléfono*: +34913367407
+*Correo*: secretaria@fi.upm.es
+*Trámites administrativos*: https://www.etsiinf.upm.es/?id=servicios/tramites
+*Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195\\_Triptico\\_Secretaria\\_Alumnos.pdf",  // to skip _ -> \_ -> to skip \ -> \\_
+            'Trámites' => 'https://www.etsiinf.upm.es/?id=servicios/tramites'
+            // 'Trámites' => [
+            //      'Preguntas frecuentes' => 'https://www.etsiinf.upm.es/?pagina=1921',
+            //      '...' => '...',
+            //      '...' => '...',
+            //      'Acreditación de nivel B2 de lengua' => 'https://www.etsiinf.upm.es/?pagina=1921',
+            //      '...' => '...',
+            //      'Otros trámites de Ingeniería Informática (Plan 96)' => '...'
+            //  ],
+        ],
+        'Publicaciones' => [
+            'Info' => "*Publicaciones*
+El Servicio de Publicaciones de la Escuela ofrece los siguentes servicios de atención al alumnado, al profesorado y a los diferentes departamentos y servicios del centro y cualquier persona interesada.
+*Web*: https://www.fi.upm.es/?pagina=219
+*Lugar*: Bloque 6, planta baja
+*Horario de mañanas*: Lunes a Viernes: 9:00 - 14:00\n*Horario de Tardes*: Lunes y Miercoles 15:00 - 18:00
+*Teléfono*: +34913367367 y +34913364291
+*Correo*: publicaciones@fi.upm.es
+*Normativa del Servicio*: https://www.fi.upm.es/docs/estructura/servicios/219\\_NORMAS%20%20SERVICIO%20DE%20PUBLICACIONES.pdf
+*Carta de servicios*: https://www.fi.upm.es/docs/estructura/1345\\_Triptico\\_Publicaciones\\_nuevo.pdf",  // to skip _ -> \_ -> to skip \ -> \\_
+            'Servicios' => [
+                 'Venta de Libros y Papelería' => '*Venta de Libros y Papelería*
+En éste servicio encontrará disponible un amplio y diverso catálogo de libros publicados en la propia Escuela y de algunas editoriales externas que sirven para complementar los conocimientos sobre las distintas asignaturas que se imparten en la Escuela y además de un listado de papelería.
+*Catálogo de Libros*: https://www.fi.upm.es/docs/servicios/papeleria/1457\\_CAT.%20NUEVO%20%202016-2017%20.pdf
+*Listado de Papeleria*: https://www.fi.upm.es/docs/servicios/papeleria/1457\\_PAPELERIA.pdf
+*AVISO*: Los precios son validos salvo error tipográfico.',
+                 'Venta de Apuntes' => '*Venta de Apuntes*
+El Servicio de Publicaciones ofrece un listado con los apuntes relativos a las asignaturas que se imparten en la Escuela.
+*1º CURSO*: https://www.fi.upm.es/docs/servicios/Apuntes/1463\\_PRIMERO%202016-2017.pdf
+*2º CURSO*: https://www.fi.upm.es/docs/servicios/Apuntes/1463\\_SEGUNDO%202016-2017.pdf
+*Examenes cursos anteriores*: https://www.fi.upm.es/docs/servicios/Apuntes/1463\\_EXAMENES%20ANTERIORES%202016-17%20.pdf
+*AVISO*: Los precios son validos salvo error tipográfico',
+                 'Reprografía y Encuadernaciones' => 'https://www.fi.upm.es/?pagina=251',
+                 'Fotocopias e Impresión Digital' => 'https://www.fi.upm.es/?pagina=250',
+             ],
+        ],
+        'Biblioteca ETSIINF' => '
+*Biblioteca ETSIINF*
+*Lugar*: Bloque 3 planta 0
+*Lugar futuro*: Bloque 1 planta 2
+*Web*: http://www.fi.upm.es/?pagina=24
+*Correo*: biblioteca.etsiinf@upm.es
+*Twitter*: https://twitter.com/BibliotecaFIUPM',
+        'Delegación de Alumnos' => '
+*Delegación de Alumnos*
+*Nombre*: Delegación de Alumnos.
+*Web*: https://www.da.etsiinf.upm.es
+*Web ETSIINF*: https://www.etsiinf.upm.es/?id=delegacion
+*Correo*: delegacion@da.fi.upm.es
+*Twitter*: https://twitter.com/daetsiinf',
         'Asociaciones' => [
             'Info asoc ETSIINF' => 'https://www.etsiinf.upm.es/?id=actividades/asociaciones',
             'Info asoc UPM' => 'http://www.upm.es/Estudiantes/Asociaciones',
@@ -78,27 +138,13 @@ La Asociación se inspira fuertemente en el humanismo cristiano, de ahí tambié
 *Correo*: aetoupm@gmail.com
 *Twitter*: https://twitter.com/AETOupm'
         ],
-        'Secretaria' => [
-            'Info' => "*Secretaría*
-La Sección de Gestión Administrativa gestiona los trámites relacionados con los expedientes de alumnos de Ingenieria, Grado, Máster y Doctorado, así como el Registro de la Escuela.
-*Web*: https://www.etsiinf.upm.es/?id=servicios/secretaria
-*Lugar*: Bloque 3, planta 1
-*Horario de mañanas*: Lunes a Viernes: 9:00 - 14:00\n*Horario de Tardes*: Lunes y Miercoles 15:30 - 17:30
-*Teléfono*: +34913367407
-*Correo*: secretaria@fi.upm.es
-*Trámites administrativos*: https://www.etsiinf.upm.es/?id=servicios/tramites
-*Carta de servicios*: https://www.etsiinf.upm.es/docs/estructura/servicios/195\\_Triptico\\_Secretaria\\_Alumnos.pdf",  // to skip _ -> \_ -> to skip \ -> \\_
-            // https://www.etsiinf.upm.es/?id=servicios/tramites
-            'Trámites' => 'https://www.etsiinf.upm.es/?id=servicios/tramites'
-            // 'Trámites' => [
-            //      'Preguntas frecuentes' => 'https://www.etsiinf.upm.es/?pagina=1921',
-            //      '...' => '...',
-            //      '...' => '...',
-            //      'Acreditación de nivel B2 de lengua' => 'https://www.etsiinf.upm.es/?pagina=1921',
-            //      '...' => '...',
-            //      'Otros trámites de Ingeniería Informática (Plan 96)' => '...'
-            //  ],
-        ],
+        'Club Deportivo' => '
+*Club Deportivo*
+*Nombre*: Club Deportivo.
+*Descripción*: Es uno de los diecinueve clubes de este tipo con que cuenta la U.P.M. y como tal participa en las competiciones organizadas por ésta. Participan en ligas por equipos de: baloncesto, voleibol, fútbol, fútbol sala, balonmano y rugby. Así mismo colabora con el área de deportes de la U.P.M. en la inscripción de participantes en competiciones individuales en deportes tan diversos como atletismo, natación, tenis, tiro con arco, squash, etc.
+*Web*: http://www.cdfim.com/
+*Correo*: cdfim@gmail.com
+*Twitter*: https://twitter.com/cdfim',
         'Servicios' => [
             'Reserva salas' => 'https://www.fi.upm.es/aulas/view-schedule.php?sid=5',
             'WIFI' => [
@@ -134,30 +180,9 @@ Poner tu correo institucional (...@alumnos.upm.es) y tu clave.
 Los alumnos de la Facultad tienen la posibilidad de acceder a sus directorios de trabajo compartidos en Windows y Unix desde sus equipos personales. Este acceso se realizará mediante protocol SCP/SFTP con el servidor *www.alumnos.fi.upm.es con su usuario y contraseña habituales*. Linux dispone de comandos para scp y sftp mientras que en Windows se pueden instalar programas libres (WinSCP, Filezilla).
 
 *Más información*: https://www.fi.upm.es/?pagina=372',
-            'Seguridad informática' => 'https://www.fi.upm.es/?id=seguridad',
-            'Quejas y sugerencias' => 'https://www.fi.upm.es/?id=politicacalidad/quejasysugerencias'
+    'Seguridad informática' => 'https://www.fi.upm.es/?id=seguridad',
+    'Quejas y sugerencias' => 'https://www.fi.upm.es/?id=politicacalidad/quejasysugerencias'
         ],
-        'Biblioteca ETSIINF' => '
-*Biblioteca ETSIINF*
-*Lugar*: Bloque 3 planta 0
-*Lugar futuro*: Bloque 1 planta 2
-*Web*: http://www.fi.upm.es/?pagina=24
-*Correo*: biblioteca.etsiinf@upm.es
-*Twitter*: https://twitter.com/BibliotecaFIUPM',
-        'Delegación de Alumnos' => '
-*Delegación de Alumnos*
-*Nombre*: Delegación de Alumnos.
-*Web*: https://www.da.etsiinf.upm.es
-*Web ETSIINF*: https://www.etsiinf.upm.es/?id=delegacion
-*Correo*: delegacion@da.fi.upm.es
-*Twitter*: https://twitter.com/daetsiinf',
-        'Club Deportivo' => '
-*Club Deportivo*
-*Nombre*: Club Deportivo.
-*Descripción*: Es uno de los diecinueve clubes de este tipo con que cuenta la U.P.M. y como tal participa en las competiciones organizadas por ésta. Participan en ligas por equipos de: baloncesto, voleibol, fútbol, fútbol sala, balonmano y rugby. Así mismo colabora con el área de deportes de la U.P.M. en la inscripción de participantes en competiciones individuales en deportes tan diversos como atletismo, natación, tenis, tiro con arco, squash, etc.
-*Web*: http://www.cdfim.com/
-*Correo*: cdfim@gmail.com
-*Twitter*: https://twitter.com/cdfim',
     ];
 
     /**
