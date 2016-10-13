@@ -211,9 +211,7 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
-
-        echo "$selectedSemester $selectedPlan $selectedSubject";
-
+        
         try
         {
             $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
