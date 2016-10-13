@@ -112,7 +112,7 @@ class BroadcastCommand extends BaseUserCommand
     {
         $number = 0;
 
-        $ids = Chat::find()->select("chat.id")->joinWith("users")->where('broadcast')->andWhere("chat.id<>:id",['id'=>$chat->getId()])->all();
+        $ids = Chat::find()->select("chat.id")->joinWith("users")->where('broadcast')->andWhere('type = "private"')->andWhere("chat.id<>:id",['id'=>$chat->getId()])->all();
 
         foreach ($ids as $id)
         {
