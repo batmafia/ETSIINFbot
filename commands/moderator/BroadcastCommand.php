@@ -31,7 +31,7 @@ class BroadcastCommand extends BaseUserCommand
     protected $name = 'broadcast';
     protected $description = 'Enviar mensajes a todos los suscriptores del bot.';
     protected $usage = '/broadcast';
-    protected $version = '0.1.0';
+    protected $version = '0.1.1';
     protected $need_mysql = true;
     /**#@-*/
 
@@ -112,7 +112,7 @@ class BroadcastCommand extends BaseUserCommand
     {
         $number = 0;
 
-        $ids = Chat::find()->select("chat.id")->joinWith("users")->where('broadcast')->andWhere("chat.id<>:id",['id'=>$chat->getId()])->all();
+        $ids = Chat::find()->select("chat.id")->joinWith("users")->where('broadcast')->andWhere('type = "private"')->andWhere("chat.id<>:id",['id'=>$chat->getId()])->all();
 
         foreach ($ids as $id)
         {

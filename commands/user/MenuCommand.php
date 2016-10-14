@@ -11,6 +11,7 @@
 namespace app\commands\user;
 
 use app\commands\base\BaseUserCommand;
+use app\commands\base\Request;
 use app\models\repositories\MenuRepository;
 
 /**
@@ -26,7 +27,7 @@ class MenuCommand extends BaseUserCommand
     protected $name = 'menu';
     protected $description = 'Consulta el menú de la cafetería de la ETSIINF.';
     protected $usage = '/menu';
-    protected $version = '0.1.0';
+    protected $version = '0.1.1';
     protected $need_mysql = true;
 
 
@@ -51,6 +52,7 @@ class MenuCommand extends BaseUserCommand
 
         if($selectedMenu !== null)
         {
+            $this->getRequest()->sendAction(Request::ACTION_UPLOADING_DOCUMENT);
             $hbIcon = "\xF0\x9F\x8D\x94";
             $cap = $menus[$selectedMenu]->caption;
             return $this->getRequest()->caption("$hbIcon $cap")->sendDocument($menus[$selectedMenu]->link);

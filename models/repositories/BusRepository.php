@@ -2,7 +2,7 @@
 
 namespace app\models\repositories;
 
-use app\models\BusStop;
+use app\models\bus\BusStop;
 use Httpful\Mime;
 use Httpful\Request;
 use yii\base\Exception;

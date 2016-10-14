@@ -6,7 +6,7 @@
  * Time: 23:28
  */
 
-namespace app\models;
+namespace app\models\metroligero;
 use yii\base\Model;
 class MetroligeroStop extends Model
 {
@@ -39,16 +39,16 @@ class MetroligeroStop extends Model
 
     }
 
-    public function getFirstStopMinutes()
-    {
-        $intervalo = $this->getIntervalo();
-        return round(($this->first_stop/60)-$intervalo);
-    }
+    public function getArrivals(){
 
-    public function getSecondStopMinutes()
-    {
         $intervalo = $this->getIntervalo();
-        return round(($this->second_stop/60)-$intervalo);
+        $myFirstStop = round(($this->first_stop/60)-$intervalo);
+        $mySecondStop = round(($this->second_stop/60)-$intervalo);
+
+        $arrivals [0] = $myFirstStop;
+        $arrivals [1] = $mySecondStop;
+
+        return $arrivals;
     }
 }
 

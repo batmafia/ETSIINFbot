@@ -10,6 +10,7 @@
 
 
 namespace app\commands\user;
+use app\commands\base\Request;
 use app\models\repositories\BusRepository;
 use app\commands\base\BaseUserCommand;
 
@@ -26,7 +27,7 @@ class BusCommand extends BaseUserCommand
     protected $name = 'bus';
     protected $description = 'Consulta el tiempo que queda para que salga el autobús.';
     protected $usage = '/bus';
-    protected $version = '0.1.0';
+    protected $version = '0.1.1';
     protected $need_mysql = true;
     /**#@-*/
 
@@ -119,11 +120,34 @@ class BusCommand extends BaseUserCommand
     public function processSendLineInfo()
     {
 
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
         $lineId = $this->getConversation()->notes['line'];
         $location = $this->getConversation()->notes['location'];
         $stopId = $this->getStopId($lineId, $location);
-        $stop = BusRepository::getBusStop($stopId);
         $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
+
+        try
+        {
+            $stop = BusRepository::getBusStop($stopId);
+        }
+        catch (\Exception $exception)
+        {
+            if ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $result = $this->getRequest()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes ".
+                "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas ".
+                    "llegadas.*\n Prueba a realizar la consulta más tarde.\n\n");
+
+                $this->stopConversation();
+                return $result;
+            }
+            else
+            {
+                throw $exception;
+            }
+        }
+
 
         if (empty($stop->getLinesByNumber($lineId)))
         {

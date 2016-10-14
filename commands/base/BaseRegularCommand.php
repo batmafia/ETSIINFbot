@@ -18,11 +18,15 @@ abstract class BaseRegularCommand extends BaseCommand
     {
         parent::__construct($telegram, $update);
 
-        $chatId = null;
-        if($this->getMessage() !== null && $this->getMessage()->getChat() !== null)
-            $chatId = $this->getMessage()->getChat()->getId();
+        $this->request = new Request;
 
-        $this->request = new Request($chatId);
+        if($this->getMessage() !== null && $this->getMessage()->getChat() !== null)
+        {
+            $this->request->chatId($this->getMessage()->getChat()->getId());
+            if($this->getMessage()->getChat()->isGroupChat() || $this->getMessage()->getChat()->isSuperGroup())
+                $this->request->replyTo($this->getMessage()->getMessageId());
+        }
+
     }
 
 
@@ -33,9 +37,10 @@ abstract class BaseRegularCommand extends BaseCommand
             $this->conversation = $conversation;
 
         $step = $this->getStepIndex();
-        $executes = array_values(array_filter(get_class_methods(get_class($this)), function($name)
+        $prefix = 'process'.implode(array_map("ucfirst", $this->getStepBranches()));
+        $executes = array_values(array_filter(get_class_methods(get_class($this)), function($name) use($prefix)
         {
-            return substr($name, 0, 7) === 'process';
+            return substr($name, 0, strlen($prefix)) === $prefix;
         }));
 
         $args = [];
@@ -69,15 +74,37 @@ abstract class BaseRegularCommand extends BaseCommand
         return $this->preExecute();
     }
 
-    public function nextStep()
+    public function nextStep($branch=null)
     {
-        $this->setStepIndex($this->getStepIndex()+1);
+        if($branch !== null)
+        {
+            $branches = $this->getStepBranches();
+            $branches[] = $branch;
+            $this->setStepBranches($branches);
+            $this->getConversation()->notes['stack_frame'][] = $this->getStepIndex();
+            $this->setStepIndex(0);
+        }
+        else
+        {
+            $this->setStepIndex($this->getStepIndex() + 1);
+        }
+
         return $this->resetCommand();
     }
 
     public function previousStep()
     {
-        $this->setStepIndex(max($this->getStepIndex()-1, 0));
+        if($this->getStepIndex() === 0)
+        {
+            $branch = $this->getStepBranches();
+            array_pop($branch);
+            $this->setStepBranches($branch);
+            $this->setStepIndex(end($this->getConversation()->notes['stack_frame']));
+        }
+        else
+        {
+            $this->setStepIndex($this->getStepIndex()-1);
+        }
         return $this->resetCommand();
     }
 
@@ -86,15 +113,28 @@ abstract class BaseRegularCommand extends BaseCommand
         $index = intval($index);
 
         if($index >= 0)
-            $this->conversation->notes['step_index'] = $index;
+            $this->getConversation()->notes['step_index'] = $index;
     }
 
     private function getStepIndex()
     {
-        if(!isset($this->conversation->notes['step_index']))
+        if(!isset($this->getConversation()->notes['step_index']))
             return 0;
 
-        return $this->conversation->notes['step_index'];
+        return $this->getConversation()->notes['step_index'];
+    }
+
+    private function getStepBranches()
+    {
+        if(!isset($this->getConversation()->notes['step_branch']))
+            return [];
+
+        return $this->getConversation()->notes['step_branch'];
+    }
+
+    private function setStepBranches($branches)
+    {
+        $this->getConversation()->notes['step_branch'] = $branches;
     }
 
     public function cancelConversation()

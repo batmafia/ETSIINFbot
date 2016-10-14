@@ -17,7 +17,7 @@ class InfoCommand extends BaseUserCommand
     protected $name = 'info';
     protected $description = 'Consulta información rápida sobre algunos temas de la facultad.';
     protected $usage = '/info';
-    protected $version = '0.1.0';
+    protected $version = '0.1.1';
     protected $need_mysql = true;
     /**#@-*/
 
@@ -47,7 +47,11 @@ class InfoCommand extends BaseUserCommand
         {
             $opts = array_keys($opts);
             $keyboard = array_chunk($opts, self::KEYBOARD_COLUMNS);
-            $keyboard[] = [self::CANCEL, self::BACK];
+            $last = [self::CANCEL];
+            if(count($this->getConversation()->notes['indexes']) > 0)
+                $last[] = self::BACK;
+
+            $keyboard[] = $last;
 
             $this->getRequest()->keyboard($keyboard);
 

@@ -3,7 +3,7 @@
 namespace app\models\repositories;
 
 
-use app\models\MenuModel;
+use app\models\menu\MenuModel;
 use Httpful\Request;
 use simplehtmldom_1_5\simple_html_dom;
 use simplehtmldom_1_5\simple_html_dom_node;
