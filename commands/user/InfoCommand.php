@@ -47,7 +47,11 @@ class InfoCommand extends BaseUserCommand
         {
             $opts = array_keys($opts);
             $keyboard = array_chunk($opts, self::KEYBOARD_COLUMNS);
-            $keyboard[] = [self::CANCEL, self::BACK];
+            $last = [self::CANCEL];
+            if(count($this->getConversation()->notes['indexes']) > 0)
+                $last[] = self::BACK;
+
+            $keyboard[] = $last;
 
             $this->getRequest()->keyboard($keyboard);
 
