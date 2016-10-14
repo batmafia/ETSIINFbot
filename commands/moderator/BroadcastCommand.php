@@ -31,7 +31,7 @@ class BroadcastCommand extends BaseUserCommand
     protected $name = 'broadcast';
     protected $description = 'Enviar mensajes a todos los suscriptores del bot.';
     protected $usage = '/broadcast';
-    protected $version = '0.1.0';
+    protected $version = '0.1.1';
     protected $need_mysql = true;
     /**#@-*/
 
