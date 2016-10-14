@@ -119,6 +119,8 @@ class CalendarRepository
                         if($a->has_child())
                             $caption = $a->first_child()->innerText();
 
+                        $caption = html_entity_decode($caption);
+
                         $examCalendar = \Yii::createObject([
                             'class' => Calendar::className(),
                             'link' => "https://www.fi.upm.es/".$a->href,
