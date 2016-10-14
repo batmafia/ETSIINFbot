@@ -23,7 +23,7 @@ class MetroligeroCommand extends BaseUserCommand
     protected $name = 'metroligero';
     protected $description = 'Consulta los minutos que quedan para que salga el metroligero.';
     protected $usage = '/metroligero';
-    protected $version = '0.1.0';
+    protected $version = '0.1.1';
     protected $need_mysql = true;
 
 

@@ -27,7 +27,7 @@ class MenuCommand extends BaseUserCommand
     protected $name = 'menu';
     protected $description = 'Consulta el menú de la cafetería de la ETSIINF.';
     protected $usage = '/menu';
-    protected $version = '0.1.0';
+    protected $version = '0.1.1';
     protected $need_mysql = true;
 
 

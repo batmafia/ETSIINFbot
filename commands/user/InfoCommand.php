@@ -17,7 +17,7 @@ class InfoCommand extends BaseUserCommand
     protected $name = 'info';
     protected $description = 'Consulta información rápida sobre algunos temas de la facultad.';
     protected $usage = '/info';
-    protected $version = '0.1.0';
+    protected $version = '0.1.1';
     protected $need_mysql = true;
     /**#@-*/
 
