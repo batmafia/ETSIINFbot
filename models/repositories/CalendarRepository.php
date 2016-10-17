@@ -35,7 +35,7 @@ class CalendarRepository
                 /** @var $t simple_html_dom_node */
                 $caption = $links[$i]->innerText();
                 if($links[$i]->has_child())
-                    $caption = $links[$i]->first_child()->innerText();
+                    $caption = strip_tags($links[$i]->first_child()->innerText());
 
                 $businessCalendar = \Yii::createObject([
                     'class' => Calendar::className(),
@@ -119,7 +119,7 @@ class CalendarRepository
                         if($a->has_child())
                             $caption = $a->first_child()->innerText();
 
-                        $caption = html_entity_decode($caption);
+                        $caption = html_entity_decode(strip_tags($caption));
 
                         $examCalendar = \Yii::createObject([
                             'class' => Calendar::className(),
@@ -171,7 +171,7 @@ class CalendarRepository
                             if ($a->has_child())
                                 $caption = $a->first_child()->innerText();
 
-                            $caption = html_entity_decode($caption);
+                            $caption = html_entity_decode(strip_tags($caption));
 
                             $timetable = \Yii::createObject([
                                 'class' => Calendar::className(),
