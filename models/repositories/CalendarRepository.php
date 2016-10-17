@@ -9,6 +9,7 @@
 namespace app\models\repositories;
 
 use app\models\calendar\Calendar;
+use Exception;
 use Httpful\Request;
 use Httpful\Mime;
 use simplehtmldom_1_5\simple_html_dom;
