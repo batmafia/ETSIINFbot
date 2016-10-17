@@ -107,10 +107,9 @@ class DirectorioCommand extends BaseUserCommand
             }
         }
 
-        $this->getConversation()->notes['personal'] = array_search($text,$directory);
+        $this->getConversation()->notes['personal'] = array_search($text,$personalKB);
         return $this->nextStep();
     }
-
 
     public function processReturnInfo($text)
     {
@@ -120,9 +119,19 @@ class DirectorioCommand extends BaseUserCommand
         $textForSearch = $this->getConversation()->notes['text'];
         $selectedIndexPersonal = $this->getConversation()->notes['personal'];
         $directory = DirectoryRepository::getDirectoryInfo(urlencode($textForSearch));
+        $phoneIcon = "\xF0\x9F\x93\x9E";
+        $mailIcon = "\xF0\x9F\x93\xA7";
+        $departmentIcon = "\xF0\x9F\x91\x94";
 
         $person = $directory[$selectedIndexPersonal];
-        $mensaje = "El personal $person->nombre\n";
+        $mensaje = "Información sobre *$person->nombre $person->apellidos [$person->departamento]*\n".
+        "$mailIcon Email: $person->nombreEmail@$person->dominioEmail\n";
+
+        if ($person->despacho !== "" && $person->despacho !== null){
+            $mensaje.="$departmentIcon Despacho: *$person->despacho*\n";
+        }
+
+        $mensaje.="$phoneIcon Teléfono: *$person->telefono*\n";
 
 
         $cancel = [self::CANCELAR, self::ATRAS ,self::NUEVA_BUSQUEDA];
@@ -148,7 +157,8 @@ class DirectorioCommand extends BaseUserCommand
             }
             else if ($text === self::NUEVA_BUSQUEDA)
             {
-                return $this->nextStep('getTextForSearch');
+                $this->stopConversation();
+                return $this->resetCommand();
             }
             else if ($text === self::ATRAS)
             {
@@ -159,7 +169,6 @@ class DirectorioCommand extends BaseUserCommand
         $this->getConversation()->notes['personal'] = array_search($text,$directory);
         return $this->nextStep();
     }
-
 
 
 }
