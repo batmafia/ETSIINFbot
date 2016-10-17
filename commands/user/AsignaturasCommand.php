@@ -52,11 +52,13 @@ class AsignaturasCommand extends BaseUserCommand
         $this->getConversation();
 
         // ETSIINF = 10; PSC = Primer y Segundo Ciclo; GRA = Grado
-        $plans = SubjectRepository::getPlansFromCenter('10','PSC','GRA',$this->getActualYear());
+        $plans = SubjectRepository::getPlansFromCenter('10','PSC','GRA,MOF',$this->getActualYear());
 
         foreach ($plans as $plan){
             $options[$plan->codigo] =  "$plan->nombre";
         }
+
+        natcasesort($options);
 
         $cancel = [self::CANCELAR];
         $keyboard = array_chunk(($options), 1);
@@ -178,6 +180,8 @@ class AsignaturasCommand extends BaseUserCommand
         {
             $opts4[$asignatura->codigo] =  "$asignatura->nombre";
         }
+
+        natcasesort($opts4);
 
         $cancel = [self::CANCELAR,self::ATRAS];
         $keyboard = array_chunk($opts4, 2);
