@@ -37,8 +37,8 @@ class DirectorioCommand extends BaseUserCommand
         $this->getConversation();
 
         $keyboard [] = [self::CANCELAR];
-
         $this->getRequest()->keyboard($keyboard);
+
         if ($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->markdown()->sendMessage("Introduce el nombre del personal/profesor del que deseas buscar información:");
@@ -60,22 +60,34 @@ class DirectorioCommand extends BaseUserCommand
         $textForSearch = $this->getConversation()->notes['text'];
         $directory = DirectoryRepository::getDirectoryInfo(urlencode($textForSearch));
 
-        $mensaje = "";
-        if(count($directory)!==0){
+        if(count($directory)!==0)
+        {
             $personalKB = [];
-            $mensaje .= "Selecciona de quién deseas obtener más información:\n\n";
-            foreach ($directory as $person){
-                $mensaje .= "*- $person->nombre $person->apellidos [$person->departamento]\n*";
-                $personalKB [] = "$person->nombre $person->apellidos [$person->departamento]";
+            $mensaje = "Selecciona de quién deseas obtener más información:\n\n";
+
+            foreach ($directory as $person)
+            {
+                if ($person->nombre === "" || $person->nombre === null)
+                {
+                    $mensaje .= "*- $person->apellidos [$person->departamento]\n*";
+                    $personalKB [] = "$person->apellidos [$person->departamento]";
+                }
+                else
+                {
+                    $mensaje .= "*- $person->nombre $person->apellidos [$person->departamento]\n*";
+                    $personalKB [] = "$person->nombre $person->apellidos [$person->departamento]";
+                }
+
             }
             $keyboard = array_chunk($personalKB, 2);
-        }else{
-            $mensaje .= "No se han encontrado resultados para tu búsqueda. Selecciona una opción del teclado.";
+        }
+        else
+        {
+            $mensaje = "No se han encontrado resultados para tu búsqueda. Selecciona una opción del teclado.";
         }
 
         $cancel = [self::CANCELAR, self::NUEVA_BUSQUEDA];
         $keyboard [] = $cancel;
-
         $this->getRequest()->keyboard($keyboard);
 
         if ($this->isProcessed() || empty($text))
@@ -124,19 +136,20 @@ class DirectorioCommand extends BaseUserCommand
         $departmentIcon = "\xF0\x9F\x91\x94";
 
         $person = $directory[$selectedIndexPersonal];
+
         $mensaje = "Información sobre *$person->nombre $person->apellidos [$person->departamento]*\n".
         "$mailIcon Email: $person->nombreEmail@$person->dominioEmail\n";
 
-        if ($person->despacho !== "" && $person->despacho !== null){
+        if ($person->despacho !== "" && $person->despacho !== null)
+        {
             $mensaje.="$departmentIcon Despacho: *$person->despacho*\n";
         }
 
-        $mensaje.="$phoneIcon Teléfono: *$person->telefono*\n";
-
+        $mensaje.="$phoneIcon Teléfono: *$person->telefono*\n\n".
+        "Selecciona una opción del teclado por favor:";
 
         $cancel = [self::CANCELAR, self::ATRAS ,self::NUEVA_BUSQUEDA];
         $keyboard [] = $cancel;
-
         $this->getRequest()->keyboard($keyboard);
 
         if ($this->isProcessed() || empty($text))
@@ -165,10 +178,5 @@ class DirectorioCommand extends BaseUserCommand
                 return $this->previousStep();
             }
         }
-
-        $this->getConversation()->notes['personal'] = array_search($text,$directory);
-        return $this->nextStep();
     }
-
-
 }

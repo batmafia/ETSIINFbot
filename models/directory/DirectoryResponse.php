@@ -29,6 +29,10 @@ class DirectoryResponse extends Model
     public function rules()
     {
         return [
+            [['nombre','apellidos'], 'filter', 'filter' => function($name)
+            {
+                return ltrim($name);
+            }],
             [['nombre', 'apellidos', 'departamento', 'despacho','telefono','nombreEmail','dominioEmail'], 'string'],
             [['enlace','despacho'], 'safe'],
         ];
