@@ -83,7 +83,10 @@ class DirectorioCommand extends BaseUserCommand
         }
         else
         {
-            $mensaje = "No se han encontrado resultados para tu búsqueda. Selecciona una opción del teclado.";
+            $mensaje = "*No se han encontrado resultados para tu búsqueda. Prueba a buscar con otros términos.*";
+            $this->getRequest()->markdown()->sendMessage($mensaje);
+            $this->stopConversation();
+            return $this->resetCommand();
         }
 
         $cancel = [self::CANCELAR, self::NUEVA_BUSQUEDA];
@@ -148,7 +151,9 @@ class DirectorioCommand extends BaseUserCommand
         $mensaje.="$phoneIcon Teléfono: *$person->telefono*\n\n".
         "Selecciona una opción del teclado por favor:";
 
-        $cancel = [self::CANCELAR, self::ATRAS ,self::NUEVA_BUSQUEDA];
+        $newSearch = [self::NUEVA_BUSQUEDA];
+        $cancel = [self::CANCELAR,self::ATRAS];
+        $keyboard [] = $newSearch;
         $keyboard [] = $cancel;
         $this->getRequest()->keyboard($keyboard);
 
@@ -157,12 +162,12 @@ class DirectorioCommand extends BaseUserCommand
             return $this->getRequest()->markdown()->sendMessage($mensaje);
         }
 
-        if (!(in_array($text, $cancel)))
+        if (!(in_array($text, $cancel) || in_array($text,$newSearch)))
         {
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
 
-        if (in_array($text, $cancel))
+        if (in_array($text, $cancel)||in_array($text,$newSearch))
         {
             if ($text === self::CANCELAR)
             {
