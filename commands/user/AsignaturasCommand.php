@@ -246,11 +246,10 @@ class AsignaturasCommand extends BaseUserCommand
             }
         }
 
-
         $numProfesores = count($subject->profesores);
 
-        $message = "La asignatura *$subject->nombre ($subject->caracter)* pertenece al departamento de *$subject->depto*, " .
-            "tiene un peso de *$subject->ects ECTS* y tienes a *$numProfesores profesores* dispuestos a ayudarte.\n" .
+        $message = "Información sobre...\n*$subject->nombre*\nDepartamento: *$subject->depto*\nTipo: *$subject->caracter*\n" .
+            "Créditos: *$subject->ects ECTS*\nProfesores: *$numProfesores profesores*\n\n" .
             "Selecciona mediante el teclado una opción.\n";
 
 
@@ -384,6 +383,11 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSubject = $this->getConversation()->notes['subject'];
         $selectedTeacher = $this->getConversation()->notes['teacher'];
 
+        $mailIcon = "\xF0\x9F\x93\xA7";
+        $departmentIcon = "\xF0\x9F\x91\x94";
+        $clockIcon = "\xF0\x9F\x95\x92";
+        $alertIcon = "\xE2\x9A\xA0";
+
         $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
 
         if ($this->isProcessed() || empty($text))
@@ -392,13 +396,13 @@ class AsignaturasCommand extends BaseUserCommand
             {
                 if (("$profesor->nombre $profesor->apellidos") == $selectedTeacher)
                 {
-                    $mensaje = "El profesor *$profesor->nombre $profesor->apellidos* te puede atender personalmente " .
-                        "en su despacho *$profesor->despacho* o bien vía email en la dirección " .
-                        "$profesor->email .\n";
+                    $mensaje = "Información sobre...\n*$profesor->nombre $profesor->apellidos*\n".
+                        "$mailIcon Email: $profesor->email\n"."$departmentIcon Despacho: *$profesor->despacho*\n";
+
 
                     if (count($profesor->tutorias) !== 0)
                     {
-                        $mensaje .= "Sus horarios de tutorias son:\n";
+                        $mensaje .= "\n$clockIcon Horarios de tutorias:\n";
                         foreach ($profesor->tutorias as $tutoria)
                         {
                             $mensaje .= $tutoria->getTutoriaMessage() . "\n";
@@ -407,7 +411,7 @@ class AsignaturasCommand extends BaseUserCommand
                     }
                     else
                     {
-                        $mensaje .="*El profesor no ha especificado un horario de tutorias válido.*\n".
+                        $mensaje .="\n$alertIcon *El profesor no ha especificado un horario de tutorias válido.*\n".
                             "Si tienes alguna duda ponte en contacto vía email.";
                     }
                 }
