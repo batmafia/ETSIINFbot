@@ -137,7 +137,7 @@ class DirectorioCommand extends BaseUserCommand
 
         $person = $directory[$selectedIndexPersonal];
 
-        $mensaje = "Información sobre *$person->nombre $person->apellidos [$person->departamento]*\n".
+        $mensaje = "Información sobre...\n*$person->nombre $person->apellidos [$person->departamento]*\n".
         "$mailIcon Email: $person->nombreEmail@$person->dominioEmail\n";
 
         if ($person->despacho !== "" && $person->despacho !== null)
