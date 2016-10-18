@@ -137,7 +137,7 @@ class BusCommand extends BaseUserCommand
         {
             if ($exception->getMessage() == "Unable to parse response as JSON")
             {
-                $result = $this->getRequest()->markdown()->sendMessage("$alertIcon Parece que la API del Consorcio de Transportes ".
+                $result = $this->getRequest()->markdown()->hideKeyboard()->sendMessage("$alertIcon Parece que la API del Consorcio de Transportes ".
                 "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas llegadas.*\n".
                 "Prueba a realizar la consulta pasados unos minutos.\n");
 
