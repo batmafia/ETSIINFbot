@@ -91,6 +91,19 @@ class AsignaturasCommand extends BaseUserCommand
         $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
 
         $opts2 = array_keys($ordenadas);
+        if(count($opts2) === 1)
+        {
+            if($text === self::ATRAS)
+            {
+                return $this->previousStep();
+            }
+            else
+            {
+                $this->getConversation()->notes['course'] = $opts2[0];
+                return $this->nextStep();
+            }
+
+        }
 
         $cancel = [self::CANCELAR, self::ATRAS];
         $keyboard = array_chunk($opts2, 2);
@@ -102,22 +115,17 @@ class AsignaturasCommand extends BaseUserCommand
         {
             return $this->getRequest()->sendMessage('Selecciona el curso al cual pertenece la asignatura:');
         }
-
         if (!(in_array($text, $opts2) || in_array($text, $cancel)))
         {
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
-
-        if (in_array($text, $cancel))
+        if ($text === self::CANCELAR)
         {
-            if ($text === self::CANCELAR)
-            {
-                return $this->cancelConversation();
-            }
-            else
-            {
-                return $this->previousStep();
-            }
+            return $this->cancelConversation();
+        }
+        if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
         }
 
         $this->getConversation()->notes['course'] = " ".$text;
