@@ -33,15 +33,15 @@ class DirectorioCommand extends BaseUserCommand
 
     public function processGetTextForSearch($text)
     {
-        $this->getRequest()->sendAction(Request::ACTION_TYPING);
         $this->getConversation();
 
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
         $keyboard [] = [self::CANCELAR];
-        $this->getRequest()->keyboard($keyboard);
 
         if ($this->isProcessed() || empty($text))
         {
-            return $this->getRequest()->markdown()->sendMessage("Introduce el nombre del personal/profesor del que deseas buscar información:");
+            return $this->getRequest()->markdown()->keyboard($keyboard)
+                ->sendMessage("Introduce el nombre del personal/profesor del que deseas buscar información:");
         }
         if ($text === self::CANCELAR)
         {
@@ -55,13 +55,23 @@ class DirectorioCommand extends BaseUserCommand
     public function processReturnSearch($text)
     {
 
-        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+        if ($text === self::CANCELAR)
+        {
+            return $this->cancelConversation();
+        }
+        else if ($text === self::NUEVA_BUSQUEDA)
+        {
+            return $this->previousStep();
+        }
 
         $textForSearch = $this->getConversation()->notes['text'];
+
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
         $directory = DirectoryRepository::getDirectoryInfo(urlencode($textForSearch));
 
         if(count($directory)!==0)
         {
+            $cancel = [self::CANCELAR, self::NUEVA_BUSQUEDA];
             $personalKB = [];
             $mensaje = "Selecciona de quién deseas obtener más información:\n\n";
 
@@ -89,7 +99,6 @@ class DirectorioCommand extends BaseUserCommand
             return $this->resetCommand();
         }
 
-        $cancel = [self::CANCELAR, self::NUEVA_BUSQUEDA];
         $keyboard [] = $cancel;
         $this->getRequest()->keyboard($keyboard);
 
@@ -103,23 +112,6 @@ class DirectorioCommand extends BaseUserCommand
             {
                 return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
             }
-        }else{
-            if (!(in_array($text, $cancel)))
-            {
-                return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
-            }
-        }
-
-        if (in_array($text, $cancel))
-        {
-            if ($text === self::CANCELAR)
-            {
-                return $this->cancelConversation();
-            }
-            else if ($text === self::NUEVA_BUSQUEDA)
-            {
-                return $this->previousStep();
-            }
         }
 
         $this->getConversation()->notes['personal'] = array_search($text,$personalKB);
@@ -129,11 +121,26 @@ class DirectorioCommand extends BaseUserCommand
     public function processReturnInfo($text)
     {
 
-        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+        if ($text === self::CANCELAR)
+        {
+            return $this->cancelConversation();
+        }
+        else if ($text === self::NUEVA_BUSQUEDA)
+        {
+            $this->stopConversation();
+            return $this->resetCommand();
+        }
+        else if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
+        }
 
         $textForSearch = $this->getConversation()->notes['text'];
         $selectedIndexPersonal = $this->getConversation()->notes['personal'];
+
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
         $directory = DirectoryRepository::getDirectoryInfo(urlencode($textForSearch));
+
         $phoneIcon = "\xF0\x9F\x93\x9E";
         $mailIcon = "\xF0\x9F\x93\xA7";
         $departmentIcon = "\xF0\x9F\x91\x94";
@@ -167,21 +174,5 @@ class DirectorioCommand extends BaseUserCommand
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
 
-        if (in_array($text, $cancel)||in_array($text,$newSearch))
-        {
-            if ($text === self::CANCELAR)
-            {
-                return $this->cancelConversation();
-            }
-            else if ($text === self::NUEVA_BUSQUEDA)
-            {
-                $this->stopConversation();
-                return $this->resetCommand();
-            }
-            else if ($text === self::ATRAS)
-            {
-                return $this->previousStep();
-            }
-        }
     }
 }
