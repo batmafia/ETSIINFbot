@@ -52,11 +52,13 @@ class AsignaturasCommand extends BaseUserCommand
         $this->getConversation();
 
         // ETSIINF = 10; PSC = Primer y Segundo Ciclo; GRA = Grado
-        $plans = SubjectRepository::getPlansFromCenter('10','PSC','GRA',$this->getActualYear());
+        $plans = SubjectRepository::getPlansFromCenter('10','PSC','GRA,MOF',$this->getActualYear());
 
         foreach ($plans as $plan){
             $options[$plan->codigo] =  "$plan->nombre";
         }
+
+        natcasesort($options);
 
         $cancel = [self::CANCELAR];
         $keyboard = array_chunk(($options), 1);
@@ -89,6 +91,19 @@ class AsignaturasCommand extends BaseUserCommand
         $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
 
         $opts2 = array_keys($ordenadas);
+        if(count($opts2) === 1)
+        {
+            if($text === self::ATRAS)
+            {
+                return $this->previousStep();
+            }
+            else
+            {
+                $this->getConversation()->notes['course'] = $opts2[0];
+                return $this->nextStep();
+            }
+
+        }
 
         $cancel = [self::CANCELAR, self::ATRAS];
         $keyboard = array_chunk($opts2, 2);
@@ -100,22 +115,17 @@ class AsignaturasCommand extends BaseUserCommand
         {
             return $this->getRequest()->sendMessage('Selecciona el curso al cual pertenece la asignatura:');
         }
-
         if (!(in_array($text, $opts2) || in_array($text, $cancel)))
         {
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
-
-        if (in_array($text, $cancel))
+        if ($text === self::CANCELAR)
         {
-            if ($text === self::CANCELAR)
-            {
-                return $this->cancelConversation();
-            }
-            else
-            {
-                return $this->previousStep();
-            }
+            return $this->cancelConversation();
+        }
+        if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
         }
 
         $this->getConversation()->notes['course'] = " ".$text;
@@ -178,6 +188,8 @@ class AsignaturasCommand extends BaseUserCommand
         {
             $opts4[$asignatura->codigo] =  "$asignatura->nombre";
         }
+
+        natcasesort($opts4);
 
         $cancel = [self::CANCELAR,self::ATRAS];
         $keyboard = array_chunk($opts4, 2);
@@ -242,11 +254,10 @@ class AsignaturasCommand extends BaseUserCommand
             }
         }
 
-
         $numProfesores = count($subject->profesores);
 
-        $message = "La asignatura *$subject->nombre ($subject->caracter)* pertenece al departamento de *$subject->depto*, " .
-            "tiene un peso de *$subject->ects ECTS* y tienes a *$numProfesores profesores* dispuestos a ayudarte.\n" .
+        $message = "Información sobre...\n*$subject->nombre*\nDepartamento: *$subject->depto*\nTipo: *$subject->caracter*\n" .
+            "Créditos: *$subject->ects ECTS*\nProfesores: *$numProfesores profesores*\n\n" .
             "Selecciona mediante el teclado una opción.\n";
 
 
@@ -380,6 +391,11 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSubject = $this->getConversation()->notes['subject'];
         $selectedTeacher = $this->getConversation()->notes['teacher'];
 
+        $mailIcon = "\xF0\x9F\x93\xA7";
+        $departmentIcon = "\xF0\x9F\x91\x94";
+        $clockIcon = "\xF0\x9F\x95\x92";
+        $alertIcon = "\xE2\x9A\xA0";
+
         $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
 
         if ($this->isProcessed() || empty($text))
@@ -388,13 +404,13 @@ class AsignaturasCommand extends BaseUserCommand
             {
                 if (("$profesor->nombre $profesor->apellidos") == $selectedTeacher)
                 {
-                    $mensaje = "El profesor *$profesor->nombre $profesor->apellidos* te puede atender personalmente " .
-                        "en su despacho *$profesor->despacho* o bien vía email en la dirección " .
-                        "$profesor->email .\n";
+                    $mensaje = "Información sobre...\n*$profesor->nombre $profesor->apellidos*\n".
+                        "$mailIcon Email: $profesor->email\n"."$departmentIcon Despacho: *$profesor->despacho*\n";
+
 
                     if (count($profesor->tutorias) !== 0)
                     {
-                        $mensaje .= "Sus horarios de tutorias son:\n";
+                        $mensaje .= "\n$clockIcon Horarios de tutorias:\n";
                         foreach ($profesor->tutorias as $tutoria)
                         {
                             $mensaje .= $tutoria->getTutoriaMessage() . "\n";
@@ -403,7 +419,7 @@ class AsignaturasCommand extends BaseUserCommand
                     }
                     else
                     {
-                        $mensaje .="*El profesor no ha especificado un horario de tutorias válido.*\n".
+                        $mensaje .="\n$alertIcon *El profesor no ha especificado un horario de tutorias válido.*\n".
                             "Si tienes alguna duda ponte en contacto vía email.";
                     }
                 }
