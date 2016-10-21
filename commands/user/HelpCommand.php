@@ -24,7 +24,7 @@ class HelpCommand extends BaseUserCommand
     protected $name = 'help';
     protected $description = 'Muestra la ayuda de comandos del bot.';
     protected $usage = '/help o /help <comando>';
-    protected $version = '1.0.1';
+    protected $version = '1.0.2';
     /**#@-*/
 
     /**
@@ -47,7 +47,8 @@ class HelpCommand extends BaseUserCommand
         if ($command === '') {
             $text = $this->telegram->getBotName() . ' v. ' . $this->telegram->getVersion() . "\n\n";
             $text .= "Bienvenido al bot de la escuela ". $this->message->getChat()->getFirstName() .
-                ", espero serte útil.\n\n";
+                ", espero serte útil.\n";
+            $text .= "Todas vuestras sugerencias o errores que observéis del bot escribidlas a @frildoren @svg153 o a @diegofpb.\n\n";
             $text .= 'Aquí tienes la lista de comandos:' . "\n";
             foreach ($commands as $command) {
                 $text .= '/' . $command->getName() . ' - ' . $command->getDescription() . "\n";
