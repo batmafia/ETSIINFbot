@@ -27,7 +27,7 @@ class BusCommand extends BaseUserCommand
     protected $name = 'bus';
     protected $description = 'Consulta el tiempo que queda para que salga el autobús.';
     protected $usage = '/bus';
-    protected $version = '0.1.1';
+    protected $version = '0.1.2';
     protected $need_mysql = true;
     /**#@-*/
 

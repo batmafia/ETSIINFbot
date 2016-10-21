@@ -23,7 +23,7 @@ class AsignaturasCommand extends BaseUserCommand
     protected $name = 'asignaturas';
     protected $description = 'Consulta información sobre las asignaturas, sus profesores y las tutorias.';
     protected $usage = '/asignaturas';
-    protected $version = '0.1.1';
+    protected $version = '0.2.0';
     protected $need_mysql = true;
 
     const PROFESORES = 'Profesores y Tutorías';
