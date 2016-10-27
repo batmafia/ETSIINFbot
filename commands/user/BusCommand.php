@@ -13,6 +13,8 @@ namespace app\commands\user;
 use app\commands\base\Request;
 use app\models\repositories\BusRepository;
 use app\commands\base\BaseUserCommand;
+use \DateTime;
+use \DateTimeZone;
 
 /**
  * User "/bus" command
@@ -119,7 +121,7 @@ class BusCommand extends BaseUserCommand
         $opts = ['Actuales','Todas'];
         $cancel = ['Cancelar'];
         $keyboard = [$opts,$cancel];
-        $titleKeyboard = '¿Quieres ver las salidas actuales o todas las salidas del día?:';
+        $titleKeyboard = '¿Quieres ver las salidas actuales o todas las salidas del día?';
         $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
 
 
@@ -140,7 +142,7 @@ class BusCommand extends BaseUserCommand
             return $this->cancelConversation();
         }
 
-
+        $this->getConversation()->notes['scheduleType'] = $text;
         if ($text==='Actuales')
         {
             return $this->nextStep();
@@ -220,6 +222,7 @@ class BusCommand extends BaseUserCommand
 
         $lineId = $this->getConversation()->notes['line'];
         $location = $this->getConversation()->notes['location'];
+        $scheduleType = $this->getConversation()->notes['scheduleType'];
         $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
 
         try
@@ -231,13 +234,35 @@ class BusCommand extends BaseUserCommand
             throw $exception;
         }
 
-        $outText = "$busIcon El bus *$lineId* tiene las siguientes salidas desde *$location* para hoy:\n\n";
-        $outText.= implode(", ", $fullTimeBuses);
 
-        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
+        $lastEl = end($fullTimeBuses);
+        $lastTimeBusSTR = "$lastEl:00";
+        $lastTimeBus = strtotime($lastTimeBusSTR);
+        $nowTimeSTR = $this->myDateFormat("H:i:s", false, 'Europe/Madrid'); // false for timeestamp
+        $nowTime = strtotime($nowTimeSTR);
+
+        $outText = "";
+
+        // echo "lastTimeBus = $lastTimeBus -> $lastTimeBusSTR\n";
+        // echo "nowTime = $nowTime -> $nowTimeSTR \n";
+        // $v = $lastTimeBus>$nowTime;
+        // echo "lastTimeBus > nowTime = $v \n";
+        // echo "scheduleType = $scheduleType\n";
+        // $v = $scheduleType==='Todas';
+        // echo "scheduleType==='Todas' = $v \n";
+        // $v = $lastTimeBus > $nowTime || $scheduleType === 'Todas';
+        // echo "TODOIF = $v \n";
+
+        if( $lastTimeBus > $nowTime || $scheduleType === 'Todas')
+        {
+            $outText .= "$busIcon El bus *$lineId* tiene las siguientes salidas desde *$location* para hoy:\n\n";
+            $outText .= implode(", ", $fullTimeBuses);
+            $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
+            $this->stopConversation();
+            return $result;
+        }
         $this->stopConversation();
-
-        return $result;
+        return 0;
     }
 
 
@@ -265,6 +290,23 @@ class BusCommand extends BaseUserCommand
                 '573' => '11278'
             ]
         ][$location][$busLine];
+    }
+
+
+    /**
+     * http://php.net/manual/es/function.date.php
+     * @param  string  $format    [description]
+     * @param  boolean $timestamp [description]
+     * @param  boolean $timezone  [description]
+     * @return [type]             [description]
+     */
+    function myDateFormat($format="r", $timestamp=false, $timezone=false)
+    {
+        $userTimezone = new DateTimeZone(!empty($timezone) ? $timezone : 'GMT');
+        $gmtTimezone = new DateTimeZone('GMT');
+        $myDateTime = new DateTime(($timestamp!=false?date("r",(int)$timestamp):date("r")), $gmtTimezone);
+        $offset = $userTimezone->getOffset($myDateTime);
+        return date($format, ($timestamp!=false?(int)$timestamp:$myDateTime->format('U')) + $offset);
     }
 
 
