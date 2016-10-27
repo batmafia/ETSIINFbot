@@ -37,7 +37,7 @@ class BusRepository
     /**
      * @return
      */
-    public function getFullTimeBuses()
+    private static function getFullTimeBuses()
     {
         $request = Request::get("http://www.etsiinf.upm.es/apps/autobuses/v2/")->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
@@ -67,34 +67,11 @@ class BusRepository
         return $availableLines;
     }
 
+
     public static function getFullTimeBusesOpts($idLine, $origin)
     {
 
-        $request = Request::get("http://www.etsiinf.upm.es/apps/autobuses/v2/")->expects(Mime::JSON)->send();
-        if (!$request->hasErrors()) {
-            $data = \GuzzleHttp\json_decode($request->raw_body, true);
-
-            $availableLines=[];
-            foreach ($data as $key => $line)
-            {
-                foreach ($line as $k => $lineObject){
-                    $myLine = new fullTimeBuses\FullTimeBusesLine();
-                    $myLine->setAttributes($lineObject);
-
-                    if ($myLine->validate()) {
-                        $availableLines[$lineObject['idLinea']]=$myLine;
-                    } else {
-                        print_r($myLine->getErrors());
-                    }
-                }
-
-            }
-
-        }
-        else
-        {
-            throw new Exception("Repository exception");
-        }
+        $availableLines = self::getFullTimeBuses();
 
         $dayType = "";
         if ($idLine==='591' || $idLine==='865') {
