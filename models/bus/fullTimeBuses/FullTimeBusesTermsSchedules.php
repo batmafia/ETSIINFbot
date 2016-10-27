@@ -16,7 +16,29 @@ class FullTimeBusesTermsSchedules extends Model
     {
         return [
             ['sentido', 'string'],
+            ['listadoHoras','safe']
         ];
+    }
+
+    public function setAttributes($values, $safeOnly = true)
+    {
+        parent::setAttributes($values, $safeOnly);
+
+        $listadoHorasTemp = [];
+        foreach($this->listadoHoras as $i=>$horasObject)
+        {
+            $horas = new FullTimeBusesSchedules();
+            $horas->setAttributes($horasObject);
+
+            if($horas->validate())
+            {
+                $listadoHorasTemp[$horasObject['dias']] = $horas;
+            }
+
+        }
+        $this->listadoHoras = $listadoHorasTemp;
+
+
     }
 
 }

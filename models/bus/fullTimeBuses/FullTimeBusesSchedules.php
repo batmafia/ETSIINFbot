@@ -4,9 +4,9 @@ namespace app\models\bus\fullTimeBuses;
 
 use yii\base\Model;
 
-class FullTimeBusesTermsSchedules extends Model
+class FullTimeBusesSchedules extends Model
 {
-    public $dias; // "Aluche >> ETSIINF", "ETSIINF >> Aluche"
+    public $dias; // "12345"
     public $horas = []; // string arary "07:30", "08:00", "08:20",...
 
     /**
@@ -16,7 +16,7 @@ class FullTimeBusesTermsSchedules extends Model
     {
         return [
             ['dias', 'integer'],
-            ['horas', 'each', 'rule' => ['string']],
+            ['horas', 'each', 'rule' => ['string']]
         ];
     }
 

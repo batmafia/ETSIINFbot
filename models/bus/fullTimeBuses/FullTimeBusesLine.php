@@ -16,8 +16,30 @@ class FullTimeBusesLine extends Model
     public function rules()
     {
         return [
-            ['idLinea', 'integer'],
+            ['idLinea', 'string'],
+            ['periodos', 'safe']
         ];
     }
+
+    public function setAttributes($values, $safeOnly = true)
+    {
+        parent::setAttributes($values, $safeOnly);
+
+        $periodosTemp = [];
+        foreach($this->periodos as $i=>$periodoObject)
+        {
+            $periodo = new FullTimeBusesTerms();
+            $periodo->setAttributes($periodoObject);
+
+            if($periodo->validate())
+            {
+                $periodosTemp[$periodoObject['idPeriodo']] = $periodo;
+            }
+        }
+
+        $this->periodos = $periodosTemp;
+
+    }
+
 
 }

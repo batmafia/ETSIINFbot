@@ -19,8 +19,32 @@ class FullTimeBusesTerms extends Model
     {
         return [
             [['idPeriodo', 'nombre', 'nombre_ingles'], 'string'],
-            ['validez', 'binary'],
+            ['validez', 'string'],
+            ['horarios','safe']
         ];
     }
+
+    public function setAttributes($values, $safeOnly = true)
+    {
+        parent::setAttributes($values, $safeOnly);
+
+        $horariosTemp = [];
+        foreach($this->horarios as $i=>$horarioObject)
+        {
+            $horario = new FullTimeBusesTermsSchedules();
+            $horario->setAttributes($horarioObject);
+
+            if($horario->validate())
+            {
+                $horariosTemp[$horarioObject['sentido']] = $horario;
+            }
+
+        }
+
+        $this->horarios = $horariosTemp;
+
+    }
+
+
 
 }
