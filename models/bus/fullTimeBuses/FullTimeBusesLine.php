@@ -6,8 +6,8 @@ use yii\base\Model;
 
 class FullTimeBusesLine extends Model
 {
-    public $idLine; // ints 591, 865, 571, 573
-    public $term = []; // ints array
+    public $idLinea; // ints 591, 865, 571, 573
+    public $periodos = []; // ints array
 
 
     /**
@@ -16,9 +16,7 @@ class FullTimeBusesLine extends Model
     public function rules()
     {
         return [
-            ['idLine', 'integer'],
-            // lines is integer array
-            ['term' => ['integer']],
+            ['idLinea', 'integer'],
         ];
     }
 

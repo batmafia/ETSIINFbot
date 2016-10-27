@@ -6,8 +6,8 @@ use yii\base\Model;
 
 class FullTimeBusesTermsSchedules extends Model
 {
-    public $sentido; // "Aluche >> ETSIINF", "ETSIINF >> Aluche"
-    public $listadoHoras = []; // ints array
+    public $dias; // "Aluche >> ETSIINF", "ETSIINF >> Aluche"
+    public $horas = []; // string arary "07:30", "08:00", "08:20",...
 
     /**
      * @return array the validation rules.
@@ -15,7 +15,8 @@ class FullTimeBusesTermsSchedules extends Model
     public function rules()
     {
         return [
-            ['sentido', 'string'],
+            ['dias', 'integer'],
+            ['horas', 'each', 'rule' => ['string']],
         ];
     }
 

@@ -6,11 +6,11 @@ use yii\base\Model;
 
 class FullTimeBusesTerms extends Model
 {
-    public $idTerm; // lectivo, no_lectivo, agosto
-    public $nameSPA;
-    public $nameENG;
-    public $valid;
-    public $schedules = []; // ints array
+    public $idPeriodo; // lectivo, no_lectivo, agosto
+    public $nombre;
+    public $nombre_ingles;
+    public $validez;
+    public $horarios = []; // ints array
 
     /**
      * @return array the validation rules.
@@ -18,10 +18,8 @@ class FullTimeBusesTerms extends Model
     public function rules()
     {
         return [
-            [['idTerm', 'nameSPA', 'nameENG'], 'integer'],
-            ['valid', 'binary'],
-            // lines is integer array
-            ['schedules' => ['integer']],
+            [['idPeriodo', 'nombre', 'nombre_ingles'], 'string'],
+            ['validez', 'binary'],
         ];
     }
 

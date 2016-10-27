@@ -7,18 +7,12 @@ use yii\base\Model;
 
 class FullTimeBusesBusLines extends Model
 {
-    public $lines = []; // ints array
+    public $lineas = []; // ints array
 
 
-    /**
-    * @return array the validation rules.
-    */
-    public function rules()
+    function setAttributes($values, $safeOnly = true)
     {
-        return [
-            // lines is integer array
-            ['lines' => ['integer']],
-        ];
+
     }
 
 }
