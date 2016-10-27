@@ -261,8 +261,8 @@ class BusCommand extends BaseUserCommand
             $this->stopConversation();
             return $result;
         }
-        $this->stopConversation();
-        return 0;
+        $result = Request::emptyRequest();
+        return return $result;;
     }
 
 
