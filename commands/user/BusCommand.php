@@ -38,6 +38,7 @@ class BusCommand extends BaseUserCommand
     const ETSIINF = 'ETSIINF';
     const MADRID = 'Madrid';
 
+
     /**
      * [process_SelectLine description]
      * @param  [type] $text [description]
@@ -76,7 +77,7 @@ class BusCommand extends BaseUserCommand
     }
 
 
-    /**
+    /**Cancelar
      * [process_SelectLocation description]
      * @param  [type] $text [description]
      * @return [type]       [description]
@@ -112,6 +113,44 @@ class BusCommand extends BaseUserCommand
         return $this->nextStep();
     }
 
+
+    public function processSelectScheduleType($text)
+    {
+        $opts = ['Actuales','Todas'];
+        $cancel = ['Cancelar'];
+        $keyboard = [$opts,$cancel];
+        $titleKeyboard = '¿Quieres ver las salidas actuales o todas las salidas del día?:';
+        $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
+
+
+        $this->getRequest()->keyboard($keyboard);
+
+        if ($this->isProcessed() || empty($text))
+        {
+            return $this->getRequest()->sendMessage($titleKeyboard);
+        }
+
+        if( !(in_array($text, $opts) || in_array($text, $cancel)) )
+        {
+            return $this->getRequest()->sendMessage($msgErrorImputKeyboard);
+        }
+
+        if (in_array($text, $cancel))
+        {
+            return $this->cancelConversation();
+        }
+
+
+        if ($text==='Actuales')
+        {
+            return $this->nextStep();
+        }
+        else
+        {
+            return $this->processSendFullTimeBuses();
+        }
+
+    }
 
     /**
      * [process_SendLineInfo description]
@@ -164,6 +203,37 @@ class BusCommand extends BaseUserCommand
             }
         }
 
+
+        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
+        $this->stopConversation();
+
+        return $result;
+    }
+
+
+
+    public function processSendFullTimeBuses()
+    {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
+        $lineId = $this->getConversation()->notes['line'];
+        $location = $this->getConversation()->notes['location'];
+        $stopId = $this->getStopId($lineId, $location);
+        $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
+
+        try
+        {
+            $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location);
+        }
+        catch (\Exception $exception)
+        {
+
+        }
+
+        $outText = "$busIcon El bus *$lineId* tiene las siguientes salidas durante todo el día para *$location*:\n";
+        $strFullTimeBuses = $this->getStringFullTimeBuses($fullTimeBuses);
+        $outText .= $strFullTimeBuses;
+
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
         $this->stopConversation();
 
@@ -195,6 +265,14 @@ class BusCommand extends BaseUserCommand
                 '573' => '11278'
             ]
         ][$location][$busLine];
+    }
+
+
+    private function getStringFullTimeBuses($fullTimeBuses)
+    {
+        $srtReturn = implode(", ", $fullTimeBuses);
+        $srtReturn .= "\n";
+        return $srtReturn;
     }
 
 }
