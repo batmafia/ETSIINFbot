@@ -174,12 +174,12 @@ class BusCommand extends BaseUserCommand
         {
             if ($exception->getMessage() == "Unable to parse response as JSON")
             {
-                $result = $this->getRequest()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes ".
+                $this->getRequest()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes ".
                 "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas ".
                     "llegadas.*\n Prueba a realizar la consulta más tarde.\n\n");
 
-                $this->stopConversation();
-                return $result;
+                return $this->nextStep();
+
             }
             else
             {
@@ -191,6 +191,8 @@ class BusCommand extends BaseUserCommand
         if (empty($stop->getLinesByNumber($lineId)))
         {
             $outText = "$busIcon *No hay próximas llegadas* para el bus *$lineId* a la parada *$stop->stopName* \n";
+            $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
+            return $this->nextStep();
         }
         else
         {
@@ -218,7 +220,6 @@ class BusCommand extends BaseUserCommand
 
         $lineId = $this->getConversation()->notes['line'];
         $location = $this->getConversation()->notes['location'];
-        $stopId = $this->getStopId($lineId, $location);
         $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
 
         try
@@ -227,12 +228,11 @@ class BusCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-
+            throw $exception;
         }
 
-        $outText = "$busIcon El bus *$lineId* tiene las siguientes salidas durante todo el día para *$location*:\n";
-        $strFullTimeBuses = $this->getStringFullTimeBuses($fullTimeBuses);
-        $outText .= $strFullTimeBuses;
+        $outText = "$busIcon El bus *$lineId* tiene las siguientes salidas desde *$location* para hoy:\n\n";
+        $outText.= implode(", ", $fullTimeBuses);
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
         $this->stopConversation();
@@ -267,12 +267,5 @@ class BusCommand extends BaseUserCommand
         ][$location][$busLine];
     }
 
-
-    private function getStringFullTimeBuses($fullTimeBuses)
-    {
-        $srtReturn = implode(", ", $fullTimeBuses);
-        $srtReturn .= "\n";
-        return $srtReturn;
-    }
 
 }

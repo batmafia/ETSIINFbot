@@ -37,7 +37,7 @@ class BusRepository
     /**
      * @return
      */
-    public static function getFullTimeBuses()
+    public function getFullTimeBuses()
     {
         $request = Request::get("http://www.etsiinf.upm.es/apps/autobuses/v2/")->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
@@ -69,8 +69,32 @@ class BusRepository
 
     public static function getFullTimeBusesOpts($idLine, $origin)
     {
-        $availableLines = $this->getFullTimeBuses();
 
+        $request = Request::get("http://www.etsiinf.upm.es/apps/autobuses/v2/")->expects(Mime::JSON)->send();
+        if (!$request->hasErrors()) {
+            $data = \GuzzleHttp\json_decode($request->raw_body, true);
+
+            $availableLines=[];
+            foreach ($data as $key => $line)
+            {
+                foreach ($line as $k => $lineObject){
+                    $myLine = new fullTimeBuses\FullTimeBusesLine();
+                    $myLine->setAttributes($lineObject);
+
+                    if ($myLine->validate()) {
+                        $availableLines[$lineObject['idLinea']]=$myLine;
+                    } else {
+                        print_r($myLine->getErrors());
+                    }
+                }
+
+            }
+
+        }
+        else
+        {
+            throw new Exception("Repository exception");
+        }
 
         $dayType = "";
         if ($idLine==='591' || $idLine==='865') {
@@ -110,19 +134,19 @@ class BusRepository
             $dest = 'Boadilla >> Moncloa';
         }
 
-        $dw = idate("w", $timestamp);
+        $dw = idate("w", time());
         $dayWeekNumber = ($dw===0)?7:$dw;
 
         $hours = [];
+
         foreach ($availableLines[$idLine]['periodos'][$dayType]['horarios'][$dest]['listadoHoras'] as $key => $value)
         {
-            if (strpos($key, $dayWeekNumber) !== FALSE)
+            if (strpos($key, "$dayWeekNumber") !== FALSE)
             {
                 $hours = array_merge( $hours, $value['horas']);
             }
         }
 
-        print_r($hours);
         //echo $availableLines[$idLine]['periodos'][$dayType]['horarios'][$dest]['listadoHoras']['12345']['horas'][0];
 
         return $hours;
