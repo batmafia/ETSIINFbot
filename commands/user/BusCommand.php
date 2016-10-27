@@ -262,7 +262,7 @@ class BusCommand extends BaseUserCommand
             return $result;
         }
         $result = Request::emptyRequest();
-        return return $result;;
+        return $result;;
     }
 
 
