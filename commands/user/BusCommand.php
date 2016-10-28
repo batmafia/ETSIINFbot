@@ -16,6 +16,7 @@ use app\commands\base\BaseUserCommand;
 use \DateTime;
 use \DateTimeZone;
 
+
 /**
  * User "/bus" command
  */
@@ -245,15 +246,15 @@ class BusCommand extends BaseUserCommand
 
         // echo "lastTimeBus = $lastTimeBus -> $lastTimeBusSTR\n";
         // echo "nowTime = $nowTime -> $nowTimeSTR \n";
-        // $v = $lastTimeBus>$nowTime;
-        // echo "lastTimeBus > nowTime = $v \n";
+        // $v = $nowTime < $lastTimeBus;
+        // echo "nowTime < lastTimeBus = $v \n";
         // echo "scheduleType = $scheduleType\n";
         // $v = $scheduleType==='Todas';
         // echo "scheduleType==='Todas' = $v \n";
         // $v = $lastTimeBus > $nowTime || $scheduleType === 'Todas';
         // echo "TODOIF = $v \n";
 
-        if( $lastTimeBus > $nowTime || $scheduleType === 'Todas')
+        if( $nowTime < $lastTimeBus || $scheduleType === 'Todas')
         {
             $outText .= "$busIcon El bus *$lineId* tiene las siguientes salidas desde *$location* para hoy:\n\n";
             $outText .= implode(", ", $fullTimeBuses);
