@@ -15,7 +15,7 @@ use app\models\repositories\BusRepository;
 use app\commands\base\BaseUserCommand;
 use \DateTime;
 use \DateTimeZone;
-use Longman\TelegramBot\Request;
+
 
 /**
  * User "/bus" command
@@ -262,7 +262,7 @@ class BusCommand extends BaseUserCommand
             $this->stopConversation();
             return $result;
         }
-        $result = Request::emptyRequest();
+        $result = \Longman\TelegramBot\Request::emptyResponse();
         return $result;;
     }
 

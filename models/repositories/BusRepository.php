@@ -139,7 +139,7 @@ class BusRepository
      * @param  boolean $timezone  [description]
      * @return [type]             [description]
      */
-    function myDateFormat($format="r", $timestamp=false, $timezone=false)
+    public static function myDateFormat($format="r", $timestamp=false, $timezone=false)
     {
         $userTimezone = new DateTimeZone(!empty($timezone) ? $timezone : 'GMT');
         $gmtTimezone = new DateTimeZone('GMT');
