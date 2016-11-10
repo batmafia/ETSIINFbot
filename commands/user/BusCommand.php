@@ -291,34 +291,6 @@ class BusCommand extends BaseUserCommand
                 $outText .= $getNextAvailableBusesTime[0];
                 $nowTime = $getNextAvailableBusesTime[1];
                 $fullTimeBuses = $getNextAvailableBusesTime[2];
-                // $nDays = 1;
-                // do {
-                //     $nDays++;
-                //     $nextDayTimestamp = strtotime("+$nDays day");
-                //     try
-                //     {
-                //         $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location, $nextDayTimestamp);
-                //     }
-                //     catch (\Exception $exception)
-                //     {
-                //         throw $exception;
-                //     }
-                // } while (sizeof($fullTimeBuses)==0);
-                //
-                // $nowTime = $this->myDateFormat("H:i:s", $nextDayTimestamp, 'Europe/Madrid');
-                //
-                // if ($nDays == 1)
-                // {
-                //     $outText .= "mañana:\n";
-                // }
-                // else
-                // {
-                //     $nextDayAvailableBuses = $this->myDateFormat("j", $nextDayTimestamp, 'Europe/Madrid');
-                //     $nextMonthAvailableBuses = $this->myDateFormat("m", $nextDayTimestamp, 'Europe/Madrid');
-                //     $nextYearAvailableBuses = $this->myDateFormat("Y", $nextDayTimestamp, 'Europe/Madrid');
-                //     $outText .= "$nextDayAvailableBuses/$nextMonthAvailableBuses/$nextYearAvailableBuses\n";
-                // }
-
             }
             $nextTimeBuses = array();
             foreach ($fullTimeBuses as $key => $time)
