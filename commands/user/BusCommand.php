@@ -366,7 +366,7 @@ class BusCommand extends BaseUserCommand
 
     function getNextAvailableBusesTime($lineId, $location)
     {
-        $nDays = 2;
+        $nDays = 1;
         $outText = "";
         do {
             $nDays++;
