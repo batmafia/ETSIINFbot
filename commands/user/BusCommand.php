@@ -228,7 +228,7 @@ class BusCommand extends BaseUserCommand
 
         try
         {
-            $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location);
+            $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location, false);
         }
         catch (\Exception $exception)
         {
@@ -254,16 +254,80 @@ class BusCommand extends BaseUserCommand
         // $v = $lastTimeBus > $nowTime || $scheduleType === 'Todas';
         // echo "TODOIF = $v \n";
 
-        if( $nowTime < $lastTimeBus || $scheduleType === 'Todas')
+        if( $scheduleType === 'Todas')
         {
-            $outText .= "$busIcon El bus *$lineId* tiene las siguientes salidas desde *$location* para hoy:\n\n";
+            if ($nowTime <= $lastTimeBus)
+            {
+                // Send all buses today
+                $outText .= "$busIcon El bus *$lineId* tiene todas las siguientes salidas desde *$location* para hoy:\n\n";
+            }
+            else
+            {
+                // Send all the next day buses
+                $outText .= "$busIcon El bus *$lineId* no tiene mas salidas desde *$location* para hoy.\n";
+                $outText .= "Las salidas para mañana son:\n";
+                try
+                {
+                    $tomorrowTimestamp = strtotime('tomorrow');
+                    $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location, $tomorrowTimestamp);
+                }
+                catch (\Exception $exception)
+                {
+                    throw $exception;
+                }
+            }
             $outText .= implode(", ", $fullTimeBuses);
-            $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
-            $this->stopConversation();
+
+        }
+        // This case for API crash
+        elseif ($scheduleType === 'Actuales')
+        {
+            if ($nowTime <= $lastTimeBus)
+            {
+                // Send the next buses
+                $outText .= "$busIcon El bus *$lineId* tiene las siguientes próximas salidas desde *$location*:\n\n";
+            }
+            else
+            {
+                // Send the next day buses
+                $outText .= "$busIcon El bus *$lineId* no tiene mas salidas desde *$location* para hoy.\n";
+                $outText .= "Las primeras salidas para mañana son:\n";
+                try
+                {
+                    $tomorrowTimestamp = strtotime('tomorrow');
+                    $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location, $tomorrowTimestamp);
+                    // nowTime to tomorrow, to send the next buses
+                    $nowTime = $this->myDateFormat("H:i:s", $tomorrowTimestamp, 'Europe/Madrid');
+                }
+                catch (\Exception $exception)
+                {
+                    throw $exception;
+                }
+            }
+            $nextTimeBuses = array();
+            foreach ($fullTimeBuses as $key => $time)
+            {
+                $nextBusTimeStopSTR = "$time:00";
+                $nextBusTimeStop = strtotime($nextBusTimeStopSTR);
+                if ($nowTime <= $nextBusTimeStop)
+                {
+                    $nextTimeBuses[] = $time;
+                }
+
+                if(sizeof($nextTimeBuses)==3) break;
+            }
+            $outText .= implode(", ", $nextTimeBuses);
+        }
+        else
+        {
+            // In other case
+            $result = \Longman\TelegramBot\Request::emptyResponse();
             return $result;
         }
-        $result = \Longman\TelegramBot\Request::emptyResponse();
-        return $result;;
+
+        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
+        $this->stopConversation();
+        return $result;
     }
 
 
