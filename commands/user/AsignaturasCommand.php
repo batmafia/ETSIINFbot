@@ -398,6 +398,18 @@ class AsignaturasCommand extends BaseUserCommand
 
         $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
 
+        $cancel = [self::CANCELAR, self::ATRAS];
+        $keyboard [] = $cancel;
+
+        if ($text === self::CANCELAR)
+        {
+            return $this->cancelConversation();
+        }
+        if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
+        }
+
         if ($this->isProcessed() || empty($text))
         {
             foreach ($subject->profesores as $profesor)
@@ -420,15 +432,20 @@ class AsignaturasCommand extends BaseUserCommand
                     else
                     {
                         $mensaje .="\n$alertIcon *El profesor no ha especificado un horario de tutorias válido.*\n".
-                            "Si tienes alguna duda ponte en contacto vía email.";
+                            "Si tienes alguna duda ponte en contacto vía email.\n";
                     }
+
+                    $mensaje .= "\n*Si deseas obtener información de otro profesor, pulsa Atrás.\nEn caso contrario, pulsa Cancelar.*";
                 }
             }
+            return $this->getRequest()->markdown()->keyboard($keyboard)->sendMessage($mensaje);
         }
 
-        $result = $this->getRequest()->markdown()->hideKeyboard()->sendMessage($mensaje);
-        $this->stopConversation();
-        return $result;
+        if (!in_array($text, $cancel))
+        {
+            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
+        }
+
     }
 
 }
