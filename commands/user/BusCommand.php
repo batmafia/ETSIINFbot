@@ -392,7 +392,7 @@ class BusCommand extends BaseUserCommand
             $nextDayAvailableBuses = $this->myDateFormat("j", $nextDayTimestamp, 'Europe/Madrid');
             $nextMonthAvailableBuses = $this->myDateFormat("m", $nextDayTimestamp, 'Europe/Madrid');
             $nextYearAvailableBuses = $this->myDateFormat("Y", $nextDayTimestamp, 'Europe/Madrid');
-            $outText .= "$nextDayAvailableBuses/$nextMonthAvailableBuses/$nextYearAvailableBuses\n";
+            $outText .= "$nextDayAvailableBuses/$nextMonthAvailableBuses/$nextYearAvailableBuses:\n";
         }
         $ret = array();
         $ret[] = $outText;
