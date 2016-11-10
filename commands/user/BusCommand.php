@@ -265,16 +265,11 @@ class BusCommand extends BaseUserCommand
             {
                 // Send all the next day buses
                 $outText .= "$busIcon El bus *$lineId* no tiene mas salidas desde *$location* para hoy.\n";
-                $outText .= "Las salidas para mañana son:\n";
-                try
-                {
-                    $tomorrowTimestamp = strtotime('tomorrow');
-                    $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location, $tomorrowTimestamp);
-                }
-                catch (\Exception $exception)
-                {
-                    throw $exception;
-                }
+                $outText .= "Las salidas para ";
+                $getNextAvailableBusesTime = $this->getNextAvailableBusesTime($lineId, $location);
+                $outText .= $getNextAvailableBusesTime[0];
+                $nowTime = $getNextAvailableBusesTime[1];
+                $fullTimeBuses = $getNextAvailableBusesTime[2];
             }
             $outText .= implode(", ", $fullTimeBuses);
 
@@ -291,18 +286,39 @@ class BusCommand extends BaseUserCommand
             {
                 // Send the next day buses
                 $outText .= "$busIcon El bus *$lineId* no tiene mas salidas desde *$location* para hoy.\n";
-                $outText .= "Las primeras salidas para mañana son:\n";
-                try
-                {
-                    $tomorrowTimestamp = strtotime('tomorrow');
-                    $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location, $tomorrowTimestamp);
-                    // nowTime to tomorrow, to send the next buses
-                    $nowTime = $this->myDateFormat("H:i:s", $tomorrowTimestamp, 'Europe/Madrid');
-                }
-                catch (\Exception $exception)
-                {
-                    throw $exception;
-                }
+                $outText .= "Las primeras salidas para ";
+                $getNextAvailableBusesTime = $this->getNextAvailableBusesTime($lineId, $location);
+                $outText .= $getNextAvailableBusesTime[0];
+                $nowTime = $getNextAvailableBusesTime[1];
+                $fullTimeBuses = $getNextAvailableBusesTime[2];
+                // $nDays = 1;
+                // do {
+                //     $nDays++;
+                //     $nextDayTimestamp = strtotime("+$nDays day");
+                //     try
+                //     {
+                //         $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location, $nextDayTimestamp);
+                //     }
+                //     catch (\Exception $exception)
+                //     {
+                //         throw $exception;
+                //     }
+                // } while (sizeof($fullTimeBuses)==0);
+                //
+                // $nowTime = $this->myDateFormat("H:i:s", $nextDayTimestamp, 'Europe/Madrid');
+                //
+                // if ($nDays == 1)
+                // {
+                //     $outText .= "mañana:\n";
+                // }
+                // else
+                // {
+                //     $nextDayAvailableBuses = $this->myDateFormat("j", $nextDayTimestamp, 'Europe/Madrid');
+                //     $nextMonthAvailableBuses = $this->myDateFormat("m", $nextDayTimestamp, 'Europe/Madrid');
+                //     $nextYearAvailableBuses = $this->myDateFormat("Y", $nextDayTimestamp, 'Europe/Madrid');
+                //     $outText .= "$nextDayAvailableBuses/$nextMonthAvailableBuses/$nextYearAvailableBuses\n";
+                // }
+
             }
             $nextTimeBuses = array();
             foreach ($fullTimeBuses as $key => $time)
@@ -374,5 +390,43 @@ class BusCommand extends BaseUserCommand
         return date($format, ($timestamp!=false?(int)$timestamp:$myDateTime->format('U')) + $offset);
     }
 
+
+
+    function getNextAvailableBusesTime($lineId, $location)
+    {
+        $nDays = 2;
+        $outText = "";
+        do {
+            $nDays++;
+            $nextDayTimestamp = strtotime("+$nDays day");
+            try
+            {
+                $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location, $nextDayTimestamp);
+            }
+            catch (\Exception $exception)
+            {
+                throw $exception;
+            }
+        } while (sizeof($fullTimeBuses)==0);
+
+        $nowTime = $this->myDateFormat("H:i:s", $nextDayTimestamp, 'Europe/Madrid');
+
+        if ($nDays == 1)
+        {
+            $outText .= "mañana:\n";
+        }
+        else
+        {
+            $nextDayAvailableBuses = $this->myDateFormat("j", $nextDayTimestamp, 'Europe/Madrid');
+            $nextMonthAvailableBuses = $this->myDateFormat("m", $nextDayTimestamp, 'Europe/Madrid');
+            $nextYearAvailableBuses = $this->myDateFormat("Y", $nextDayTimestamp, 'Europe/Madrid');
+            $outText .= "$nextDayAvailableBuses/$nextMonthAvailableBuses/$nextYearAvailableBuses\n";
+        }
+        $ret = array();
+        $ret[] = $outText;
+        $ret[] = $nowTime;
+        $ret[] = $fullTimeBuses;
+        return $ret;
+    }
 
 }
