@@ -69,7 +69,7 @@ class MenuCommand extends BaseUserCommand
                 $result = $this->getRequest()->markdown()->sendMessage("⚠️ *No se ha encontrado ningún menú* en la web de la cafetería. Prueba más tarde.");
             }
         }
-        $this->stopConversation();
+
         return $result;
     }
 
