@@ -36,6 +36,7 @@ abstract class BaseRegularCommand extends BaseCommand
         if(!isset($this->conversation) && $conversation->exists())
             $this->conversation = $conversation;
 
+
         $step = $this->getStepIndex();
         $prefix = 'process'.implode(array_map("ucfirst", $this->getStepBranches()));
         $executes = array_values(array_filter(get_class_methods(get_class($this)), function($name) use($prefix)
@@ -118,7 +119,7 @@ abstract class BaseRegularCommand extends BaseCommand
 
     private function getStepIndex()
     {
-        if(!isset($this->getConversation()->notes['step_index']))
+        if(!isset($this->conversation) || !isset($this->getConversation()->notes['step_index']))
             return 0;
 
         return $this->getConversation()->notes['step_index'];
@@ -126,7 +127,7 @@ abstract class BaseRegularCommand extends BaseCommand
 
     private function getStepBranches()
     {
-        if(!isset($this->getConversation()->notes['step_branch']))
+        if(!isset($this->conversation) || !isset($this->getConversation()->notes['step_branch']))
             return [];
 
         return $this->getConversation()->notes['step_branch'];
