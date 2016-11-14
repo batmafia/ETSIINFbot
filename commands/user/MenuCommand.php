@@ -56,9 +56,6 @@ class MenuCommand extends BaseUserCommand
             $hbIcon = "\xF0\x9F\x8D\x94";
             $cap = $menus[$selectedMenu]->caption;
             $result = $this->getRequest()->caption("$hbIcon $cap")->sendDocument($menus[$selectedMenu]->link);
-            $this->stopConversation();
-            return $result;
-
         }
         else
         {
@@ -71,9 +68,9 @@ class MenuCommand extends BaseUserCommand
             {
                 $result = $this->getRequest()->markdown()->sendMessage("⚠️ *No se ha encontrado ningún menú* en la web de la cafetería. Prueba más tarde.");
             }
-            $this->stopConversation();
-            return $result;
         }
+        $this->stopConversation();
+        return $result;
     }
 
 }
