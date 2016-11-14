@@ -11,5 +11,5 @@ return [
     'moderators' => [
         'pmoso' => 268290292
     ],
-    'version' => '0.3'
+    'version' => '0.4'
 ];
