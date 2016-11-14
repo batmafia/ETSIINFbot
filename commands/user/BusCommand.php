@@ -228,7 +228,7 @@ class BusCommand extends BaseUserCommand
 
         try
         {
-            $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location);
+            $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location, false);
         }
         catch (\Exception $exception)
         {
@@ -254,16 +254,68 @@ class BusCommand extends BaseUserCommand
         // $v = $lastTimeBus > $nowTime || $scheduleType === 'Todas';
         // echo "TODOIF = $v \n";
 
-        if( $nowTime < $lastTimeBus || $scheduleType === 'Todas')
+        if( $scheduleType === 'Todas')
         {
-            $outText .= "$busIcon El bus *$lineId* tiene las siguientes salidas desde *$location* para hoy:\n\n";
+            if ($nowTime <= $lastTimeBus)
+            {
+                // Send all buses today
+                $outText .= "$busIcon El bus *$lineId* tiene todas las siguientes salidas desde *$location* para hoy:\n\n";
+            }
+            else
+            {
+                // Send all the next day buses
+                $outText .= "$busIcon El bus *$lineId* no tiene mas salidas desde *$location* para hoy.\n";
+                $outText .= "Las salidas para ";
+                $getNextAvailableBusesTime = $this->getNextAvailableBusesTime($lineId, $location);
+                $outText .= $getNextAvailableBusesTime[0];
+                $nowTime = $getNextAvailableBusesTime[1];
+                $fullTimeBuses = $getNextAvailableBusesTime[2];
+            }
             $outText .= implode(", ", $fullTimeBuses);
-            $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
-            $this->stopConversation();
+
+        }
+        // This case for API crash
+        elseif ($scheduleType === 'Actuales')
+        {
+            if ($nowTime <= $lastTimeBus)
+            {
+                // Send the next buses
+                $outText .= "$busIcon El bus *$lineId* tiene las siguientes próximas salidas desde *$location*:\n\n";
+            }
+            else
+            {
+                // Send the next day buses
+                $outText .= "$busIcon El bus *$lineId* no tiene mas salidas desde *$location* para hoy.\n";
+                $outText .= "Las primeras salidas para ";
+                $getNextAvailableBusesTime = $this->getNextAvailableBusesTime($lineId, $location);
+                $outText .= $getNextAvailableBusesTime[0];
+                $nowTime = $getNextAvailableBusesTime[1];
+                $fullTimeBuses = $getNextAvailableBusesTime[2];
+            }
+            $nextTimeBuses = array();
+            foreach ($fullTimeBuses as $key => $time)
+            {
+                $nextBusTimeStopSTR = "$time:00";
+                $nextBusTimeStop = strtotime($nextBusTimeStopSTR);
+                if ($nowTime <= $nextBusTimeStop)
+                {
+                    $nextTimeBuses[] = $time;
+                }
+
+                if(sizeof($nextTimeBuses)==3) break;
+            }
+            $outText .= implode(", ", $nextTimeBuses);
+        }
+        else
+        {
+            // In other case
+            $result = \Longman\TelegramBot\Request::emptyResponse();
             return $result;
         }
-        $result = \Longman\TelegramBot\Request::emptyResponse();
-        return $result;;
+
+        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
+        $this->stopConversation();
+        return $result;
     }
 
 
@@ -310,5 +362,43 @@ class BusCommand extends BaseUserCommand
         return date($format, ($timestamp!=false?(int)$timestamp:$myDateTime->format('U')) + $offset);
     }
 
+
+
+    function getNextAvailableBusesTime($lineId, $location)
+    {
+        $nDays = 0;
+        $outText = "";
+        do {
+            $nDays++;
+            $nextDayTimestamp = strtotime("+$nDays day");
+            try
+            {
+                $fullTimeBuses = BusRepository::getFullTimeBusesOpts($lineId, $location, $nextDayTimestamp);
+            }
+            catch (\Exception $exception)
+            {
+                throw $exception;
+            }
+        } while (sizeof($fullTimeBuses)==0);
+
+        $nowTime = $this->myDateFormat("H:i:s", $nextDayTimestamp, 'Europe/Madrid');
+
+        if ($nDays == 1)
+        {
+            $outText .= "mañana:\n";
+        }
+        else
+        {
+            $nextDayAvailableBuses = $this->myDateFormat("j", $nextDayTimestamp, 'Europe/Madrid');
+            $nextMonthAvailableBuses = $this->myDateFormat("m", $nextDayTimestamp, 'Europe/Madrid');
+            $nextYearAvailableBuses = $this->myDateFormat("Y", $nextDayTimestamp, 'Europe/Madrid');
+            $outText .= "$nextDayAvailableBuses/$nextMonthAvailableBuses/$nextYearAvailableBuses:\n";
+        }
+        $ret = array();
+        $ret[] = $outText;
+        $ret[] = $nowTime;
+        $ret[] = $fullTimeBuses;
+        return $ret;
+    }
 
 }

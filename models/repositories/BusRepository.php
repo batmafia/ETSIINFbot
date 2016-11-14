@@ -71,7 +71,7 @@ class BusRepository
     }
 
 
-    public static function getFullTimeBusesOpts($idLine, $origin)
+    public static function getFullTimeBusesOpts($idLine, $origin, $timestamp=false)
     {
 
         $availableLines = self::getFullTimeBuses();
@@ -114,7 +114,8 @@ class BusRepository
             $dest = 'Boadilla >> Moncloa';
         }
 
-        $nowTimeSTR = self::myDateFormat("D M j G:i:s T Y", false, 'Europe/Madrid'); // false for timeestamp
+        $myDateFormatTimestamp = (($timestamp!=false)?$timestamp:false);
+        $nowTimeSTR = self::myDateFormat("D M j G:i:s T Y", $myDateFormatTimestamp, 'Europe/Madrid'); // false for timeestamp
         $nowTime = strtotime($nowTimeSTR);
         $dw = idate("w", $nowTime);
         $dayWeekNumber = ($dw===0)?7:$dw;
