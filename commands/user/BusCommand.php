@@ -40,6 +40,8 @@ class BusCommand extends BaseUserCommand
      */
     const ETSIINF = 'ETSIINF';
     const MADRID = 'Madrid';
+    const BOADILLA = 'Boadilla';
+    const POZUELO = 'Pozuelo';
 
 
     /**
@@ -50,7 +52,7 @@ class BusCommand extends BaseUserCommand
     public function processSelectLine($text)
     {
 
-        $opts = ['591','865','571','573'];
+        $opts = ['591','865','571','573','566'];
         $cancel = ['Cancelar'];
         $keyboard = [$opts,$cancel];
         $titleKeyboard = 'Selecciona una línea';
@@ -88,7 +90,8 @@ class BusCommand extends BaseUserCommand
     public function processSelectLocation($text)
     {
 
-        $opts = [self::ETSIINF,self::MADRID];
+        $opts = $this->getKeyboardOptsByLine($this->getConversation()->notes['line']);
+
         $cancel = ['Cancelar'];
         $keyboard = [$opts,$cancel];
         $titleKeyboard = 'Selecciona donde te encuentras actualmente:';
@@ -112,8 +115,15 @@ class BusCommand extends BaseUserCommand
             return $this->cancelConversation();
         }
 
+
         $this->getConversation()->notes['location'] = $text;
-        return $this->nextStep();
+
+        if ( ( $line == '571' || $line == '573' || $line == '566' ) && $text == self::ETSIINF )
+        {
+            return $this->nextStep();
+        }
+
+        return $this->nextStep('selectScheduleType');
     }
 
 
@@ -319,6 +329,32 @@ class BusCommand extends BaseUserCommand
     }
 
 
+    /**
+     * [getStopId description]
+     * @param  [type] $busLine  [description]
+     * @param  [type] $location [description]
+     * @return [type]           [description]
+     */
+    private function getStopId($busLine, $location)
+    {
+        if ($line == '591' || $line == '865')
+        {
+            $opts = [self::ETSIINF,self::MADRID];
+
+        }else if($line == '571' || $line == '573' ){
+
+            $opts = [self::ETSIINF,self::BOADILLA,self::MADRID];
+
+        }else if($line == '566' ){
+
+            $opts = [self::ETSIINF,self::BOADILLA,self::POZUELO];
+
+        } else {
+            $opts = [];
+        }
+
+        return $opts;
+    }
 
 
     /**
