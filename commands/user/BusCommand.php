@@ -34,7 +34,6 @@ class BusCommand extends BaseUserCommand
     protected $need_mysql = true;
     /**#@-*/
 
-
     /**
      * Global Vars
      */
@@ -43,11 +42,11 @@ class BusCommand extends BaseUserCommand
     const BOADILLA = 'Boadilla';
     const POZUELO = 'Pozuelo';
 
-
     /**
      * [process_SelectLine description]
-     * @param  [type] $text [description]
-     * @return [type]       [description]
+     * @param $text
+     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed [type]       [description]
+     * @internal param $ [type] $text [description]
      */
     public function processSelectLine($text)
     {
@@ -55,7 +54,7 @@ class BusCommand extends BaseUserCommand
         $opts = ['591','865','571','573','566'];
         $cancel = ['Cancelar'];
         $keyboard = [$opts,$cancel];
-        $titleKeyboard = 'Selecciona una línea';
+        $titleKeyboard = 'Selecciona del teclado una línea';
         $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
 
         $this->getConversation();
@@ -81,20 +80,21 @@ class BusCommand extends BaseUserCommand
         return $this->nextStep();
     }
 
-
     /**
      * [process_SelectLocation description]
-     * @param  [type] $text [description]
-     * @return [type]       [description]
+     * @param $text
+     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed [type]       [description]
+     * @internal param $ [type] $text [description]
      */
-    public function processSelectLocation($text)
+    public function processSelectDeparture($text)
     {
 
-        $opts = $this->getKeyboardOptsByLine($this->getConversation()->notes['line']);
+        $selectedLine = $this->getConversation()->notes['line'];
+        $opts = $this->getKeyboardOptsByLine($selectedLine);
 
         $cancel = ['Cancelar'];
         $keyboard = [$opts,$cancel];
-        $titleKeyboard = 'Selecciona donde te encuentras actualmente:';
+        $titleKeyboard = 'Selecciona del teclado donde te encuentras actualmente:';
         $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
 
 
@@ -115,18 +115,81 @@ class BusCommand extends BaseUserCommand
             return $this->cancelConversation();
         }
 
-
         $this->getConversation()->notes['location'] = $text;
 
-        if ( ( $line == '571' || $line == '573' || $line == '566' ) && $text == self::ETSIINF )
+        if ($selectedLine == '571' || $selectedLine == '573' || $selectedLine == '566')
         {
-            return $this->nextStep();
+            if ($text == self::ETSIINF){
+                return $this->nextStep();
+            }
+            else
+            {
+                unset($opts[array_search(self::ETSIINF,$opts)]);    // Deleted selected location.
+                unset($opts[array_search($text,$opts)]);    // Deleted selected location.
+
+                $destination=array_values($opts);
+                $this->getConversation()->notes['destination'] = $destination[0]->term_id;
+
+                return $this->nextStep('selectScheduleType');
+            }
+
+        }
+        elseif ($selectedLine == '591' || $selectedLine == '865' )
+        {
+            unset($opts[array_search($text,$opts)]);    // Deleted selected location.
+
+            $destination=array_values($opts);
+            $this->getConversation()->notes['destination'] = $destination[0]->term_id;
+            return $this->nextStep('selectScheduleType');
         }
 
-        return $this->nextStep('selectScheduleType');
     }
 
+    /**
+     * @param $text
+     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     */
+    public function processSelectDestination($text)
+    {
 
+        $selectedLine = $this->getConversation()->notes['line'];
+        $selectedLocationDeparture = $this->getConversation()->notes['location'];
+        $opts = $this->getKeyboardOptsByLine($selectedLine);
+        unset($opts[array_search($selectedLocationDeparture,$opts)]);    // Deleted selected location, always ETSIINF.
+
+        $cancel = ['Cancelar'];
+        $keyboard = [$opts,$cancel];
+        $titleKeyboard = 'Selecciona del teclado hacia dónde te diriges:';
+        $msgErrorInputKeyboard = 'Selecciona una opción del teclado por favor:';
+
+
+        $this->getRequest()->keyboard($keyboard);
+
+        if ($this->isProcessed() || empty($text))
+        {
+            return $this->getRequest()->sendMessage($titleKeyboard);
+        }
+
+        if( !(in_array($text, $opts) || in_array($text, $cancel)) )
+        {
+            return $this->getRequest()->sendMessage($msgErrorInputKeyboard);
+        }
+
+        if (in_array($text, $cancel))
+        {
+            return $this->cancelConversation();
+        }
+
+        $this->getConversation()->notes['destination'] = $text;
+
+        return $this->nextStep('selectScheduleType');
+
+    }
+
+    /**
+     * @param $text
+     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     */
     public function processSelectScheduleType($text)
     {
         $opts = ['Actuales','Todas'];
@@ -167,7 +230,8 @@ class BusCommand extends BaseUserCommand
 
     /**
      * [process_SendLineInfo description]
-     * @return [type]       [description]
+     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed [type]       [description]
+     * @throws \Exception
      */
     public function processSendLineInfo()
     {
@@ -176,7 +240,8 @@ class BusCommand extends BaseUserCommand
 
         $lineId = $this->getConversation()->notes['line'];
         $location = $this->getConversation()->notes['location'];
-        $stopId = $this->getStopId($lineId, $location);
+        $destination = $this->getConversation()->notes['destination'];
+        $stopId = $this->getStopId($lineId, $location,$destination);
         $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
 
         try
@@ -189,7 +254,7 @@ class BusCommand extends BaseUserCommand
             {
                 $this->getRequest()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes ".
                 "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas ".
-                    "llegadas.*\n Prueba a realizar la consulta más tarde.\n\n");
+                    "llegadas.*\nPrueba a realizar la consulta más tarde.\n\n");
 
                 return $this->nextStep();
 
@@ -225,8 +290,10 @@ class BusCommand extends BaseUserCommand
         return $result;
     }
 
-
-
+    /**
+     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     * @throws \Exception
+     */
     public function processSendFullTimeBuses()
     {
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
@@ -328,43 +395,15 @@ class BusCommand extends BaseUserCommand
         return $result;
     }
 
-
-    /**
-     * [getStopId description]
-     * @param  [type] $busLine  [description]
-     * @param  [type] $location [description]
-     * @return [type]           [description]
-     */
-    private function getStopId($busLine, $location)
-    {
-        if ($line == '591' || $line == '865')
-        {
-            $opts = [self::ETSIINF,self::MADRID];
-
-        }else if($line == '571' || $line == '573' ){
-
-            $opts = [self::ETSIINF,self::BOADILLA,self::MADRID];
-
-        }else if($line == '566' ){
-
-            $opts = [self::ETSIINF,self::BOADILLA,self::POZUELO];
-
-        } else {
-            $opts = [];
-        }
-
-        return $opts;
-    }
-
-
     /**
      * [getStopId description]
      * @param  [type] $busline  [description]
      * @param  [type] $location [description]
      * @return [type]           [description]
      */
-    private function getStopId($busLine, $location)
+    private function getStopId($busLine, $location, $destination)
     {
+        // @TODO: Esta funcion hay que modificarla.
         return [
             self::ETSIINF => [
                 '591' => '08411',
@@ -380,7 +419,6 @@ class BusCommand extends BaseUserCommand
             ]
         ][$location][$busLine];
     }
-
 
     /**
      * http://php.net/manual/es/function.date.php
@@ -398,8 +436,12 @@ class BusCommand extends BaseUserCommand
         return date($format, ($timestamp!=false?(int)$timestamp:$myDateTime->format('U')) + $offset);
     }
 
-
-
+    /**
+     * @param $lineId
+     * @param $location
+     * @return array
+     * @throws \Exception
+     */
     function getNextAvailableBusesTime($lineId, $location)
     {
         $nDays = 0;
@@ -435,6 +477,26 @@ class BusCommand extends BaseUserCommand
         $ret[] = $nowTime;
         $ret[] = $fullTimeBuses;
         return $ret;
+    }
+
+    /**
+     * @param $line
+     * @return array
+     */
+    private function getKeyboardOptsByLine($line)
+    {
+        if($line == '591' || $line == '865')
+        {
+            return [self::MADRID,self::ETSIINF];
+        }
+        else if ($line == '571' || $line == '573')
+        {
+            return [self::MADRID,self::ETSIINF,self::BOADILLA];
+        }
+        else if ($line == '566')
+        {
+            return [self::MADRID,self::ETSIINF,self::POZUELO];
+        }
     }
 
 }

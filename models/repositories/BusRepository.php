@@ -17,6 +17,7 @@ class BusRepository
     /**
      * @param $busStopId
      * @return BusStop
+     * @throws Exception
      */
     public static function getBusStop($busStopId)
     {
@@ -38,7 +39,8 @@ class BusRepository
     }
 
     /**
-     * @return
+     * @return array
+     * @throws Exception
      */
     private static function getFullTimeBuses()
     {
