@@ -86,3 +86,20 @@ In production environments it is recommended to use WebHook, but for testing you
 ```
 ./yii start/updates
 ```
+
+### TIPS
+Add this alias to you `~/.aliases` file:
+* Start:
+```
+echo 'alias start_ETSIINFBot="~/REPOSITORIOS/ETSIINFbot/yii start/updates"' >> ~/.aliases
+```
+    * and run:
+    ```
+    start_ETSIINFBot
+    ```
+
+* Stop:
+    * but if you run `start_ETSIINFBot`, instace of `start_ETSIINFBot &`, the better way to stop it is by `ctrl+c` in the same terminal.
+```
+echo 'alias stop_ETSIINFBot="~/REPOSITORIOS/ETSIINFbot/yii start/stop-hook"' >> ~/.aliases
+```
