@@ -175,6 +175,8 @@ class SubjectRepository
         // ETSIINF = 10; PSC = Primer y Segundo Ciclo; GRA = Grado
         $plans = SubjectRepository::getPlansFromCenter('10','PSC','GRA,MOF',$actualYear);
 
+
+        $subjectsOrderedMachedList = [];
         foreach ( $plans as $plan )
         {
             $subjectsOrderedList = SubjectRepository::getSubjectsList($plan->codigo, $actualYear);

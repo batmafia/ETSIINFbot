@@ -75,9 +75,23 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
 
         $asignaturasPosibles = SubjectRepository::getSubjectsMachedByText(urlencode($textForSearch));
 
+        if (empty($asignaturasPosibles))
+        {
+            $this->getRequest()->sendMessage("No hay ninguna asignatura con el nombre: \"$textForSearch\"");
+            return $this->previousStep();
+        }
+
+        if (count($asignaturasPosibles) > 20)
+        {
+            $this->getRequest()->sendMessage("Hay demasiadas asignaturas que coinciden con esa búsqueda \"$textForSearch\". Por favor introduce alguna palabra mas para refinar la siguiente búsqueda.");
+            return $this->previousStep();
+        }
+
         foreach ($asignaturasPosibles as $asignatura)
         {
             $opts4[$asignatura->codigo] =  "$asignatura->nombre";
+            echo "$asignatura->codigo - $asignatura->nombre\n";
+
         }
 
         $cancel = [self::CANCELAR,self::ATRAS];
@@ -109,6 +123,8 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         }
 
         $subjectCodeSelected = array_search($text,$opts4);
+        $sub = array_search($text,$asignaturasPosibles);
+        print_r($sub);
         $this->getConversation()->notes['subjectCode'] = $subjectCodeSelected;
 
         return $this->nextStep();
