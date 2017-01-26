@@ -39,6 +39,60 @@ class SubjectRepository
 
     }
 
+    /**
+     * @param $codeSubject
+     * @return Subject
+     * @throws Exception
+     */
+    public static function getSubjectByCode($codeSubject)
+    {
+        $year = self::getActualYear();
+        $year2 = substr($year + 1, -2);
+        // ETSIINF = 10; PSC = Primer y Segundo Ciclo; GRA = Grado
+        $plans = SubjectRepository::getPlansFromCenter('10','PSC','GRA,MOF',$year);
+
+        foreach ( $plans as $plan )
+        {
+            $subjectsOrderedList = SubjectRepository::getSubjectsList($plan->codigo, $year);
+            foreach ( $subjectsOrderedList as $course )
+            {
+                foreach ( $course as $semester )
+                {
+
+                    foreach ( $semester as $subject )
+                    {
+
+                        // if (strcmp($subject->codigo, $codeSubject))
+                        if ($subject->codigo == $codeSubject)
+                        {
+                            $semesterCode = array_search($semester,$course); // $semesterCode = $subject->imparticion[0]->codigo_duracion;
+                            $planCode = $plan->codigo;
+
+                            $request = Request::get("https://www.upm.es/comun_gauss/publico/api/$year-$year2/$semesterCode/$planCode" . "_" . "$codeSubject.json")
+                                ->expects(Mime::JSON)->send();
+                            if (!$request->hasErrors()) {
+                                $subjObj = new Subject();
+                                $data = \GuzzleHttp\json_decode($request->raw_body, true);
+                                $subjObj->setAttributes($data);
+
+                                if ($subjObj->validate()) {
+                                    return $subjObj;
+                                } else {
+                                    print_r($subjObj->getErrors());
+                                }
+                            } else {
+                                throw new Exception("Repository exception");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+    }
+
 
     public static function getPlansFromCenter($center, $studyType, $studySubType, $year)
     {
@@ -114,6 +168,35 @@ class SubjectRepository
         }
     }
 
+    public static function getSubjectsMachedByText($subjectName)
+    {
+        $actualYear = self::getActualYear();
+        $subjectNameProcessed = self::filterSubjectName($subjectName);
+        // ETSIINF = 10; PSC = Primer y Segundo Ciclo; GRA = Grado
+        $plans = SubjectRepository::getPlansFromCenter('10','PSC','GRA,MOF',$actualYear);
+
+        foreach ( $plans as $plan )
+        {
+            $subjectsOrderedList = SubjectRepository::getSubjectsList($plan->codigo, $actualYear);
+            foreach ( $subjectsOrderedList as $course )
+            {
+                foreach ( $course as $semester )
+                {
+                    foreach ( $semester as $subject)
+                    {
+                        $nombreProcesado = self::filterSubjectName($subject->nombre);
+                        if (strpos($nombreProcesado, $subjectNameProcessed) !== false)
+                        {
+                            $subjectsOrderedMachedList[$subject->codigo] = $subject;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $subjectsOrderedMachedList;
+    }
+
     public static function getGuide($planImpartition){
 
         $request = Request::get($planImpartition->guia_pdf)->withoutStrictSSL()->send();
@@ -125,6 +208,26 @@ class SubjectRepository
             throw new Exception("Repository exception");
         }
 
+    }
+
+    public static function getActualYear()
+    {
+        $year = intval(date("Y"));
+
+        if (intval(date("m")) <= 7)
+            $year--;
+
+        return $year;
+    }
+
+    private static function filterSubjectName($subjectName)
+    {
+        return strtolower(self::tirarAcentos($subjectName));
+    }
+
+    private static function tirarAcentos($string)
+    {
+        return preg_replace(array("/(á|à|ã|â|ä)/","/(Á|À|Ã|Â|Ä)/","/(é|è|ê|ë)/","/(É|È|Ê|Ë)/","/(í|ì|î|ï)/","/(Í|Ì|Î|Ï)/","/(ó|ò|õ|ô|ö)/","/(Ó|Ò|Õ|Ô|Ö)/","/(ú|ù|û|ü)/","/(Ú|Ù|Û|Ü)/","/(ñ)/","/(Ñ)/"),explode(" ","a A e E i I o O u U n N"),$string);
     }
 
 }
