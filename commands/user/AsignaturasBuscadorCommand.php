@@ -2,8 +2,6 @@
 /**
  * Created by PhpStorm.
  * User: Sergio
- * Date: 30/9/16
- * Time: 13:01
  */
 
 namespace app\commands\user;
@@ -90,8 +88,8 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         foreach ($asignaturasPosibles as $asignatura)
         {
             $opts4[$asignatura->codigo] =  "$asignatura->nombre";
-            echo "$asignatura->codigo - $asignatura->nombre\n";
-
+            // echo "$asignatura->codigo - $asignatura->nombre\n";
+            // print_r($asignatura);
         }
 
         $cancel = [self::CANCELAR,self::ATRAS];
@@ -124,7 +122,7 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
 
         $subjectCodeSelected = array_search($text,$opts4);
         $sub = array_search($text,$asignaturasPosibles);
-        print_r($sub);
+        // print_r($sub);
         $this->getConversation()->notes['subjectCode'] = $subjectCodeSelected;
 
         return $this->nextStep();
