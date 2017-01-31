@@ -71,7 +71,10 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
 
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
-        $asignaturasPosibles = SubjectRepository::getSubjectsMachedByText(urlencode($textForSearch));
+        $year = SubjectRepository::getActualYear();
+        $year2 = 2000 + SubjectRepository::getYear2($year);
+
+        $asignaturasPosibles = SubjectRepository::getSubjectsCodeByTextMatched($textForSearch);
 
         if (empty($asignaturasPosibles))
         {
@@ -87,43 +90,68 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
 
         foreach ($asignaturasPosibles as $asignatura)
         {
-            $opts4[$asignatura->codigo] =  "$asignatura->nombre";
-            // echo "$asignatura->codigo - $asignatura->nombre\n";
-            // print_r($asignatura);
-        }
+            $codigo = $asignatura->codigo;
+            $nombre = $asignatura->nombre;
 
-        $cancel = [self::CANCELAR,self::ATRAS];
-        $keyboard = array_chunk($opts4, 2);
-        $keyboard [] = $cancel;
+            $imparticion = $asignatura->imparticion;
 
-        $this->getRequest()->keyboard($keyboard);
-
-        if ($this->isProcessed() || empty($text))
-        {
-            return $this->getRequest()->sendMessage('Selecciona la asignatura de la cual necesitas información:');
-        }
-
-        if (!(in_array($text, $opts4) || in_array($text, $cancel)))
-        {
-            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
-        }
-
-        if (in_array($text, $cancel))
-        {
-            if ($text === self::CANCELAR)
+            $semestre = $imparticion[0]->codigo_duracion;
+            $guia_pdf = $imparticion[0]->guia_pdf;
+            $plan = "NOGUIA";
+            if (!empty($guia_pdf))
             {
-                return $this->cancelConversation();
+                $plan = explode("_", substr($guia_pdf, 61));
+                $plan = $plan[0];
+                $opts4[$asignatura->codigo] = "[$plan][$semestre] $nombre";
             }
-            else
-            {
-                return $this->previousStep();
-            }
+
+            // echo "[$plan] [$year-$year2] [$semestre] $nombre($codigo) [$guia_pdf]\n";
         }
 
-        $subjectCodeSelected = array_search($text,$opts4);
-        $sub = array_search($text,$asignaturasPosibles);
-        // print_r($sub);
-        $this->getConversation()->notes['subjectCode'] = $subjectCodeSelected;
+        // If only have 1 matched
+        if (count($asignaturasPosibles) == 1 && count($opts4) == 1)
+        {
+            $keyboardSubjectSelectedName = array_values($opts4)[0];
+        }
+        else
+        {
+            $cancel = [self::CANCELAR,self::ATRAS];
+            $keyboard = array_chunk($opts4, 1);
+            $keyboard [] = $cancel;
+
+            $this->getRequest()->keyboard($keyboard);
+
+            if ($this->isProcessed() || empty($text))
+            {
+                return $this->getRequest()->sendMessage("Selecciona la asignatura de la cual necesitas información (todas son del curso $year-$year2)\nSi la asginatura no está, puede ser que no este colgada la guía:");
+            }
+
+            if (!(in_array($text, $opts4) || in_array($text, $cancel)))
+            {
+                return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
+            }
+
+            if (in_array($text, $cancel))
+            {
+                if ($text === self::CANCELAR)
+                {
+                    return $this->cancelConversation();
+                }
+                else
+                {
+                    return $this->previousStep();
+                }
+            }
+
+            $keyboardSubjectSelectedName = $text;
+        }
+
+
+        $subjectCodeSelected = array_search($keyboardSubjectSelectedName,$opts4);
+        $subjectSelected = $asignaturasPosibles[$subjectCodeSelected];
+        $subjectSelectedAPIPointJSON = $subjectSelected->imparticion[0]->guia_json;
+
+        $this->getConversation()->notes['subjectAPIPoint'] = $subjectSelectedAPIPointJSON;
 
         return $this->nextStep();
     }
@@ -132,15 +160,24 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
     {
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
-        $selectedSubjectCode = $this->getConversation()->notes['subjectCode'];
-        
+        $subjectSelectedAPIPointJSON = $this->getConversation()->notes['subjectAPIPoint'];
+
         try
         {
-            $subject = SubjectRepository::getSubjectByCode($selectedSubjectCode);
+            $subject = SubjectRepository::getSubjectByAPIPoint($subjectSelectedAPIPointJSON);
         }
         catch (\Exception $exception)
         {
             if ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*\n\n");
+
+                return $this->previousStep();
+            }
+            elseif ($exception->getMessage() == "Attempting to send a request before defining a URI endpoint.")
             {
                 $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
@@ -157,7 +194,14 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
 
         $numProfesores = count($subject->profesores);
 
-        $message = "Información sobre...\n*$subject->nombre*\nDepartamento: *$subject->depto*\nTipo: *$subject->caracter*\n" .
+        // Curso??
+//        $message = "Información sobre...\n*$subject->nombre*\nPlan: *$subject->plan*\nAño: *$subject->anio*\n" .
+//            "Curso: *$subject->curso*\nSemestre: *$subject->semestre*\nDepartamento: *$subject->depto*\nTipo: *$subject->caracter*\n" .
+//            "Créditos: *$subject->ects ECTS*\nProfesores: *$numProfesores profesores*\n\n" .
+//            "Selecciona mediante el teclado una opción.\n";
+
+        $message = "Información sobre...\n*$subject->nombre*\nPlan: *$subject->plan*\nAño: *$subject->anio*\n" .
+            "Departamento: *$subject->depto*\nTipo: *$subject->caracter*\n" .
             "Créditos: *$subject->ects ECTS*\nProfesores: *$numProfesores profesores*\n\n" .
             "Selecciona mediante el teclado una opción.\n";
 
@@ -195,22 +239,32 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
     {
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
-        $selectedSubjectCode = $this->getConversation()->notes['subjectCode'];
+        $subjectSelectedAPIPointJSON = $this->getConversation()->notes['subjectAPIPoint'];
 
+        // TODO: Mirar el error SSL.
+        //$guiaPDF=SubjectRepository::getGuia($subject->guia);
+        //$cap = "Aquí te enviamos la guia docente de $subject->nombre";
+        //$this->getRequest()->caption("$cap")->sendDocument($guiaPDF);
         try
         {
-            $subject = SubjectRepository::getSubjectByCode($selectedSubjectCode);
+            $subject = SubjectRepository::getSubjectByAPIPoint($subjectSelectedAPIPointJSON);
         }
         catch (\Exception $exception)
         {
             throw $exception;
         }
 
-        // TODO: Mirar el error SSL.
-        //$guiaPDF=SubjectRepository::getGuia($subject->guia);
-        //$cap = "Aquí te enviamos la guia docente de $subject->nombre";
-        //$this->getRequest()->caption("$cap")->sendDocument($guiaPDF);
-        $result = $this->getRequest()->hideKeyboard()->sendMessage("Aquí tienes la guia docente de $subject->nombre\n$subject->guia");
+        print_r($subject);
+        $nombre = $subject->nombre;
+        // $curso =
+        $semestre = $subject->semestre;
+        $guia_pdf = $subject->guia;
+        $plan = explode("_", substr($guia_pdf, 61))[0];
+        $year = $subject->anio;
+        // $msg = "Aquí tienes la guia docente de:\n*[$plan] [$year-$year2] [$curso] [$semestre] $nombre*\n$guia_pdf";
+        $msg = "Aquí tienes la guia docente de:\n*[$plan] $nombre*\n$guia_pdf";
+
+        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($msg);
         $this->stopConversation();
         return $result;
     }
@@ -219,11 +273,11 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
     {
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
-        $selectedSubjectCode = $this->getConversation()->notes['subjectCode'];
+        $subjectSelectedAPIPointJSON = $this->getConversation()->notes['subjectAPIPoint'];
 
         try
         {
-            $subject = SubjectRepository::getSubjectByCode($selectedSubjectCode);
+            $subject = SubjectRepository::getSubjectByAPIPoint($subjectSelectedAPIPointJSON);
         }
         catch (\Exception $exception)
         {
@@ -306,11 +360,11 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
 
         $selectedTeacher = $this->getConversation()->notes['teacher'];
 
-        $selectedSubjectCode = $this->getConversation()->notes['subjectCode'];
+        $subjectSelectedAPIPointJSON = $this->getConversation()->notes['subjectAPIPoint'];
 
         try
         {
-            $subject = SubjectRepository::getSubjectByCode($selectedSubjectCode);
+            $subject = SubjectRepository::getSubjectByAPIPoint($subjectSelectedAPIPointJSON);
         }
         catch (\Exception $exception)
         {
