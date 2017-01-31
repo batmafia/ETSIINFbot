@@ -20,8 +20,30 @@ class SubjectRepository
 
     public static function getSubject($plan, $codSubject, $semester, $year)
     {
-        $year2 = substr($year + 1, -2);
+        $year2 = self::getYear2($year);
         $request = Request::get("https://www.upm.es/comun_gauss/publico/api/$year-$year2/$semester/$plan" . "_" . "$codSubject.json")
+            ->expects(Mime::JSON)->send();
+        if (!$request->hasErrors()) {
+            $subjObj = new Subject();
+            $data = \GuzzleHttp\json_decode($request->raw_body, true);
+            $subjObj->setAttributes($data);
+
+            if ($subjObj->validate()) {
+                return $subjObj;
+            } else {
+                print_r($subjObj->getErrors());
+            }
+        } else {
+            throw new Exception("Repository exception");
+        }
+
+    }
+
+    public static function getSubjectByAPIPoint($urlAPIPoint)
+    {
+        $year = substr($urlAPIPoint, 77, 4);
+        $year2 = self::getYear2($year);
+        $request = Request::get($urlAPIPoint)
             ->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
             $subjObj = new Subject();
@@ -47,7 +69,6 @@ class SubjectRepository
     public static function getSubjectByCode($codeSubject)
     {
         $year = self::getActualYear();
-        $year2 = substr($year + 1, -2);
         // ETSIINF = 10; PSC = Primer y Segundo Ciclo; GRA = Grado
         $plans = SubjectRepository::getPlansFromCenter('10','PSC','GRA,MOF',$year);
 
@@ -58,31 +79,16 @@ class SubjectRepository
             {
                 foreach ( $course as $semester )
                 {
-
                     foreach ( $semester as $subject )
                     {
-
+                        // TODO si esta la misma asignatura en los dos emestres del año siempre da la primera.
                         // if (strcmp($subject->codigo, $codeSubject))
                         if ($subject->codigo == $codeSubject)
                         {
                             $semesterCode = array_search($semester,$course); // $semesterCode = $subject->imparticion[0]->codigo_duracion;
                             $planCode = $plan->codigo;
 
-                            $request = Request::get("https://www.upm.es/comun_gauss/publico/api/$year-$year2/$semesterCode/$planCode" . "_" . "$codeSubject.json")
-                                ->expects(Mime::JSON)->send();
-                            if (!$request->hasErrors()) {
-                                $subjObj = new Subject();
-                                $data = \GuzzleHttp\json_decode($request->raw_body, true);
-                                $subjObj->setAttributes($data);
-
-                                if ($subjObj->validate()) {
-                                    return $subjObj;
-                                } else {
-                                    print_r($subjObj->getErrors());
-                                }
-                            } else {
-                                throw new Exception("Repository exception");
-                            }
+                            return self::getSubject($planCode, $codeSubject, $semesterCode, $year);
                         }
                     }
                 }
@@ -96,7 +102,7 @@ class SubjectRepository
 
     public static function getPlansFromCenter($center, $studyType, $studySubType, $year)
     {
-        $year2 = substr($year + 1, -2);
+        $year2 = self::getYear2($year);
         $request = Request::get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json/$center/planes/$studyType?subtipo_estudio=$studySubType&anio=$year$year2")
             ->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
@@ -129,7 +135,7 @@ class SubjectRepository
 
     public static function getSubjectsList($plan, $year)
     {
-        $year2 = substr($year + 1, -2);
+        $year2 = self::getYear2($year);
         $request = Request::get
         ("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/plan.json/$plan/asignaturas?anio=$year$year2")
             ->expects(Mime::JSON)->send();
@@ -168,7 +174,7 @@ class SubjectRepository
         }
     }
 
-    public static function getSubjectsMachedByText($subjectName)
+    public static function getSubjectsCodeByTextMatched($subjectName)
     {
         $actualYear = self::getActualYear();
         $subjectNameProcessed = self::filterSubjectName($subjectName);
@@ -220,6 +226,12 @@ class SubjectRepository
             $year--;
 
         return $year;
+    }
+
+    public static function getYear2($year)
+    {
+        $year2 = intval(substr($year + 1, -2));
+        return $year2;
     }
 
     private static function filterSubjectName($subjectName)
