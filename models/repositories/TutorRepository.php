@@ -8,11 +8,10 @@
 
 namespace app\models\repositories;
 
+use app\models\tutor\Tutor;
 use Exception;
 use Httpful\Request;
 use Httpful\Mime;
-use simplehtmldom_1_5\simple_html_dom;
-use simplehtmldom_1_5\simple_html_dom_node;
 use Sunra\PhpSimple\HtmlDomParser;
 
 class TutorRepository
@@ -49,8 +48,19 @@ class TutorRepository
             }
 
             $info = array_combine ($d1,$d2);
-            print_r($info);
 
+            $tutorModel = \Yii::createObject([
+                'class' => Tutor::className(),
+                'profesor' => $info[0],
+                'departamento' => $info[1],
+                'despacho'=> $info[2],
+                'curso' => $info[3]
+            ]);
+
+            if($tutorModel->validate())
+            {
+                return $tutorModel;
+            }
 
         }
         else
