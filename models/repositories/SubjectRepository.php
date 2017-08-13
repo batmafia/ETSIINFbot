@@ -7,6 +7,8 @@
  */
 namespace app\models\repositories;
 
+use app\models\subjects\Center;
+use app\models\subjects\MyCenter;
 use app\models\subjects\CenterPlan;
 use app\models\subjects\PlanSubject;
 use app\models\subjects\Subject;
@@ -95,14 +97,75 @@ class SubjectRepository
             }
         }
 
+    }
+
+
+    /**
+     * @param $studyType
+     * @param $studySubType
+     * @param $year
+     * @return array
+    $array = SubjectRepository::getPlans('PSC','PSC,GRA,MOF',2016);
+    print_r($array);
+     */
+    public static function getPlans($studyType, $studySubType, $year)
+    {
+        $centers = SubjectRepository::getCenters();
+
+        $plansCenter = [];
+
+        foreach ( $centers as $center )
+        {
+            $plans = SubjectRepository::getPlansFromCenter($center->codigo,$studyType,$studySubType,$year);
+
+            $myCenterModel = new MyCenter();
+            # $myCenterModel->setAttributes($center);
+            $myCenterModel->codigo = $center->codigo;
+            $myCenterModel->nombre = $center->nombre;
+            $myCenterModel->titulaciones = $plans;
+
+            $plansCenter[] = $myCenterModel;
+        }
+
+        return $plansCenter;
 
 
     }
 
 
+    public static function getCenters()
+    {
+        $request = Request::get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json")
+            ->expects(Mime::JSON)->send();
+        if (!$request->hasErrors()) {
+
+            $data = \GuzzleHttp\json_decode($request->raw_body, true);
+            $availableCenters = [];
+
+            foreach ($data as $center)
+            {
+
+                $centerModel = new Center();
+                $centerModel->setAttributes($center);
+
+                if ($centerModel->validate()) {
+                    $availableCenters[] = $centerModel;
+                } else {
+                    print_r($centerModel->getErrors());
+                }
+            }
+
+            return $availableCenters;
+
+        } else {
+            throw new Exception("Repository exception");
+        }
+    }
+
     public static function getPlansFromCenter($center, $studyType, $studySubType, $year)
     {
         $year2 = self::getYear2($year);
+        // https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json/2/planes/PSC?subtipo_estudio=GRA,MOF&anio=201617
         $request = Request::get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json/$center/planes/$studyType?subtipo_estudio=$studySubType&anio=$year$year2")
             ->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
@@ -190,7 +253,7 @@ class SubjectRepository
             {
                 foreach ( $course as $semester )
                 {
-                    foreach ( $semester as $subject)
+                    foreach ( $semester as $subject )
                     {
                         $nombreProcesado = self::filterSubjectName($subject->nombre);
                         if (strpos($nombreProcesado, $subjectNameProcessed) !== false)
