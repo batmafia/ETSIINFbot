@@ -14,7 +14,8 @@ use yii\base\Model;
 class Tutor extends Model
 {
 
-    public $profesor;
+    public $nombre;
+    public $apellidos;
     public $departamento;
     public $despacho;
     public $curso;
@@ -22,7 +23,8 @@ class Tutor extends Model
     function rules()
     {
         return [
-            [['profesor', 'departamento','despacho','curso'], 'string']
+            [['nombre', 'apellidos', 'departamento','despacho','curso'], 'string'],
+            [['nombre', 'apellidos', 'departamento','despacho','curso'],'safe']
         ];
     }
 

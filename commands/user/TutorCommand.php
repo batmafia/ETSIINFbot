@@ -49,66 +49,83 @@ class TutorCommand extends BaseUserCommand
         }
 
         $this->getConversation()->notes['text'] = $text;
-        $data = TutorRepository::getTutor(urlencode($text));
 
-        return $this->stopConversation();
+        return $this->nextStep();
     }
 
 
-   /* public function processReturnInfo($text)
+   public function processReturnInfo($text)
     {
 
         if ($text === self::CANCELAR)
         {
             return $this->cancelConversation();
         }
-        else if ($text === self::NUEVA_BUSQUEDA)
-        {
-            $this->stopConversation();
-            return $this->resetCommand();
-        }
-        else if ($text === self::ATRAS)
-        {
-            return $this->previousStep();
-        }
 
         $textForSearch = $this->getConversation()->notes['text'];
 
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
-        $directory = TutorRepository::getTutor(urlencode($textForSearch));
+        $tutor = TutorRepository::getTutor(urlencode($textForSearch));
+
+        if ($tutor == null)
+        {
+            $mensaje = "Este número de matrícula: *$textForSearch*, no es válido.\n";
+            $mensaje .= "Vuelva a lanzar el comando con un número de matrícula válido.";
+            $this->getRequest()->markdown()->hideKeyboard()->sendMessage($mensaje);
+            return $this->stopConversation();
+        }
+
+        // @TODO: check if return a empty object with 140360
+        if ($tutor->nombre == "" && $tutor->apellidos == "" && $tutor->departamento == "")
+        {
+            $mensaje = "Hola *$textForSearch*.\nParece que no tienes un tutor asignado. Contacta con subdirección de alumnos para mas información.";
+            $this->getRequest()->markdown()->hideKeyboard()->sendMessage($mensaje);
+            return $this->stopConversation();
+        }
+
+        // @TODO: check if return a field empty
+
+        // @TODO: call DirectoryRepository::getDirectoryInfo(urlencode(nombre apellidos1 apellido2)); in repository to get more info
+
 
         $phoneIcon = "\xF0\x9F\x93\x9E";
         $mailIcon = "\xF0\x9F\x93\xA7";
         $departmentIcon = "\xF0\x9F\x91\x94";
 
-        $person = $directory[$selectedIndexPersonal];
+        $mensaje = "";
+        $mensaje .= "Hola *$textForSearch*";
+        //$mensaje .= " que empezó en el curso *$tutor->curso*";
+        $mensaje .= " este es tu tutor:\n";
 
-        $mensaje = "Información sobre...\n*$person->nombre $person->apellidos [$person->departamento]*\n".
-        "$mailIcon Email: $person->nombreEmail@$person->dominioEmail\n";
+        $mensaje .= "*$tutor->nombre $tutor->apellidos* del *$tutor->departamento*\n";
 
-        if ($person->despacho !== "" && $person->despacho !== null)
+        /*
+        $mensaje = "Información sobre...\n*$nombre $apellidos [$tutor->departamento]*\n".
+        "$mailIcon Email: $tutor->nombreEmail@$tutor->dominioEmail\n";
+        */
+
+        if ($tutor->despacho !== "" && $tutor->despacho !== null)
         {
-            $mensaje.="$departmentIcon Despacho: *$person->despacho*\n";
+            // $mensaje.="$departmentIcon Despacho: *$tutor->despacho*\n";
+            $mensaje.="Puedes encontrarle en el depacho: *$tutor->despacho*.\n";
+
         }
 
-        $mensaje.="$phoneIcon Teléfono: *$person->telefono*\n\n".
-        "Selecciona una opción del teclado por favor:";
+        /*
+        $mensaje = "Información sobre...\n*$nombre $apellidos [$tutor->departamento]*\n".
+        "$mailIcon Email: $tutor->nombreEmail@$tutor->dominioEmail\n";
 
-        $newSearch = [self::NUEVA_BUSQUEDA];
-        $cancel = [self::CANCELAR,self::ATRAS];
-        $keyboard [] = $newSearch;
-        $keyboard [] = $cancel;
-        $this->getRequest()->keyboard($keyboard);
+        $mensaje.="$phoneIcon Teléfono: *$tutor->telefono*\n\n";
+        */
 
         if ($this->isProcessed() || empty($text))
         {
-            return $this->getRequest()->markdown()->sendMessage($mensaje);
+            $this->getRequest()->markdown()->hideKeyboard()->sendMessage($mensaje);
         }
 
-        if (!(in_array($text, $cancel) || in_array($text,$newSearch)))
-        {
-            return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
-        }
+        print("$mensaje\n");
+        $this->stopConversation();
 
-    } */
+
+    }
 }
