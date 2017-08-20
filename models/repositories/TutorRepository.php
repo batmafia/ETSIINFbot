@@ -9,71 +9,96 @@
 namespace app\models\repositories;
 
 use app\models\tutor\Tutor;
+use app\models\tutor\Alumno;
 use Exception;
 use Httpful\Request;
 use Httpful\Mime;
 use Sunra\PhpSimple\HtmlDomParser;
+use app\models\directory\DirectoryResponse;
 
 class TutorRepository
 {
-    public static function getTutor($matricula)
+
+    public static function getTutoria($matricula)
     {
 
+        // return alumno and profesor info
         $tutoria = [];
 
-/*
         if (!self::isValidMat($matricula)){
             return null;
         }
-*/
 
-        $request = Request::get("https://www.fi.upm.es/index.php?id=consultatutoria&E_buscar=$matricula")
-            ->followRedirects(true)->expects(Mime::HTML)->send();
+        // https://www.fi.upm.es/index.php?id=consultatutoria
+        $urlTutoria="https://www.fi.upm.es/index.php?id=consultatutoria&E_buscar=$matricula";
+        // NOTE: Webpage has this:
+        //       <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        //       so, the codification is iso-8859-1
+        //       https://stackoverflow.com/a/5173006
 
-        if(!$request->hasErrors())
-        {
+        $request = Request::get($urlTutoria)->followRedirects(true)->expects(Mime::HTML)->send();
+
+        if(!$request->hasErrors()) {
+
+            $retTutorInfo = "";
 
             $dom = HtmlDomParser::str_get_html($request->raw_body);
 
             // if send $matricula empty return
-            if ($dom->find('Debe especificar el número de matrícula completo')){
+            if ($dom->find('Debe especificar el número de matrícula completo')) {
                 return null;
             }
 
-            /*
+
             //
             // alumno
             //
-            // @TODO: take alumno info from web
-            $d0 = [];
 
-            // @TODO: change p by the correct
-            $alumnoData= $dom->find('p');
+            $headerAlumno = [];
+            $fieldAlumno = [];
 
-            foreach($alumnoData as $campos=>$ths)
-            {
-                array_push($d0,$ths->innertext);
 
+            $alumnoDataSTR = $dom->find('h2', 0);
+            $alumnoDataSTR = $alumnoDataSTR->next_sibling();
+            $alumnoDataSTR = $alumnoDataSTR->innertext;
+            // $alumnoDataSTR = mb_convert_encoding($alumnoDataSTR, "UTF-8", "ISO-8859-1");
+
+            $wordlistToRemove = array("<b>", "</b>");
+            foreach ($wordlistToRemove as $word)
+                $alumnoDataSTR = str_replace($word, "", $alumnoDataSTR);
+
+            $alumnoDataARRAY = explode("<br />", $alumnoDataSTR);
+
+            foreach ($alumnoDataARRAY as $row) {
+                $alumnoDataARRAYRow = explode(": ", $row);
+                array_push($headerAlumno, $alumnoDataARRAYRow[0]);
+                array_push($fieldAlumno, $alumnoDataARRAYRow[1]);
             }
 
-            $explode = explode(", ", $d0[0]);
-            $nombre = $explode[1];
-            $apellidos = $explode[0];
+
+            $explode = explode(", ", ucwords(strtolower($fieldAlumno[0])));
+            $nombreAlumno = $explode[1];
+            $apellidosAlumno = $explode[0];
+            $nMat = $fieldAlumno[1];
+            $cursoEmpieze = $fieldAlumno[2];
+
 
             $alumnoModel = \Yii::createObject([
                 'class' => Alumno::className(),
-                'nombre' => $nombre,
-                'apellidos' => $apellidos,
-                '$nMat' => $d0[1],
-                'curso' => $d0[2]
+                'nombre' => $nombreAlumno,
+                'apellidos' => $apellidosAlumno,
+                'nMat' => $nMat,
+                'cursoEmpieze' => $cursoEmpieze
             ]);
 
-            if($alumnoModel->validate())
-            {
-                $tutoria[] = $alumnoModel;
+            if ($alumnoModel->validate()) {
+                array_push($tutoria, $alumnoModel);
+            } else {
+                $emptyAlumnoModel = \Yii::createObject([
+                    'class' => Alumno::className()]);
+                array_push($tutoria, $emptyAlumnoModel);
+                print_r($alumnoModel->getErrors());
             }
-
-            */
 
 
             //
@@ -88,12 +113,15 @@ class TutorRepository
 
             foreach($columns as $campos=>$ths)
             {
-                array_push($d1,$ths->innertext);
+                $headCol = mb_convert_encoding($ths->innertext, "UTF-8", "ISO-8859-1");
+                array_push($d1,$headCol);
 
             }
             foreach($data as $campos=>$tds)
             {
-                array_push($d2,$tds->innertext);
+                // https://stackoverflow.com/a/5173006
+                $dataCol = mb_convert_encoding($tds->innertext, "UTF-8", "ISO-8859-1");
+                array_push($d2,$dataCol);
             }
 
             // @TODO: Why??
@@ -101,12 +129,35 @@ class TutorRepository
 
             if (empty($d2))
             {
-                return $tutorModel = \Yii::createObject([
+                $emptyTutorModel = \Yii::createObject([
                     'class' => Tutor::className()]);
+                array_push($tutoria, $emptyTutorModel);
+                return $tutoria;
             }
 
-            // [profesor] => Robles Santamarta, Juan
+
             $profesor = $d2[0];
+            $nombre = "";
+            $apellidos = "";
+            $enlace = "";
+            $departamento = $d2[1];
+            $despacho = $d2[2];
+            $curso = $d2[3];
+            $departamento = "";
+            $despacho = "";
+            $telefono = "";
+            $nombreEmail = "";
+            $dominioEmail = "";
+
+
+
+
+
+            // Possible teachers names in $profesor:
+            // @TODO: make a funtion to generalize this.
+            //     [profesor] => Robles Santamarta, Juan
+            //     [profesor] => Nombre Apellidos1 Apellidos2
+
             if (strpos($profesor , ',') !== false){
                 $explode = explode(", ", $profesor);
                 $nombre = $explode[1];
@@ -117,25 +168,64 @@ class TutorRepository
                 $apellidos = "$explode[1] $explode[2]";
             }
 
+
+            // can we get more info about the tutor in teachers directory?
+            $tutorFullName = "$nombre $apellidos";
+
+            $directoryMatchesByTutorName = DirectoryRepository::getDirectoryInfo(urlencode($tutorFullName));
+
+            // only for one match, impossible to determinate if there are more than one.
+            if (sizeof($directoryMatchesByTutorName) == 1)
+            {
+                $tutorInfoDirectory = $directoryMatchesByTutorName[0];
+
+                $nombre = $tutorInfoDirectory['nombre'];
+                $apellidos = $tutorInfoDirectory['apellidos'];
+
+                if ($tutorInfoDirectory['enlace'] !== null && $tutorInfoDirectory['enlace'] !== "")
+                {
+                    $enlace = $tutorInfoDirectory['enlace'];
+                }
+
+                $departamento = $tutorInfoDirectory['departamento'];
+
+                if ($tutorInfoDirectory['despacho'] !== null && $tutorInfoDirectory['despacho'] !== "")
+                {
+                    $despacho = $tutorInfoDirectory['despacho'];
+                }
+
+                $telefono = $tutorInfoDirectory['telefono'];
+                $nombreEmail = $tutorInfoDirectory['nombreEmail'];
+                $dominioEmail = $tutorInfoDirectory['dominioEmail'];
+
+            }
+
             $tutorModel = \Yii::createObject([
                 'class' => Tutor::className(),
                 'nombre' => $nombre,
                 'apellidos' => $apellidos,
-                'departamento' => $d2[1],
-                'despacho'=> $d2[2],
-                'curso' => $d2[3]
+                'enlace' => $enlace,
+                'departamento' => $departamento,
+                'despacho'=> $despacho,
+                'curso' => $curso,
+                'nombreEmail' => $nombreEmail,
+                'telefono' => $telefono,
+                'dominioEmail' => $dominioEmail
             ]);
 
             if($tutorModel->validate())
             {
-                $tutoria[] = $tutorModel;
-
+                array_push($tutoria, $tutorModel);
+            } else {
+                $emptyTutorModel = \Yii::createObject([
+                    'class' => Tutor::className()]);
+                array_push($tutoria, $emptyTutorModel);
+                print_r($tutorModel->getErrors());
             }
 
-            // @TODO: FUTURE: return alumno and profesor info,
-            // return $tutoria;
 
-            return $tutorModel;
+            //return $tutorRET;
+            return $tutoria;
 
         }
         else
@@ -144,26 +234,35 @@ class TutorRepository
         }
     }
 
+    public static function getTutor($matricula)
+    {
+        $tutor = self::getTutoria($matricula)[1];
+        return $tutor;
+    }
+
+    public static function getAlumno($matricula)
+    {
+        $alumno = self::getTutoria($matricula)[0];
+        return $alumno;
+    }
+
+
     public static function isValidMat($matricula)
     {
+        // matricula valid format
+        // length matricula == 6
         // YY -> started year ; X -> [0-9] ->
-        //     II = YYXXXX -> 170001 -> 17 -> started year, 0001 -> number
-        //     MI = YYmXXX -> 17m001 -> 17 -> started year, m -> MI,  001 -> number
-        //     ADE = YYiXXX -> 17m001 -> 17 -> started year, i -> ADE,  001 -> number
+        //     II = YYXXXX
+        //          i.e ==> 170001 -> 17 -> started year, 0001 -> number
+        //     MI = YYmXXX
+        //          i.e ==> 17m001 -> 17 -> started year, m -> MI,  001 -> number
+        //     ADE = YYiXXX
+        //          i.e ==> 17m001 -> 17 -> started year, i -> ADE,  001 -> number
 
+        // thanks to @alvarogtx300
+        $re = '/^\d{2}[mi\d]\d{3}$/i';
 
-        // $re = '/^([0-9]{2})([0-9mi])([0-9]{3})/';
-
-        // return preg_match($re, $matricula);
-
-        $arr = str_split($matricula);
-
-        $valid = is_int(intval($arr[0])) && is_int(intval($arr[1])) &&
-            (is_int(intval($arr[2])) || $arr[2] == 'm' || $arr[2] == 'i') &&
-            is_int(intval($arr[3])) && is_int(intval($arr[4])) && is_int(intval($arr[5]));
-
-        return $valid;
-
+        return preg_match($re, $matricula);
     }
 
 }

@@ -16,15 +16,20 @@ class Tutor extends Model
 
     public $nombre;
     public $apellidos;
+    public $enlace;
     public $departamento;
     public $despacho;
     public $curso;
+    public $telefono;
+    public $nombreEmail;
+    public $dominioEmail;
+
 
     function rules()
     {
         return [
-            [['nombre', 'apellidos', 'departamento','despacho','curso'], 'string'],
-            [['nombre', 'apellidos', 'departamento','despacho','curso'],'safe']
+            [['nombre', 'apellidos', 'enlace', 'departamento', 'despacho', 'curso', 'telefono', 'nombreEmail', 'dominioEmail'], 'string'],
+            [['nombre', 'apellidos', 'enlace', 'departamento', 'despacho', 'curso', 'telefono', 'nombreEmail', 'dominioEmail'], 'safe'],
         ];
     }
 

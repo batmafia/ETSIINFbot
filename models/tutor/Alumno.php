@@ -6,7 +6,7 @@
  * Time: 16:19
  */
 
-namespace app\models\alumno;
+namespace app\models\tutor;
 
 
 use yii\base\Model;
@@ -17,13 +17,13 @@ class Alumno extends Model
     public $nombre;
     public $apellidos;
     public $nMat;
-    public $curso;
+    public $cursoEmpieze;
 
     function rules()
     {
         return [
-            [['nombre', 'apellidos','nMat','curso'], 'string'],
-            [['nombre', 'apellidos','nMat','curso'],'safe']
+            [['nombre', 'apellidos','nMat','cursoEmpieze'], 'string'],
+            [['nombre', 'apellidos','nMat','cursoEmpieze'],'safe']
         ];
     }
 
