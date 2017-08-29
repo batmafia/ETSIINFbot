@@ -69,6 +69,13 @@ class TutorRepository
 
             $alumnoDataARRAY = explode("<br />", $alumnoDataSTR);
 
+            # Alumno does not exist
+            if (sizeof($alumnoDataARRAY) == 1 &&
+            $alumnoDataARRAY[0] === "<tr><th>Profesor</th> <th>Departamento</th> <th>Despacho</th> <th>Curso</th></tr>") {
+                # privacity
+                return null;
+            }
+
             foreach ($alumnoDataARRAY as $row) {
                 $alumnoDataARRAYRow = explode(": ", $row);
                 array_push($headerAlumno, $alumnoDataARRAYRow[0]);
@@ -76,9 +83,27 @@ class TutorRepository
             }
 
 
-            $explode = explode(", ", $fieldAlumno[0]);
-            $nombreAlumno = ucwords(self::strtolower_utf8(strtolower($explode[1])));
-            $apellidosAlumno = ucwords(self::strtolower_utf8(strtolower($explode[0])));
+            // Possible Alumnos names in $profesor:
+            // @TODO: make a funtion to generalize this.
+            if (strpos($fieldAlumno[0], ", ") !== false) {
+                // apellido apellido,nombre
+                $explode = explode(", ", $fieldAlumno[0]);
+                $nombreAlumno = self::strtolower_utf8($explode[1]);
+                $apellidosAlumno = self::strtolower_utf8($explode[0]);
+            } elseif (strpos($fieldAlumno[0], ",") !== false) {
+                # apellido apellido, nombre
+                $explode = explode(",", $fieldAlumno[0]);
+                $nombreAlumno = self::strtolower_utf8($explode[1]);
+                $apellidosAlumno = self::strtolower_utf8($explode[0]);
+            } else {
+                # nombre apellido apellido
+                $explode = explode(" ", $fieldAlumno[0]);
+                $apellidosArray = array_slice($explode, 1, -1);
+                $nombreAlumno = self::strtolower_utf8($explode[0]);
+                $apellidosAlumno = self::strtolower_utf8(implode(" ", $apellidosArray));
+            }
+
+
             $nMat = $fieldAlumno[1];
             $cursoEmpieze = $fieldAlumno[2];
 
@@ -155,17 +180,22 @@ class TutorRepository
 
             // Possible teachers names in $profesor:
             // @TODO: make a funtion to generalize this.
-            //     [profesor] => Robles Santamarta, Juan
-            //     [profesor] => Nombre Apellidos1 Apellidos2
-
-            if (strpos($profesor , ',') !== false){
+            if (strpos($profesor, ", ") !== false) {
+                // apellido apellido,nombre
                 $explode = explode(", ", $profesor);
                 $nombre = $explode[1];
                 $apellidos = $explode[0];
+            } elseif (strpos($profesor[0], ",") !== false) {
+                # apellido apellido, nombre
+                $explode = explode(",", $profesor);
+                $nombre = $explode[1];
+                $apellidos = $explode[0];
             } else {
+                # nombre apellido apellido
                 $explode = explode(" ", $profesor);
-                $nombre = $explode[0];
-                $apellidos = "$explode[1] $explode[2]";
+                $apellidosArray = array_slice($explode, 1, -1);
+                $nombre = self::strtolower_utf8($explode[0]);
+                $apellidos = self::strtolower_utf8(implode(" ", $apellidosArray));
             }
 
 
@@ -265,24 +295,9 @@ class TutorRepository
         return preg_match($re, $matricula);
     }
 
-    // http://php.net/manual/es/function.strtolower.php#91805
+    // http://php.net/manual/en/function.mb-convert-case.php
     function strtolower_utf8($string){
-        $convert_to = array(
-            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
-            "v", "w", "x", "y", "z", "à", "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï",
-            "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ø", "ù", "ú", "û", "ü", "ý", "а", "б", "в", "г", "д", "е", "ё", "ж",
-            "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы",
-            "ь", "э", "ю", "я"
-        );
-        $convert_from = array(
-            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
-            "V", "W", "X", "Y", "Z", "À", "Á", "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï",
-            "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж",
-            "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ъ",
-            "Ь", "Э", "Ю", "Я"
-        );
-
-        return str_replace($convert_from, $convert_to, $string);
+        return mb_convert_case($string, MB_CASE_TITLE, "UTF-8");
     }
 
 }
