@@ -22,8 +22,8 @@ class Alumno extends Model
     function rules()
     {
         return [
-            [['nombre', 'apellidos','nMat','cursoEmpieze'], 'string'],
-            [['nombre', 'apellidos','nMat','cursoEmpieze'],'safe']
+            [['nombre', 'apellidos', 'nMat', 'cursoEmpieze'], 'string'],
+            [['nombre', 'apellidos', 'nMat', 'cursoEmpieze'],'safe']
         ];
     }
 
