@@ -2,6 +2,7 @@
 
 namespace app\commands\base;
 
+use Longman\TelegramBot\Entities\Keyboard;
 use Longman\TelegramBot\Entities\ReplyKeyboardHide;
 use Longman\TelegramBot\Entities\ReplyKeyboardMarkup;
 
@@ -32,7 +33,8 @@ class Request
 
     public function keyboard($keyboard)
     {
-        $this->data['reply_markup'] = new ReplyKeyboardMarkup(
+
+        $this->data['reply_markup'] = new Keyboard(
             [
                 'keyboard' => $keyboard ,
                 'resize_keyboard' => true,
@@ -40,6 +42,7 @@ class Request
                 'selective' => true
             ]
         );
+
         return $this;
     }
 
@@ -51,7 +54,7 @@ class Request
 
     public function locationKeyboard()
     {
-        $this->data['reply_markup'] = new ReplyKeyboardMarkup([
+        $this->data['reply_markup'] = new Keyboard([
             'keyboard' => [[
                 [ 'text' => 'Share Location', 'request_location' => true ],
             ]],
@@ -64,7 +67,7 @@ class Request
 
     public function contactKeyboard()
     {
-        $this->data['reply_markup'] = new ReplyKeyboardMarkup([
+        $this->data['reply_markup'] = new Keyboard([
             'keyboard' => [[
                 [ 'text' => 'Share Contact', 'request_contact' => true ],
             ]],
@@ -77,7 +80,11 @@ class Request
 
     public function hideKeyboard()
     {
-        $this->data['reply_markup'] = new ReplyKeyboardHide(['selective' => true]);
+        $this->data['reply_markup'] = new Keyboard([
+            'keyboard' => [],
+            'remove_keyboard' => true,
+            'selective' => false
+        ]);
         return $this;
     }
 
@@ -109,7 +116,8 @@ class Request
 
     public function sendDocument($file)
     {
-        $result = \Longman\TelegramBot\Request::sendDocument($this->data, $file);
+        $this->data['file'] = $file;
+        $result = \Longman\TelegramBot\Request::sendDocument($this->data);
 
         $this->data = [];
         $this->reset();
