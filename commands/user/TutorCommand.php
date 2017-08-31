@@ -149,7 +149,12 @@ class TutorCommand extends BaseUserCommand
 
         if ($tutor->telefono !== null && $tutor->telefono !== "")
         {
-            $mensaje .= "$phoneIcon Teléfono: +34$tutor->telefono\n";
+            $mensaje .= "$phoneIcon Teléfono: ";
+            if(strpos($tutor->telefono, "+34") === false) {
+                $mensaje .= "+34";
+            }
+            $mensaje .= "$tutor->telefono\n";
+
         }
 
 
