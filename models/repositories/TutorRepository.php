@@ -82,7 +82,6 @@ class TutorRepository
                 array_push($fieldAlumno, $alumnoDataARRAYRow[1]);
             }
 
-
             // Possible Alumnos names in $profesor:
             // @TODO: make a funtion to generalize this.
             if (strpos($fieldAlumno[0], ", ") !== false) {
@@ -95,6 +94,11 @@ class TutorRepository
                 $explode = explode(",", $fieldAlumno[0]);
                 $nombreAlumno = self::strtolower_utf8($explode[1]);
                 $apellidosAlumno = self::strtolower_utf8($explode[0]);
+            } elseif (substr_count($fieldAlumno[0], " ") == 1) {
+                # nombre apellido
+                $explode = explode(" ", $fieldAlumno[0]);
+                $nombreAlumno = self::strtolower_utf8($explode[0]);
+                $apellidosAlumno = self::strtolower_utf8($explode[1]);
             } else {
                 # nombre apellido apellido
                 $explode = explode(" ", $fieldAlumno[0]);
@@ -176,8 +180,6 @@ class TutorRepository
 
 
 
-
-
             // Possible teachers names in $profesor:
             // @TODO: make a funtion to generalize this.
             if (strpos($profesor, ", ") !== false) {
@@ -190,6 +192,11 @@ class TutorRepository
                 $explode = explode(",", $profesor);
                 $nombre = $explode[1];
                 $apellidos = $explode[0];
+            } elseif (substr_count($profesor, " ") == 1) {
+                # nombre apellido
+                $explode = explode(" ", $profesor);
+                $nombre = self::strtolower_utf8($explode[0]);
+                $apellidos = self::strtolower_utf8($explode[1]);
             } else {
                 # nombre apellido apellido
                 $explode = explode(" ", $profesor);
@@ -205,9 +212,20 @@ class TutorRepository
             $directoryMatchesByTutorName = DirectoryRepository::getDirectoryInfo(urlencode($tutorFullName));
 
             // only for one match, impossible to determinate if there are more than one.
-            if (sizeof($directoryMatchesByTutorName) == 1)
+            if (sizeof($directoryMatchesByTutorName) >= 1)
             {
+
                 $tutorInfoDirectory = $directoryMatchesByTutorName[0];
+                if (sizeof($directoryMatchesByTutorName) > 1) {
+                    foreach ($directoryMatchesByTutorName as $possibleTutor) {
+                        $possibleTutorFullName = $possibleTutor['nombre'] . " ". $possibleTutor['apellidos'];
+                        if (strpos($possibleTutorFullName, $tutorFullName) !== false) {
+                            $tutorInfoDirectory = $possibleTutor;
+                            break;
+                        }
+                    }
+                }
+
 
                 $nombre = $tutorInfoDirectory['nombre'];
                 $apellidos = $tutorInfoDirectory['apellidos'];
