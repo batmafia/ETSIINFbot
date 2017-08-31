@@ -54,7 +54,7 @@ class TutorCommand extends BaseUserCommand
     }
 
 
-   public function processReturnInfo($text)
+    public function processReturnInfo($text)
     {
 
         if ($text === self::CANCELAR)
