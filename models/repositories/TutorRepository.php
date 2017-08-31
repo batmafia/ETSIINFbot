@@ -211,22 +211,93 @@ class TutorRepository
 
             $directoryMatchesByTutorName = DirectoryRepository::getDirectoryInfo(urlencode($tutorFullName));
 
-            // only for one match, impossible to determinate if there are more than one.
-            if (sizeof($directoryMatchesByTutorName) >= 1)
+            $encontrado = false;
+            if ($encontrado == false && sizeof($directoryMatchesByTutorName) == 1)
             {
-
                 $tutorInfoDirectory = $directoryMatchesByTutorName[0];
-                if (sizeof($directoryMatchesByTutorName) > 1) {
-                    foreach ($directoryMatchesByTutorName as $possibleTutor) {
-                        $possibleTutorFullName = $possibleTutor['nombre'] . " ". $possibleTutor['apellidos'];
-                        if (strpos($possibleTutorFullName, $tutorFullName) !== false) {
+                $encontrado = true;
+            }
+
+            if ($encontrado == false && sizeof($directoryMatchesByTutorName) > 1)
+            {
+                foreach ($directoryMatchesByTutorName as $possibleTutor)
+                {
+                    $possibleTutorFullName = $possibleTutor['nombre'] . " ". $possibleTutor['apellidos'];
+                    if ($encontrado == false && strpos($possibleTutorFullName, $tutorFullName) !== false)
+                    {
+                        $tutorInfoDirectory = $possibleTutor;
+                        $encontrado = true;
+                        break;
+                    }
+                }
+            }
+
+
+
+            if ($encontrado == false && sizeof($directoryMatchesByTutorName) == 0)
+            {
+                // try again but only with the surnames
+                $directoryMatchesByTutorName = DirectoryRepository::getDirectoryInfo(urlencode($apellidos));
+
+                if ($encontrado == false && sizeof($directoryMatchesByTutorName) == 1)
+                {
+                    $tutorInfoDirectory = $directoryMatchesByTutorName[0];
+                    $encontrado = true;
+                }
+
+                if ($encontrado == false && sizeof($directoryMatchesByTutorName) > 1)
+                {
+                    foreach ($directoryMatchesByTutorName as $possibleTutor)
+                    {
+                        // posible the tutor has second name
+                        $explode = explode($possibleTutor['nombre'], " ");
+                        $possibleTutorFullName = $explode[0] . " ". $possibleTutor['apellidos'];
+                        if ($encontrado == false && strpos($possibleTutorFullName, $tutorFullName) !== false)
+                        {
                             $tutorInfoDirectory = $possibleTutor;
+                            $encontrado = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if ($encontrado == false && sizeof($directoryMatchesByTutorName) == 0)
+            {
+                // try again but only with the first surname
+                // IGOR BOGUSLAVSKIY MARGOLIN -->  Igor Boguslavskiy [DIA]
+                $primerApellidoTutor = explode($apellidos, " ");
+                $tutorNameFirstSurname = "$nombre $primerApellidoTutor[0]";
+
+                $directoryMatchesByTutorName = DirectoryRepository::getDirectoryInfo(urlencode($tutorNameFirstSurname));
+
+                if ($encontrado == false && sizeof($directoryMatchesByTutorName) == 1)
+                {
+                    $tutorInfoDirectory = $directoryMatchesByTutorName[0];
+                    $encontrado = true;
+                }
+
+                if ($encontrado == false && sizeof($directoryMatchesByTutorName) > 1)
+                {
+                    foreach ($directoryMatchesByTutorName as $possibleTutor)
+                    {
+                        // posible the tutor has second name
+                        $explode = explode($possibleTutor['nombre'], " ");
+
+                        if ($encontrado == false && strpos($tutorNameFirstSurname, $tutorFullName) !== false)
+                        {
+                            $tutorInfoDirectory = $possibleTutor;
+                            $encontrado = true;
                             break;
                         }
                     }
                 }
 
+            }
 
+
+            if ($encontrado == true && $tutorInfoDirectory !== null && $tutorInfoDirectory !== "")
+            {
                 $nombre = $tutorInfoDirectory['nombre'];
                 $apellidos = $tutorInfoDirectory['apellidos'];
 
@@ -245,8 +316,8 @@ class TutorRepository
                 $telefono = $tutorInfoDirectory['telefono'];
                 $nombreEmail = $tutorInfoDirectory['nombreEmail'];
                 $dominioEmail = $tutorInfoDirectory['dominioEmail'];
-
             }
+
 
             $tutorModel = \Yii::createObject([
                 'class' => Tutor::className(),
