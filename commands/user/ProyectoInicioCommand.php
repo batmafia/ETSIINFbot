@@ -159,8 +159,9 @@ class ProyectoInicioCommand extends BaseUserCommand
 
         if ($this->isProcessed() || empty($text))
         {
-            return $this->getRequest()->markdown()->keyboard($keyboard)
-                ->sendMessage("Introduce su numero de DNI (sin letra) para consultar su equipo y su turno:\n (No almacenamos ningun tipo de info en el servidor lo utilizamos para consultar al información)");
+            $msg = "Introduce su numero de DNI (sin letra) para consultar su equipo y su turno.\n";
+            $msg .= "(No almacenamos ningun tipo de info en el servidor lo utilizamos para consultar la información)";
+            return $this->getRequest()->markdown()->keyboard($keyboard)->sendMessage($msg);
         }
 
         if ($text === self::ATRAS)
@@ -201,67 +202,139 @@ class ProyectoInicioCommand extends BaseUserCommand
 
         $alumnoGrupoPI = ProyectoInicioRepository::getGrupoPI($dni);
 
-        if ($alumnoGrupoPI == null || $alumnoGrupoPI->nombre == "")
+        if ($alumnoGrupoPI == null  || $alumnoGrupoPI == [] || $alumnoGrupoPI->nombre == "")
         {
             return $this->getRequest()->markdown()->keyboard($keyboard)
-                ->sendMessage("DNI no válido. Por favor, vuelva a intentarlo. Cualquier duda vaya a la web oficial: https://www.fi.upm.es/index.php?id=piequipos.");
+                ->sendMessage("DNI no válido. Por favor, vuelva a intentarlo. Si el fallo persiste, vaya a la web oficial: https://www.fi.upm.es/index.php?id=piequipos.");
         }
 
 
         $mensaje = "";
 
 
-        if ($alumnoGrupoPI !== null && $alumnoGrupoPI !== [] &&
-            $alumnoGrupoPI->nombre !== null && $alumnoGrupoPI->nombre !== "" &&
-            $alumnoGrupoPI->apellidos !== null && $alumnoGrupoPI->apellidos !== "")
+        if ($alumnoGrupoPI->equipoPI == null || $alumnoGrupoPI->equipoPI == "")
         {
-            $mensaje .= "Hola *$alumnoGrupoPI->nombre $alumnoGrupoPI->apellidos*.\n";
-        } else {
-            $mensaje .= "Hola *$dni*.\n";
+            $mensaje .= "Hola alumno con dni " . $dni . ".\n";
+            $mensaje .= "Estoy viendo que éste no es tu primer año, por lo tanto, no puedes relaizar el proyecto inicio ni tampoco tienes un equipo asignado.\n";
+            $mensaje .= "Te recomiendo que sigas usando el resto de comandos que ofrecemos en el bot, dado que éste no te sirve de mucha de utilidad.\n";
+            $mensaje .= "Sabes que puedes consultar todos los comandos disponibles con /help.\n";
+            $mensaje .= "Saludos ;)";
+
+        }
+        else
+        {
+
+            if ($alumnoGrupoPI !== null && $alumnoGrupoPI !== [] &&
+                $alumnoGrupoPI->nombre !== null && $alumnoGrupoPI->nombre !== "" &&
+                $alumnoGrupoPI->apellidos !== null && $alumnoGrupoPI->apellidos !== "") {
+                $mensaje .= "Hola *$alumnoGrupoPI->nombre $alumnoGrupoPI->apellidos*.\n";
+            } else {
+                $mensaje .= "Hola *$dni*.\n";
+            }
+
+            if ($alumnoGrupoPI->nMat !== null && $alumnoGrupoPI->nMat !== "") {
+                $mensaje .= " - Número matrícula: *$alumnoGrupoPI->nMat*\n";
+            }
+
+            if ($alumnoGrupoPI->correoUPM !== null && $alumnoGrupoPI->correoUPM !== "") {
+                $mensaje .= " - Correo institucional: $alumnoGrupoPI->correoUPM\n";
+            }
+
+            if ($alumnoGrupoPI->plan !== null && $alumnoGrupoPI->plan !== "") {
+                $mensaje .= " - Plan de estudios: *$alumnoGrupoPI->plan*\n";
+            }
+
+
+            $mensaje .= " - Equipo de P.I.: *$alumnoGrupoPI->equipoPI*\n";
+
+
+            if ($alumnoGrupoPI->turno !== null && $alumnoGrupoPI->turno !== "") {
+                $mensaje .= " - Turno: *$alumnoGrupoPI->turno*\n";
+            }
+
+
+
+            $phoneIcon = "\xF0\x9F\x93\x9E";
+            $mailIcon = "\xF0\x9F\x93\xA7";
+            $departmentIcon = "\xF0\x9F\x8F\xA2";
+
+            $nMat = $alumnoGrupoPI->nMat;
+            $tutoria = TutorRepository::getTutoria(urlencode($nMat));
+
+
+            if ($tutoria !== null && $tutoria !== [] && $tutoria !== "") {
+
+                $tutor = $tutoria[1];
+
+                if ($tutor->nombre == "" && $tutor->apellidos == "" && $tutor->departamento == "")
+                {
+                    $mensaje .= "\nParece que no tienes un tutor asignado.\n";
+                    $mensaje .= "Contacta con subdirección de alumnos para mas información.";
+                    $this->getRequest()->hideKeyboard()->markdown()->sendMessage($mensaje);
+                    return $this->stopConversation();
+                }
+                else
+                {
+
+                    //$mensaje .= " desde el curso *$tutor->curso*,";
+                    $mensaje .= "\nA continuación te mostramos también quien es tu tutor curricular quien te guiará y ayudará en el camino por la escuela ([mas info aquí](https://www.fi.upm.es/?id=tutoriacurricular)):\n";
+
+
+                    if ($tutor->enlace !== null && $tutor->enlace !== "") {
+                        $mensaje .= "[$tutor->nombre $tutor->apellidos]($tutor->enlace)";
+                    } else {
+                        $mensaje .= "*$tutor->nombre $tutor->apellidos*";
+                    }
+
+                    if ($tutor->departamento !== null && $tutor->departamento !== "") {
+                        $mensaje .= " del *$tutor->departamento*\n";
+                    }
+
+                    if ($tutor->nombreEmail !== null && $tutor->dominioEmail !== null &&
+                        $tutor->nombreEmail !== "" && $tutor->dominioEmail !== "") {
+                        $mensaje .= "$mailIcon Email: $tutor->nombreEmail@$tutor->dominioEmail\n";
+                    }
+
+                    if ($tutor->despacho !== null && $tutor->despacho !== "") {
+                        $mensaje .= "$departmentIcon Despacho: *$tutor->despacho*\n";
+                    }
+
+                    if ($tutor->telefono !== null && $tutor->telefono !== "") {
+                        $mensaje .= "$phoneIcon Teléfono: ";
+                        if (strpos($tutor->telefono, "+34") === false) {
+                            $mensaje .= "+34";
+                        }
+                        $mensaje .= "$tutor->telefono\n";
+
+                    }
+                }
+            }
+
+
+
+
+
+            if ($alumnoGrupoPI->turno !== null && $alumnoGrupoPI->turno !== "" &&
+                $alumnoGrupoPI->turnoMsg !== null && $alumnoGrupoPI->turnoMsg !== "" &&
+                $alumnoGrupoPI->horaTurno !== null && $alumnoGrupoPI->horaTurno !== "")
+            {
+                $mensaje .= "Te ha tocado en el turno: \"$alumnoGrupoPI->turno\". Por lo tanto, tienes que presentarte en la ";
+                $mensaje .= "Escuela Técnica Superior de Ingenieros Informáicos el día ";
+                $mensaje .= "4 de septiembre de 2017 "; // @TODO: @CHANGE
+                $mensaje .= "a las ";
+                $mensaje .= "$alumnoGrupoPI->horaTurno:00 ";
+                $mensaje .= "en el hall del bloque 1 de la escuela. ";
+                $mensaje .= "\n";
+//            $mensaje .= "\n$alumnoGrupoPI->turnoMsg\n";
+            }
+
         }
 
-        if ($alumnoGrupoPI->nMat !== null && $alumnoGrupoPI->nMat !== "")
-        {
-            $mensaje .= " - Número matricula: $alumnoGrupoPI->nMat\n";
-        }
 
-        if ($alumnoGrupoPI->plan !== null && $alumnoGrupoPI->plan !== "")
-        {
-            $mensaje .= " - Plan de estudios: $alumnoGrupoPI->plan\n";
-        }
-
-        if ($alumnoGrupoPI->equipoPI !== null && $alumnoGrupoPI->equipoPI !== "")
-        {
-            $mensaje .= " - Equipo de P.I.: $alumnoGrupoPI->equipoPI\n";
-        }
-
-        if ($alumnoGrupoPI->nMat !== null && $alumnoGrupoPI->nMat !== "")
-        {
-            $mensaje .= " - nMatricula: $alumnoGrupoPI->nMat\n";
-        }
-
-        if ($alumnoGrupoPI->correoUPM !== null && $alumnoGrupoPI->correoUPM !== "")
-        {
-            $mensaje .= " - nMatricula: $alumnoGrupoPI->correoUPM\n";
-        }
-
-        if ($alumnoGrupoPI->turno !== null && $alumnoGrupoPI->turno !== "" &&
-            $alumnoGrupoPI->turnoMsg !== null && $alumnoGrupoPI->turnoMsg !== "" &&
-            $alumnoGrupoPI->horaTurno !== null && $alumnoGrupoPI->horaTurno !== "")
-        {
-//            $mensaje .= "Te ha tocado en el turno: \"$alumnoGrupoPI->turno\". Por lo tanto, tienes que presentarte en la "
-//            $mensaje .= "Escuela Técnica Superior de Ingenieros Informáicos el día ";
-//            $mensaje .= "4 de septiembre de 2017 "; // @TODO: @CHANGE
-//            $mensaje .= "a las "
-//            $mensaje .= "\n";
-            $mensaje .= "$alumnoGrupoPI->turnoMsg\n";
-        }
-
-
-
-
-        $this->getRequest()->hideKeyboard()->markdown()->sendMessage($mensaje);
+        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($mensaje);
         $this->stopConversation();
+        return $result;
+
 
     }
 
