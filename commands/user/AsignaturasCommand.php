@@ -299,7 +299,27 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
 
-        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
+        try
+        {
+            $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
+        }
+        catch (\Exception $exception)
+        {
+            if ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*\n\n");
+
+                return $this->previousStep();
+            }
+            else
+            {
+                throw $exception;
+            }
+        }
+
 
         // TODO: Mirar el error SSL.
         //$guiaPDF=SubjectRepository::getGuia($subject->guia);
@@ -318,7 +338,26 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedPlan = $this->getConversation()->notes['plan'];
         $selectedSubject = $this->getConversation()->notes['subject'];
-        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
+        try
+        {
+            $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
+        }
+        catch (\Exception $exception)
+        {
+            if ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*\n\n");
+
+                return $this->previousStep();
+            }
+            else
+            {
+                throw $exception;
+            }
+        }
 
         $profesoresKB = [];
 
@@ -396,7 +435,26 @@ class AsignaturasCommand extends BaseUserCommand
         $clockIcon = "\xF0\x9F\x95\x92";
         $alertIcon = "\xE2\x9A\xA0";
 
-        $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
+        try
+        {
+            $subject = SubjectRepository::getSubject($selectedPlan, $selectedSubject, $selectedSemester, $this->getActualYear());
+        }
+        catch (\Exception $exception)
+        {
+            if ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*\n\n");
+
+                return $this->previousStep();
+            }
+            else
+            {
+                throw $exception;
+            }
+        }
 
         $cancel = [self::CANCELAR, self::ATRAS];
         $keyboard [] = $cancel;
