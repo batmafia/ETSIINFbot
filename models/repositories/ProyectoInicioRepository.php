@@ -34,19 +34,29 @@ class ProyectoInicioRepository
         //       so, the codification is iso-8859-1
         //       https://stackoverflow.com/a/5173006
 
-        $request = Request::get($urlGrupoPI)->followRedirects(true)->expects(Mime::HTML)->send();
 
+        $request = Request::get($urlGrupoPI)->followRedirects(true)->expects(Mime::HTML)->send();
         if(!$request->hasErrors()) {
 
-            $dom = HtmlDomParser::str_get_html($request->raw_body);
-
+            try
+            {
+                $dom = HtmlDomParser::str_get_html($request->raw_body);
+            }
+            catch (\Exception $exception)
+            {
+                throw $exception;
+            }
 
 
             // if dni is not valid
             $domSTR = $dom->find('h2', 0);
+            if ($domSTR == null || $domSTR == "")
+            {
+                return null;
+            }
             $domSTR = $domSTR->innertext;
-            $domSTR = mb_convert_encoding($domSTR, "UTF-8", "ISO-8859-1");
-            if ($domSTR !== 'Datos del alumno') {
+            if ($domSTR !== "Datos del alumno")
+            {
                 return null;
             }
 
@@ -60,6 +70,7 @@ class ProyectoInicioRepository
 
 
             $alumnoData = $dom->find('h2', 0);
+
             $alumnoDataS = $alumnoData->next_sibling();
             $alumnoDataSTR = $alumnoDataS->innertext;
             $alumnoDataSTR = mb_convert_encoding($alumnoDataSTR, "UTF-8", "ISO-8859-1");

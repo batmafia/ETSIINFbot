@@ -214,7 +214,7 @@ class ProyectoInicioCommand extends BaseUserCommand
 
         if ($alumnoGrupoPI->equipoPI == null || $alumnoGrupoPI->equipoPI == "")
         {
-            $mensaje .= "Hola alumno con dni " . $dni . ".\n";
+            $mensaje .= "Hola alumno con dni *" . $dni . "*.\n";
             $mensaje .= "Estoy viendo que este no es tu primer año, por lo que no puedes realizar el Proyecto Inicio ni tampoco tienes un equipo asignado.\n";
             $mensaje .= "Te recomiendo que sigas usando el resto de comandos que ofrecemos en el bot, ya que éste no te va a resultar de mucha utilidad.\n";
             $mensaje .= "Puedes consultar todos los comandos disponibles en /help.\n";
