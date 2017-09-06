@@ -36,6 +36,19 @@ class HistoricController extends Controller
             'days'=>[]
         ];
 
+
+        $result2 = \Yii::$app->getDb()->createCommand(
+            "SELECT
+                    COUNT(*) as count,
+                    case when LOCATE('@', text) OR LOCATE(' ', text) then LEFT(text, LOCATE('@', text)+LOCATE(' ', text)-1) else text end as command
+                FROM message
+                WHERE LEFT(text, 1) = '/'
+                AND user_id NOT IN (".$notIds.")
+                GROUP BY command
+                ORDER BY count ASC"
+        )->queryAll();
+
+
         foreach ($result as $r)
         {
             $name = date("d M", strtotime($r['day']));
@@ -48,17 +61,6 @@ class HistoricController extends Controller
             $data['days'][] = $name;
             $data['requests'][] = ['name'=>$name, 'y'=>intval($r['requests']), 'drilldown'=>$name];
             $data['users'][] = ['name'=>$name, 'y'=>intval($r['users'])];
-
-            $result2 = \Yii::$app->getDb()->createCommand(
-                "SELECT
-                    COUNT(*) as count,
-                    case when LOCATE('@', text) OR LOCATE(' ', text) then LEFT(text, LOCATE('@', text)+LOCATE(' ', text)-1) else text end as command
-                FROM message
-                WHERE LEFT(text, 1) = '/'
-                AND user_id NOT IN (".$notIds.")
-                GROUP BY command
-                ORDER BY count ASC"
-            )->queryAll();
 
             foreach ($result2 as $r2)
             {
