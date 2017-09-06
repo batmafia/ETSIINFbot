@@ -480,7 +480,7 @@ class AsignaturasCommand extends BaseUserCommand
 
                     if (count($profesor->tutorias) !== 0)
                     {
-                        $mensaje .= "\n$clockIcon Horarios de tutorias:\n";
+                        $mensaje .= "\n$clockIcon Horarios de tutorías:\n";
                         foreach ($profesor->tutorias as $tutoria)
                         {
                             $mensaje .= $tutoria->getTutoriaMessage() . "\n";
@@ -489,7 +489,7 @@ class AsignaturasCommand extends BaseUserCommand
                     }
                     else
                     {
-                        $mensaje .="\n$alertIcon *El profesor no ha especificado un horario de tutorias válido.*\n".
+                        $mensaje .="\n$alertIcon *El profesor no ha especificado un horario de tutorías válido.*\n".
                             "Si tienes alguna duda ponte en contacto vía email.\n";
                     }
 
