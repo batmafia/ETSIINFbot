@@ -161,15 +161,26 @@ class CalendarRepository
                 if(substr($h->innerText(), 0, strlen("Horarios curso ")) === "Horarios curso ")
                 {
                     /** @var $h simple_html_dom_node */
-                    while(($h = $h->nextSibling())->tag === "h3")
+                    $tag1 = "h3";
+                    $tag2 = "ul a";
+
+                    if ($degree === "?id=gradomatematicasinformatica")
+                    {
+                        $tag1 = "p";
+                        $tag2 = "li a";
+                    }
+
+                    while(($h = $h->nextSibling())->tag === $tag1)
                     {
                         $semester = $h->innerText();
-                        foreach ($h->nextSibling()->find("ul a") as $a) {
+                        foreach ($h->nextSibling()->find($tag2) as $a) {
+
                             if (!isset($a->href))
                                 continue;
 
                             $caption = $a->innerText();
-                            if ($a->has_child())
+
+                            if ($degree !== "?id=gradomatematicasinformatica" && $a->has_child())
                                 $caption = $a->first_child()->innerText();
 
                             $caption = html_entity_decode(strip_tags($caption));
