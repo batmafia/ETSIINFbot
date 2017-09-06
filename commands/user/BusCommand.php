@@ -38,8 +38,14 @@ class BusCommand extends BaseUserCommand
     /**
      * Global Vars
      */
+    const CANCELAR = 'Cancelar';
+    const ATRAS = 'Atrás';
+    const NUEVA_BUSQUEDA = 'Nueva Búsqueda';
+
     const ETSIINF = 'ETSIINF';
     const MADRID = 'Madrid';
+    const TODAS = 'Todas';
+    const ACTUALES = 'Actuales';
 
 
     /**
@@ -51,7 +57,7 @@ class BusCommand extends BaseUserCommand
     {
 
         $opts = ['591','865','571','573'];
-        $cancel = ['Cancelar'];
+        $cancel = [self::CANCELAR];
         $keyboard = [$opts,$cancel];
         $titleKeyboard = 'Selecciona una línea';
         $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
@@ -88,28 +94,34 @@ class BusCommand extends BaseUserCommand
     public function processSelectLocation($text)
     {
 
-        $opts = [self::ETSIINF,self::MADRID];
-        $cancel = ['Cancelar'];
-        $keyboard = [$opts,$cancel];
+        $opts = [self::ETSIINF, self::MADRID];
+        $keyboard = [$opts];
+        $keyboard [] = [self::CANCELAR,self::ATRAS];
         $titleKeyboard = 'Selecciona donde te encuentras actualmente:';
         $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
 
 
         $this->getRequest()->keyboard($keyboard);
 
+
         if ($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->sendMessage($titleKeyboard);
         }
 
-        if( !(in_array($text, $opts) || in_array($text, $cancel)) )
+        if ($text === self::ATRAS)
         {
-            return $this->getRequest()->sendMessage($msgErrorImputKeyboard);
+            return $this->previousStep();
         }
 
-        if (in_array($text, $cancel))
+        if ($text === self::CANCELAR)
         {
             return $this->cancelConversation();
+        }
+
+        if( ! in_array($text, $opts))
+        {
+            return $this->getRequest()->sendMessage($msgErrorImputKeyboard);
         }
 
         $this->getConversation()->notes['location'] = $text;
@@ -117,43 +129,59 @@ class BusCommand extends BaseUserCommand
     }
 
 
+    /**
+     * @param $text
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
     public function processSelectScheduleType($text)
     {
-        $opts = ['Actuales','Todas'];
-        $cancel = ['Cancelar'];
-        $keyboard = [$opts,$cancel];
+        $opts = [self::ACTUALES, self::TODAS];
+        $keyboard = [$opts];
+        $keyboard [] = [self::CANCELAR,self::ATRAS];
         $titleKeyboard = '¿Quieres ver las salidas actuales o todas las salidas del día?';
         $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
 
 
         $this->getRequest()->keyboard($keyboard);
 
+
         if ($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->sendMessage($titleKeyboard);
         }
 
-        if( !(in_array($text, $opts) || in_array($text, $cancel)) )
+        if ($text === self::ATRAS)
         {
-            return $this->getRequest()->sendMessage($msgErrorImputKeyboard);
+            return $this->previousStep();
         }
 
-        if (in_array($text, $cancel))
+        if ($text === self::CANCELAR)
         {
             return $this->cancelConversation();
         }
 
+        if( ! in_array($text, $opts))
+        {
+            return $this->getRequest()->sendMessage($msgErrorImputKeyboard);
+        }
+
+
         $this->getConversation()->notes['scheduleType'] = $text;
-        if ($text==='Actuales')
+        if ($text === self::ACTUALES)
         {
             return $this->nextStep();
         }
-        else
+        elseif ($text === self::TODAS)
         {
             return $this->processSendFullTimeBuses();
         }
+        else
+        {
+            return $this->getRequest()->sendMessage($msgErrorImputKeyboard);
+        }
 
     }
+
 
     /**
      * [process_SendLineInfo description]
@@ -178,10 +206,10 @@ class BusCommand extends BaseUserCommand
             if ($exception->getMessage() == "Unable to parse response as JSON")
             {
                 $this->getRequest()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes ".
-                "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas ".
+                    "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas ".
                     "llegadas.*\n Prueba a realizar la consulta más tarde.\n\n");
 
-                return $this->nextStep();
+                return $this->processSendFullTimeBuses();
 
             }
             else
@@ -191,7 +219,8 @@ class BusCommand extends BaseUserCommand
         }
 
 
-        if (empty($stop->getLinesByNumber($lineId)))
+        $lineByNumber = $stop->getLinesByNumber($lineId);
+        if (empty($lineByNumber))
         {
             $outText = "$busIcon *No hay próximas llegadas* para el bus *$lineId* a la parada *$stop->stopName* \n";
             $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
@@ -201,7 +230,7 @@ class BusCommand extends BaseUserCommand
         {
             $outText = "$busIcon El bus *$lineId* saldrá de la parada *$stop->stopName*:\n";
 
-            foreach($stop->getLinesByNumber($lineId) as $line)
+            foreach($lineByNumber as $line)
             {
                 $msg = $line->getWaitHumanTime();
                 $outText .= " - $msg\n";
