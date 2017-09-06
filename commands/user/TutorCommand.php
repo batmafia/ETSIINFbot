@@ -70,8 +70,8 @@ class TutorCommand extends BaseUserCommand
 
         if ($tutoria == null)
         {
-            $mensaje = "Este número de matrícula: *$textForSearch*, no es válido.\n";
-            $mensaje .= "Escriba un número de matrícula válido.";
+            $mensaje = "El número de matrícula introducido, no es válido.\n";
+            $mensaje .= "Por favor, escriba un número de matrícula válido.";
             $this->getRequest()->hideKeyboard()->markdown()->sendMessage($mensaje);
             $this->stopConversation();
             return $this->resetCommand();
