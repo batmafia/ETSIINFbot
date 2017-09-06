@@ -63,21 +63,6 @@ class ProyectoInicioCommand extends BaseUserCommand
 
         $this->getConversation()->notes['text'] = $text;
 
-        return $this->nextStep();
-    }
-
-
-    public function processReturnInfo($text)
-    {
-
-        if ($text === self::CANCELAR)
-        {
-            return $this->cancelConversation();
-        }
-
-        $this->getRequest()->sendAction(Request::ACTION_TYPING);
-
-        $text = $this->getConversation()->notes['text'];
 
         if ($text === 'Calendario')
         {
@@ -129,7 +114,7 @@ class ProyectoInicioCommand extends BaseUserCommand
         }
         elseif ($text === 'Equipo PI')
         {
-            return $this->nextStep("EquipoPI");
+            return $this->nextStep('equipoPI');
         }
         elseif ($text === 'Proyecto mentor')
         {
@@ -155,14 +140,8 @@ class ProyectoInicioCommand extends BaseUserCommand
     public function processEquipoPI($text)
     {
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
-        $keyboard [] = [self::CANCELAR];
+        $keyboard [] = [self::CANCELAR, self::ATRAS];
 
-        if ($this->isProcessed() || empty($text))
-        {
-            $msg = "Introduce su numero de DNI (sin letra) para consultar su equipo y su turno.\n";
-            $msg .= "(No almacenamos ningun tipo de info en el servidor lo utilizamos para consultar la información)";
-            return $this->getRequest()->markdown()->keyboard($keyboard)->sendMessage($msg);
-        }
 
         if ($text === self::ATRAS)
         {
@@ -172,6 +151,13 @@ class ProyectoInicioCommand extends BaseUserCommand
         {
             return $this->cancelConversation();
         }
+        if ($this->isProcessed() || empty($text))
+        {
+            $msg = "Introduce su numero de DNI (sin letra) para consultar su equipo y su turno.\n";
+            $msg .= "(No almacenamos ningun tipo de info en el servidor lo utilizamos para consultar la información)";
+            return $this->getRequest()->markdown()->keyboard($keyboard)->sendMessage($msg);
+        }
+
 
         $this->getConversation()->notes['dni'] = $text;
 
@@ -182,19 +168,22 @@ class ProyectoInicioCommand extends BaseUserCommand
 
     public function processEquipoPIDni($text)
     {
-        $keyboard [] = [self::CANCELAR];
+        $keyboard [] = [self::CANCELAR, self::ATRAS];
 
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
-//        if ($this->isProcessed() || empty($text))
-//        {
-//            return $this->previousStep();
-//        }
-
+        if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
+        }
         if ($text === self::CANCELAR)
         {
             return $this->cancelConversation();
         }
+//        if ($this->isProcessed() || empty($text))
+//        {
+//            return $this->previousStep();
+//        }
 
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
