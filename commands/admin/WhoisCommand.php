@@ -44,127 +44,126 @@ class WhoisCommand extends BaseAdminCommand
         $text = trim($message->getText(true));
 
         $data = [ 'chat_id' => $chat_id ];
-//
-//        //No point in replying to messages in private chats
-//        if (!$message->getChat()->isPrivateChat()) {
-//            $data['reply_to_message_id'] = $message->getMessageId();
-//        }
-//
-//        if ($command !== 'whois') {
-//            $text = substr($command, 5);
-//
-//            //We need that '-' now, bring it back
-//            if ((substr($text, 0, 1) == 'g')) {
-//                $text = str_replace('g', '-', $text);
-//            }
-//        }
-//
-//        if ($text === '') {
-//            $text = 'Especifica el ID a buscar: /whois <id>';
-//        } else {
-//            $user_id = $text;
-//
-//            if (is_numeric($text)) {
-//                try
-//                {
-//                    $result = DB::selectChats(
-//                        true, //Select groups (group chat)
-//                        true, //Select supergroups (super group chat)
-//                        true, //Select users (single chat)
-//                        null, //'yyyy-mm-dd hh:mm:ss' date range from
-//                        null, //'yyyy-mm-dd hh:mm:ss' date range to
-//                        $user_id //Specific chat_id to select
-//                    );
-//
-//                    if (is_array($result) && count($result) == 1) {
-//                        $result = $result[0];
-//                    }
-//                }
-//                catch (\Exception $exception)
-//                {
-//                    throw $exception;
-//                }
-//
-//            } else {
-//                $results = DB::selectChats(
-//                    true, //Select groups (group chat)
-//                    true, //Select supergroups (super group chat)
-//                    true, //Select users (single chat)
-//                    null, //'yyyy-mm-dd hh:mm:ss' date range from
-//                    null, //'yyyy-mm-dd hh:mm:ss' date range to
-//                    null, //Specific chat_id to select
-//                    $text //Text to search in user/group name
-//                );
-//
-//                if (is_array($results) && count($results) == 1) {
-//                    $result = $results[0];
-//                }
-//            }
-//
-//            if (is_array($result)) {
-//                $result['id'] = $result['chat_id'];
-//                $chat = new Chat($result);
-//
-//                $user_id = $result['id'];
-//                $created_at = $result['chat_created_at'];
-//                $updated_at = $result['chat_updated_at'];
-//                $old_id = $result['old_id'];
-//            }
-//
-//            if ($chat != null) {
-//                if ($chat->isPrivateChat()) {
-//                    $text = 'ID de Usuario: ' . $user_id . "\n";
-//                    $text .= 'Nombre: ' . $chat->getFirstName() . ' ' . $chat->getLastName() . "\n";
-//
-//                    if ($chat->getUsername() != '') {
-//                        $text .= 'Username: @' . $chat->getUsername() . "\n";
-//                    }
-//
-//                    $text .= 'Primera vez visto: ' . $created_at . "\n";
-//                    $text .= 'Última actividad: ' . $updated_at . "\n";
-//
-//                    //Code from Whoami command
-//                    $limit = 10;
-//                    $offset = null;
-//                    $ServerResponse = Request::getUserProfilePhotos([
-//                        'user_id' => $user_id ,
-//                        'limit'   => $limit,
-//                        'offset'  => $offset,
-//                    ]);
-//
-//                    if ($ServerResponse->isOk()) {
-//                        $UserProfilePhoto = $ServerResponse->getResult();
-//                        $totalcount = $UserProfilePhoto->getTotalCount();
-//                    } else {
-//                        $totalcount = 0;
-//                    }
-//
-//                    if ($totalcount > 0) {
-//                        $photos = $UserProfilePhoto->getPhotos();
-//                        $photo = $photos[0][2];
-//                        $file_id = $photo->getFileId();
-//
-//                        $data['photo'] = $file_id;
-//                        $data['caption'] = $text;
-//
-//                        return Request::sendPhoto($data);
-//                    }
-//                } elseif ($chat->isGroupChat()) {
-//                    $text = 'ID del chat: ' . $user_id . (!empty($old_id) ? ' (anteriormente: '.$old_id.')' : ''). "\n";
-//                    $text .= 'Tipo: ' . ucfirst($chat->getType()) . "\n";
-//                    $text .= 'Titulo: ' . $chat->getTitle() . "\n";
-//                    $text .= 'Primera vez añadido al grupo: ' . $created_at . "\n";
-//                    $text .= 'Última actividad: ' . $updated_at . "\n";
-//                }
-//            } elseif (is_array($results) && count($results) > 1) {
-//                $text = '¡Multiples chats encontrados!';
-//            } else {
-//                $text = 'Chats no encontrados.';
-//            }
-//        }
-//
-//        $data['text'] = $text;
-        $data['text'] = "no puedes enviar whois de un id que no este en el bot";
+
+        //No point in replying to messages in private chats
+        if (!$message->getChat()->isPrivateChat()) {
+            $data['reply_to_message_id'] = $message->getMessageId();
+        }
+
+        if ($command !== 'whois') {
+            $text = substr($command, 5);
+
+            //We need that '-' now, bring it back
+            if ((substr($text, 0, 1) == 'g')) {
+                $text = str_replace('g', '-', $text);
+            }
+        }
+
+        if ($text === '') {
+            $text = 'Especifica el ID a buscar: /whois <id>';
+        } else {
+            $user_id = $text;
+
+            if (is_numeric($text)) {
+                try
+                {
+                    $result = DB::selectChats(
+                        true, //Select groups (group chat)
+                        true, //Select supergroups (super group chat)
+                        true, //Select users (single chat)
+                        null, //'yyyy-mm-dd hh:mm:ss' date range from
+                        null, //'yyyy-mm-dd hh:mm:ss' date range to
+                        $user_id //Specific chat_id to select
+                    );
+
+                    if (is_array($result) && count($result) == 1) {
+                        $result = $result[0];
+                    }
+                }
+                catch (\Exception $exception)
+                {
+                    throw $exception;
+                }
+
+            } else {
+                $results = DB::selectChats(
+                    true, //Select groups (group chat)
+                    true, //Select supergroups (super group chat)
+                    true, //Select users (single chat)
+                    null, //'yyyy-mm-dd hh:mm:ss' date range from
+                    null, //'yyyy-mm-dd hh:mm:ss' date range to
+                    null, //Specific chat_id to select
+                    $text //Text to search in user/group name
+                );
+
+                if (is_array($results) && count($results) == 1) {
+                    $result = $results[0];
+                }
+            }
+
+            if (is_array($result)) {
+                $result['id'] = $result['chat_id'];
+                $chat = new Chat($result);
+
+                $user_id = $result['id'];
+                $created_at = $result['chat_created_at'];
+                $updated_at = $result['chat_updated_at'];
+                $old_id = $result['old_id'];
+            }
+
+            if ($chat != null) {
+                if ($chat->isPrivateChat()) {
+                    $text = 'ID de Usuario: ' . $user_id . "\n";
+                    $text .= 'Nombre: ' . $chat->getFirstName() . ' ' . $chat->getLastName() . "\n";
+
+                    if ($chat->getUsername() != '') {
+                        $text .= 'Username: @' . $chat->getUsername() . "\n";
+                    }
+
+                    $text .= 'Primera vez visto: ' . $created_at . "\n";
+                    $text .= 'Última actividad: ' . $updated_at . "\n";
+
+                    //Code from Whoami command
+                    $limit = 10;
+                    $offset = null;
+                    $ServerResponse = Request::getUserProfilePhotos([
+                        'user_id' => $user_id ,
+                        'limit'   => $limit,
+                        'offset'  => $offset,
+                    ]);
+
+                    if ($ServerResponse->isOk()) {
+                        $UserProfilePhoto = $ServerResponse->getResult();
+                        $totalcount = $UserProfilePhoto->getTotalCount();
+                    } else {
+                        $totalcount = 0;
+                    }
+
+                    if ($totalcount > 0) {
+                        $photos = $UserProfilePhoto->getPhotos();
+                        $photo = $photos[0][2];
+                        $file_id = $photo->getFileId();
+
+                        $data['photo'] = $file_id;
+                        $data['caption'] = $text;
+
+                        return Request::sendPhoto($data);
+                    }
+                } elseif ($chat->isGroupChat()) {
+                    $text = 'ID del chat: ' . $user_id . (!empty($old_id) ? ' (anteriormente: '.$old_id.')' : ''). "\n";
+                    $text .= 'Tipo: ' . ucfirst($chat->getType()) . "\n";
+                    $text .= 'Titulo: ' . $chat->getTitle() . "\n";
+                    $text .= 'Primera vez añadido al grupo: ' . $created_at . "\n";
+                    $text .= 'Última actividad: ' . $updated_at . "\n";
+                }
+            } elseif (is_array($results) && count($results) > 1) {
+                $text = '¡Multiples chats encontrados!';
+            } else {
+                $text = 'Chats no encontrados.';
+            }
+        }
+
+        $data['text'] = $text;
         return Request::sendMessage($data);
 
     }
