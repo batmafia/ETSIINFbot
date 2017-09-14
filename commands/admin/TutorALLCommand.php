@@ -11,6 +11,7 @@ use app\commands\base\Request;
 use app\commands\base\BaseUserCommand;
 use app\models\repositories\TutorRepository;
 
+
 /**
  * User "/tutorALL" command
  */
@@ -28,6 +29,19 @@ class TutorALLCommand extends BaseUserCommand
 
 
     const CANCELAR = 'Cancelar';
+    const ATRAS = 'Atras';
+
+    const NOTES_ANIO_START = 'anio_start';
+    const NOTES_ANIO_END = 'anio_end';
+
+    const ANIO_ETSIINF_START = 1977;
+
+    const ID_NMAT_MAX = 100;
+    const N_ALUM_MAX_II = 700;
+    const ANIO_START_MI = 10;
+    const N_ALUM_MAX_MI = 100;
+    const ANIO_START_ADE = 16;
+    const N_ALUM_MAX_ADE = 100;
 
 
     public function processGetTextForSearch($text)
@@ -41,21 +55,65 @@ class TutorALLCommand extends BaseUserCommand
         if ($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->markdown()->keyboard($keyboard)
-                ->sendMessage("Introduce el año de cominezo (2009, 1997, 2011 etc...) por el cual quieres comenzar la búsqueda.");
+                ->sendMessage("Introduce el *año de comienzo de la búsqueda* (2009, 1997, 2011 etc...) por el cual quieres comenzar la búsqueda.");
         }
         if ($text === self::CANCELAR)
         {
             return $this->cancelConversation();
         }
 
-        $this->getConversation()->notes['text'] = $text;
+        $this->getConversation()->notes[self::NOTES_ANIO_START] = $text;
         return $this->nextStep();
     }
 
 
-    public function processGetAllTutories($text)
+    public function processAnioEnd($text)
     {
 
+        if ($text === self::CANCELAR) {
+            return $this->cancelConversation();
+        }
+
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
+        $anio_start_imput_str = $this->getConversation()->notes[self::NOTES_ANIO_START];
+        if (strlen($anio_start_imput_str) !== 4
+            || intval($anio_start_imput_str) == 0
+            || is_int(intval($anio_start_imput_str)) == false
+            || intval($anio_start_imput_str) < self::ANIO_ETSIINF_START
+            || intval($anio_start_imput_str) > intval(date('Y')) )
+        {
+            return $this->previousStep();
+        }
+
+        $keyboard [] = [self::CANCELAR, self::ATRAS];
+
+        if ($this->isProcessed() || empty($text))
+        {
+            return $this->getRequest()->markdown()->keyboard($keyboard)
+                ->sendMessage("Introduce el *año de fin de la búsqueda* (2009, 1997, 2011 etc... Puedes poner el mismo del cominezo y solo se buscaría en ese año).");
+        }
+        if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
+        }
+        if ($text === self::CANCELAR)
+        {
+            return $this->cancelConversation();
+        }
+
+        $this->getConversation()->notes[self::NOTES_ANIO_END] = $text;
+        return $this->nextStep();
+
+    }
+
+    public function processCheck($text)
+    {
+
+        if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
+        }
         if ($text === self::CANCELAR)
         {
             return $this->cancelConversation();
@@ -63,20 +121,50 @@ class TutorALLCommand extends BaseUserCommand
 
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
-
-        $anio_imput_str = $this->getConversation()->notes['text'];
-        if (is_int($anio_imput_str) === false)
+        $anio_end_imput_str = $this->getConversation()->notes[self::NOTES_ANIO_END];
+        if (strlen($anio_end_imput_str) !== 4
+            || intval($anio_end_imput_str) == 0
+            || is_int(intval($anio_end_imput_str)) == false
+            || intval($anio_end_imput_str) < self::ANIO_ETSIINF_START
+            || intval($anio_end_imput_str) > intval(date('Y')) )
         {
             return $this->previousStep();
         }
 
-        // pasamos de 2009 a 09, y luego a valor int -> 9
-        $anio_imput_str_cut = substr($anio_imput_str, -2);
-        $anio_imput_int = intval($anio_imput_str_cut);
+        $anio_start_imput_str = $this->getConversation()->notes[self::NOTES_ANIO_START];
+        if (intval($anio_start_imput_str) > intval($anio_end_imput_str))
+        {
+            return $this->previousStep();
+        }
 
+
+
+        $this->getConversation()->notes[self::NOTES_ANIO_END] = $text;
+        return $this->nextStep();
+
+    }
+
+
+
+    public function processGetAllTutories($text)
+    {
 
         // header
         $mensaje = "AlumnoNumeroMatricula;AlumnoNombre;AlumnoApellidos;AlumnoCursoEmpieze;TutorNombre;TutorApellidos;TutorEnlace;TutorDepartamento;TutorDespacho;TutorCurso;TutorTelefono;TutorEmail\n";
+
+
+        $anio_start_imput_str = $this->getConversation()->notes[self::NOTES_ANIO_START];
+        // pasamos de 2009 a 09, y luego a valor int -> 9
+        $anio_start_imput_str_cut = substr($anio_start_imput_str, -2);
+        $anio_start_imput_int = intval($anio_start_imput_str_cut);
+
+
+        $anio_end_imput_str = $this->getConversation()->notes[self::NOTES_ANIO_END];
+        // pasamos de 2009 a 09, y luego a valor int -> 9
+        $anio_end_imput_str_cut = substr($anio_end_imput_str, -2);
+        $anio_end_imput_int = intval($anio_end_imput_str_cut );
+
+
 
 
 
@@ -90,35 +178,41 @@ class TutorALLCommand extends BaseUserCommand
         //     ADE = YYiXXX
         //          i.e ==> 17m001 -> 17 -> started year, i -> ADE,  001 -> number
 
-        $anio_start = $anio_imput_int;
+        $anio_start = $anio_start_imput_int;
 
         // el anio depende del mes,
         //      de Septiembre a Diciembre es el mismo que el del anio
         //      de Enero a Julio es uno menos que el del anio
-        $anio_end = self::getActualYear();
+        $anio_end = $anio_end_imput_int;
+        // $anio_end = self::getActualYear();
 
         $control_chart_letter_ARRAY = array("0", "m", "i");
         // suponemos con el "0" que los de ing infor no hay mas de 999 alumnos
 
-        $id_MAX = 100;
+        $id_MAX = self::ID_NMAT_MAX;
         $anio_start_II = $anio_start;
-        $nALUMNOSMAX_II = 700;
-        $anio_start_MI = 10;
-        $nALUMNOSMAX_MI = 100;
-        $anio_start_ADE = 17;
-        $nALUMNOSMAX_ADE = 100;
+        $nALUMNOSMAX_II = self::N_ALUM_MAX_II;
+        $anio_start_MI = self::ANIO_START_MI;
+        $nALUMNOSMAX_MI = self::N_ALUM_MAX_MI;
+        $anio_start_ADE = self::ANIO_START_ADE;
+        $nALUMNOSMAX_ADE = self::N_ALUM_MAX_ADE;
 
-        // 16 minutos por año
-        $timpoTardarApox = ($anio_end - $anio_start_II) * 16;
+        // 16 minutos por año aprox
+        $timpoTardarApox = (($anio_end + 1)  - $anio_start_II) * 16;
 
-        $matriculasACompobar_str = sprintf("%02d", $anio_start_II) . "0000 -> " . sprintf("%02d", $anio_end) . "0" . sprintf("%03d", $nALUMNOSMAX_II) . "\n";
-        // Solo para los años qeu estan dispibles
-        $matriculasACompobar_str .= sprintf("%02d", $anio_start_MI) . "m000 -> " . sprintf("%02d", $anio_end) . "m" . sprintf("%03d", $nALUMNOSMAX_MI) . "\n";
-        $matriculasACompobar_str .= sprintf("%02d", $anio_start_ADE) . "i000 -> " . sprintf("%02d", $anio_end) . "i" . sprintf("%03d", $nALUMNOSMAX_ADE) . "\n";
+        $matriculasACompobar_str = "";
+        if ($anio_start_II <= $anio_end)
+            $matriculasACompobar_str .= " - " . sprintf("%02d", $anio_start_II) . "0000 -> " . sprintf("%02d", $anio_end) . "0" . sprintf("%03d", $nALUMNOSMAX_II) . "\n";
+        // Solo para los años que estan dispibles
+        if ($anio_start_MI <= $anio_end)
+            $matriculasACompobar_str .= " - " . sprintf("%02d", $anio_start_MI) . "m000 -> " . sprintf("%02d", $anio_end) . "m" . sprintf("%03d", $nALUMNOSMAX_MI) . "\n";
+        if ($anio_start_ADE <= $anio_end)
+            $matriculasACompobar_str .= " - " . sprintf("%02d", $anio_start_ADE) . "i000 -> " . sprintf("%02d", $anio_end) . "i" . sprintf("%03d", $nALUMNOSMAX_ADE) . "\n";
 
-        $msgTiempoTardar = "Vamos a procesar esats matrículas: \n";
+        $msgTiempoTardar = "Vamos a procesar estas matrículas: \n";
         $msgTiempoTardar .= $matriculasACompobar_str;
-        $msgTiempoTardar .= "Tardará aproximadamente: $timpoTardarApox minutos \n";
+        $msgTiempoTardar .= "*Tardará aproximadamente: $timpoTardarApox minutos.*\n";
+        $msgTiempoTardar .= "_Su conversación se bloquerá en ese tiempo_\n";
 
         $this->getRequest()->hideKeyboard();
         $this->getRequest()->markdown()->sendMessage($msgTiempoTardar);
@@ -165,7 +259,9 @@ class TutorALLCommand extends BaseUserCommand
 
 
                     $tutoria = self::getTutoriaPorMat_CSV($nMatToSend);
+                    // echo $tutoria . PHP_EOL;
                     $mensaje .= $tutoria;
+
                     sleep(1); // prevenir el baneo
 
 
@@ -185,9 +281,11 @@ class TutorALLCommand extends BaseUserCommand
         file_put_contents($fichero, $mensaje, LOCK_EX);
 
 
-//        $this->getRequest()->markdown()->sendMessage($mensaje);
-//        $this->getRequest()->sendMessage($mensaje);
-        $this->getRequest()->sendDocument($fichero);
+        // $this->getRequest()->markdown()->sendMessage($mensaje);
+        // $this->getRequest()->sendMessage($mensaje);
+        // $this->getRequest()->sendDocument($fichero);
+
+        // unlink($fichero);
 
         return $this->stopConversation();
 
