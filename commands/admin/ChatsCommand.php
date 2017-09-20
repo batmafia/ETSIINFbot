@@ -100,6 +100,7 @@ class ChatsCommand extends BaseAdminCommand
             $text_back .= "\n" . 'Grupos: ' . $group_chats;
             $text_back .= "\n" . 'Super Grupos: ' . $super_group_chats;
             $text_back .= "\n" . 'Total: ' . ($user_chats + $group_chats + $super_group_chats);
+            $text_back .= "\n\n" . 'Mas información en la web: https://batmafia.frildoren.com/';
 
             if ($text === '') {
                 $text_back .= "\n\n" . 'Muestra todos los chats: /' . $this->name .' *' . "\n" . 'Buscar chats: /' . $this->name .' <Término de búsqueda>';
