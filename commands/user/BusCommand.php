@@ -203,7 +203,8 @@ class BusCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            if ($exception->getMessage() == "Unable to parse response as JSON")
+            if ($exception->getMessage() == "Unable to parse response as JSON"
+                || preg_match('/Unable to connect to /',$exception->getMessage()))
             {
                 $this->getRequest()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes ".
                     "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas ".
