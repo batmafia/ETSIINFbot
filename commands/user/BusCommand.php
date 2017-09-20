@@ -46,6 +46,7 @@ class BusCommand extends BaseUserCommand
     const MADRID = 'Madrid';
     const TODAS = 'Todas';
     const ACTUALES = 'Actuales';
+    const ORIGINALES = 'Carteles oficiales';
 
 
     /**
@@ -135,9 +136,9 @@ class BusCommand extends BaseUserCommand
      */
     public function processSelectScheduleType($text)
     {
-        $opts = [self::ACTUALES, self::TODAS];
-        $keyboard = [$opts];
-        $keyboard [] = [self::CANCELAR,self::ATRAS];
+        $opts = [self::ACTUALES, self::TODAS, self::ORIGINALES];
+        $keyboard = array_chunk(($opts), 2);
+        $keyboard [] = [self::CANCELAR, self::ATRAS];
         $titleKeyboard = '¿Quieres ver las salidas actuales o todas las salidas del día?';
         $msgErrorImputKeyboard = 'Selecciona una opción del teclado por favor:';
 
@@ -175,6 +176,10 @@ class BusCommand extends BaseUserCommand
         {
             return $this->processSendFullTimeBuses();
         }
+        elseif ($text === self::ORIGINALES)
+        {
+            return $this->processSendOriginal();
+        }
         else
         {
             return $this->getRequest()->sendMessage($msgErrorImputKeyboard);
@@ -203,7 +208,8 @@ class BusCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            if ($exception->getMessage() == "Unable to parse response as JSON")
+            if ($exception->getMessage() == "Unable to parse response as JSON"
+                || preg_match('/Unable to connect to /',$exception->getMessage()))
             {
                 $this->getRequest()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes ".
                     "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas ".
@@ -246,6 +252,10 @@ class BusCommand extends BaseUserCommand
 
 
 
+    /**
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     * @throws \Exception
+     */
     public function processSendFullTimeBuses()
     {
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
@@ -348,6 +358,33 @@ class BusCommand extends BaseUserCommand
     }
 
 
+
+    /**
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
+    public function processSendOriginal()
+    {
+
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+
+        $lineId = $this->getConversation()->notes['line'];
+        $location = $this->getConversation()->notes['location'];
+        $scheduleType = $this->getConversation()->notes['scheduleType'];
+
+        $outText = "Aquí tienes los carteles oficiales de la línea *" . $lineId . "*:\n";
+        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
+
+        $urlH1 = "http://www.crtm.es/datos\_lineas/horarios/8" . $lineId . "H1" . ".pdf";
+        $outText = "*Ida*: " . $urlH1 . "\n";
+        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
+
+        $urlH2 = "http://www.crtm.es/datos\_lineas/horarios/8" . $lineId . "H2" . ".pdf";
+        $outText = "*Vuelta*: " . $urlH2 . "\n";
+        $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
+
+        $this->stopConversation();
+        return $result;
+    }
 
 
     /**
