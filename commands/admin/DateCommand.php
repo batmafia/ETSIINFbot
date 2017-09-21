@@ -52,7 +52,6 @@ class DateCommand extends BaseAdminCommand
 
 
         $result = $this->getRequest()->sendMessage($outText);
-        $this->stopConversation();
         return $result;
 
     }
