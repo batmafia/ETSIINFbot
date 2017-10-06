@@ -27,7 +27,7 @@ class MenuCommand extends BaseUserCommand
     protected $name = 'menu';
     protected $description = 'Consulta el menú de la cafetería de la ETSIINF.';
     protected $usage = '/menu';
-    protected $version = '0.1.1';
+    protected $version = '0.2.0';
     protected $need_mysql = true;
 
 
@@ -52,10 +52,21 @@ class MenuCommand extends BaseUserCommand
 
         if($selectedMenu !== null)
         {
-            $this->getRequest()->sendAction(Request::ACTION_UPLOADING_DOCUMENT);
             $hbIcon = "\xF0\x9F\x8D\x94";
-            $cap = $menus[$selectedMenu]->caption;
-            $result = $this->getRequest()->caption("$hbIcon $cap")->sendDocument($menus[$selectedMenu]->link);
+            $cap = "Aquí tienes el menú para esta semana";
+            $linkMenu = $menus[$selectedMenu]->link;
+
+            if (strpos($linkMenu, ".jpg") !== false) {
+                $this->getRequest()->sendAction(Request::ACTION_UPLOADING_PHOTO);
+                $result = $this->getRequest()->caption("$hbIcon $cap")->sendPhoto($linkMenu);
+            } elseif ((strpos($linkMenu, ".pdf") !== false)) {
+                $this->getRequest()->sendAction(Request::ACTION_UPLOADING_DOCUMENT);
+                $result = $this->getRequest()->caption("$hbIcon $cap")->sendDocument($linkMenu);
+            } else {
+                $this->getRequest()->sendAction(Request::ACTION_TYPING);
+                $result = $this->getRequest()->caption("$hbIcon $cap")->sendMessage($linkMenu);
+            }
+
         }
         else
         {
