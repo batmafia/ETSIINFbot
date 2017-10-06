@@ -32,7 +32,7 @@ class StartController extends Controller
 
     public function actionStopHook()
     {
-        \Yii::$app->bot->unsetWebHook();
+        \Yii::$app->bot->deleteWebhook();
     }
 
     public function actionUpdates($timeout=1)
