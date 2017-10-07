@@ -159,7 +159,7 @@ class TransporteCommand extends BaseUserCommand
 
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
-        $linesID = ['591','865','571','573'];
+
         $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
 
         $stop_array = [];
@@ -171,10 +171,10 @@ class TransporteCommand extends BaseUserCommand
         $outText_lines = "";
 
 
+        $linesID = $this->getLines($origin);
 
         foreach ($linesID as $lineId) {
             $stopId = $this->getStopId($lineId, $origin);
-
 
             try {
                 $stop = BusRepository::getBusStop($stopId);
@@ -243,11 +243,29 @@ class TransporteCommand extends BaseUserCommand
             ],
             self::MONCLOA => [
                 '865' => '8-1684',
-            ],
-            self::BOADILLA => [
-                #'865' => '8-1684',
             ]
+            # self::BOADILLA => [
+            #'865' => '8-1684',
+            # ]
         ][$location][$busLine];
+    }
+
+    /**
+     * [getStopId description]
+     * @param  [type] $busline  [description]
+     * @param  [type] $location [description]
+     * @return [type]           [description]
+     */
+    private function getLines($origin)
+    {
+        return [
+            self::ETSIINF => [ '591', '865', '571', '573' ],
+            self::ALUCHE => [ '591', '571', '573' ],
+            self::ALUCHE => [ '591', '571', '573' ],
+            self::MONCLOA => [ '865' ],
+            # self::BOADILLA => [ '865' ]
+        ][$origin];
+
     }
 
 }
