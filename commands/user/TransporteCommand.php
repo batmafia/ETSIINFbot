@@ -40,7 +40,7 @@ class TransporteCommand extends BaseUserCommand
     const ATRAS = 'Atrás';
     const NUEVA_BUSQUEDA = 'Nueva Búsqueda';
 
-    const ETSIINF = 'ETSIInf';
+    const ETSIINF = 'ETSIINF';
     const ALUCHE = 'Aluche';
     const COLONIA = 'Colonia Jardín';
     const MONCLOA = 'Moncloa';
@@ -159,26 +159,34 @@ class TransporteCommand extends BaseUserCommand
 
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
-
         $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
 
-        $stop_array = [];
+
         $lineByNumber_array = [];
-
-
-        $origin = $this->getConversation()->notes['origin'];
-        $destination = $this->getConversation()->notes['destination'];
+        $stop_array = [];
         $outText_lines = "";
 
 
-        $linesID = $this->getLines($origin);
+        $origin = $this->getConversation()->notes['origin'];
+        $linesIDs_ori = $this->getLines($origin);
+        $destination = $this->getConversation()->notes['destination'];
+        $linesIDs_des = $this->getLines($destination);
+        $linesIDs = array_intersect($linesIDs_ori, $linesIDs_des);
 
-        foreach ($linesID as $lineId) {
-            $stopId = $this->getStopId($lineId, $origin);
+        $stopsIDs = [];
+        foreach ($linesIDs as $lineID) {
+            $stopId_tmp = $this->getStopId($lineID, $origin);
+            $stopsIDs[$stopId_tmp][] = $lineID;
+        }
+
+        $stop = [];
+        foreach ($stopsIDs as $linesIDsByStop) {
+
+            $stopID = key($stopsIDs);
 
             try {
-                $stop = BusRepository::getBusStop($stopId);
-                $stop_array["$lineId->$origin"] = $stop;
+                $stop = BusRepository::getBusStop($stopID);
+                $stop_array[$stopID] = $stop;
             } catch (\Exception $exception) {
                 $emsg = $exception->getMessage();
                 if ( $emsg == "Unable to parse response as JSON" || preg_match('/Unable to connect to /', $emsg ) ){
@@ -192,23 +200,37 @@ class TransporteCommand extends BaseUserCommand
                 }
             }
 
+            foreach ($linesIDsByStop as $lineID) {
 
-            $lineByNumber = $stop->getLinesByNumber($lineId);
-            $lineByNumber_array[$lineId] = $lineByNumber;
-            if (! empty($lineByNumber)) {
-                $outText_lines .= " - *$lineId*: ";
-                foreach ($lineByNumber as $line) {
-                    $msg = $line->getWaitHumanTime_transportes();
-                    $outText_lines .= "$msg, ";
+                $lineByNumber = $stop->getLinesByNumber($lineID);
+                if (!empty($lineByNumber)) {
+                    $lineByNumber_array[$lineID] = $lineByNumber;
+                    $outText_lines .= " - *$lineID*: ";
+                    foreach ($lineByNumber as $line) {
+                        $msg = $line->getWaitHumanTime_transportes();
+                        $outText_lines .= "$msg, ";
+                    }
+                    $outText_lines = substr($outText_lines, 0, -2);
+                    $outText_lines .= "\n";
                 }
-                $outText_lines = substr($outText_lines, 0, -2);
-                $outText_lines .= "\n";
-
             }
+
         }
 
-        $outText_header = "$busIcon Próximas salidas de: *$origin* con destino: *$destination*:\n";
-        $outText_tosend = $outText_header . $outText_lines;
+
+        $outText_tosend = "";
+        if (!empty($lineByNumber_array)){
+            $outText_header = "$busIcon Próximas salidas de: *$origin* con destino: *$destination*:\n";
+            $outText_tosend = $outText_header . $outText_lines;
+        } else {
+            $outText_tosend = "$busIcon No hay ninguna salida próxima de: *$origin* con destino: *$destination*, de ninguno de los siguientes buses:\n*";
+            foreach ($linesIDs as $lineID) {
+                $outText_tosend .= $lineID . ", ";
+            }
+            $outText_tosend = substr($outText_tosend, 0, -2);
+            $outText_tosend .= "*\n";
+        }
+
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText_tosend);
         $this->stopConversation();
 
@@ -256,16 +278,18 @@ class TransporteCommand extends BaseUserCommand
      * @param  [type] $location [description]
      * @return [type]           [description]
      */
-    private function getLines($origin)
+    private function getLines($location)
     {
         return [
             self::ETSIINF => [ '591', '865', '571', '573' ],
             self::ALUCHE => [ '591', '571', '573' ],
-            self::ALUCHE => [ '591', '571', '573' ],
+            self::COLONIA => [ '591', '571', '573' ],
             self::MONCLOA => [ '865' ],
             # self::BOADILLA => [ '865' ]
-        ][$origin];
+        ][$location];
 
     }
+
+
 
 }
