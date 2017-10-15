@@ -179,10 +179,8 @@ class TransporteCommand extends BaseUserCommand
             $stopsIDs[$stopId_tmp][] = $lineID;
         }
 
-        $stop = [];
-        foreach ($stopsIDs as $linesIDsByStop) {
-
-            $stopID = key($stopsIDs);
+        $lineswithoutExits = [];
+        foreach ($stopsIDs as $stopID => $linesIDsByStop) {
 
             try {
                 $stop = BusRepository::getBusStop($stopID);
@@ -200,8 +198,8 @@ class TransporteCommand extends BaseUserCommand
                 }
             }
 
-            foreach ($linesIDsByStop as $lineID) {
 
+            foreach ($linesIDsByStop as $lineID) {
                 $lineByNumber = $stop->getLinesByNumber($lineID);
                 if (!empty($lineByNumber)) {
                     $lineByNumber_array[$lineID] = $lineByNumber;
@@ -212,23 +210,36 @@ class TransporteCommand extends BaseUserCommand
                     }
                     $outText_lines = substr($outText_lines, 0, -2);
                     $outText_lines .= "\n";
+                } else {
+                    $lineswithoutExits[] = $lineID;
                 }
+
             }
 
         }
 
 
         $outText_tosend = "";
+        //print_r($lineByNumber_array);
         if (!empty($lineByNumber_array)){
             $outText_header = "$busIcon Próximas salidas de: *$origin* con destino: *$destination*:\n";
             $outText_tosend = $outText_header . $outText_lines;
+            if (!empty($lineswithoutExits)){
+                $outText_tosend = $outText_tosend . "No hay ninguna salida próxima de ninguno de los siguientes buses:\n*";
+            }
         } else {
             $outText_tosend = "$busIcon No hay ninguna salida próxima de: *$origin* con destino: *$destination*, de ninguno de los siguientes buses:\n*";
-            foreach ($linesIDs as $lineID) {
-                $outText_tosend .= $lineID . ", ";
+        }
+
+        if (!empty($lineswithoutExits)){
+            $outText_lineswithoutExits = "- ";
+            foreach ($lineswithoutExits as $lineID) {
+                $outText_lineswithoutExits .= $lineID . ", ";
             }
-            $outText_tosend = substr($outText_tosend, 0, -2);
-            $outText_tosend .= "*\n";
+            $outText_lineswithoutExits = substr($outText_lineswithoutExits, 0, -2);
+            $outText_lineswithoutExits .= "*\n";
+
+            $outText_tosend = $outText_tosend . $outText_lineswithoutExits;
         }
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText_tosend);
