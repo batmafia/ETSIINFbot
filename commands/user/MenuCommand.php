@@ -66,18 +66,19 @@ class MenuCommand extends BaseUserCommand
                 $this->getRequest()->sendAction(Request::ACTION_TYPING);
                 $result = $this->getRequest()->caption("$hbIcon $cap")->sendMessage($linkMenu);
             }
-
         }
         else
         {
             if(!empty($menus))
             {
-                $cap = $menus[0]->caption;
-                $result = $this->getRequest()->markdown()->sendMessage("⚠️ El menú disponible en la web de la cafetería es antiguo (*$cap*). Prueba más tarde.");
+                $menuDA = $menus[0];
+                $dateFrom = date("d/m/Y", $menuDA->validFrom);
+                $dateTo = date("d/m/Y", $menuDA->validTo);
+                $result = $this->getRequest()->markdown()->sendMessage("⚠️ El menú disponible de la cafetería es antiguo (*$dateFrom - $dateTo*). Prueba más tarde.");
             }
             else
             {
-                $result = $this->getRequest()->markdown()->sendMessage("⚠️ *No se ha encontrado ningún menú* en la web de la cafetería. Prueba más tarde.");
+                $result = $this->getRequest()->markdown()->sendMessage("⚠️ *No se ha encontrado ningún menú* de la cafetería. Prueba más tarde.");
             }
         }
 
