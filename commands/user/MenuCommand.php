@@ -27,7 +27,7 @@ class MenuCommand extends BaseUserCommand
     protected $name = 'menu';
     protected $description = 'Consulta el menú de la cafetería de la ETSIINF.';
     protected $usage = '/menu';
-    protected $version = '0.1.1';
+    protected $version = '0.2.0';
     protected $need_mysql = true;
 
 
@@ -40,8 +40,13 @@ class MenuCommand extends BaseUserCommand
     {
         date_default_timezone_set('Europe/Madrid');
         $menus = MenuRepository::getMenus();
-        $selectedMenu = null;
 
+        if ($menus == null){
+            $result = $this->getRequest()->markdown()->sendMessage("⚠️ Ha habido un problema al consultar el menu de la cafeteria. Prueba más tarde.");
+            return $result;
+        }
+
+        $selectedMenu = null;
         foreach ($menus as $key => $weekMenu)
         {
             if (time() < strtotime("+1 day",$weekMenu->validTo))
@@ -52,21 +57,33 @@ class MenuCommand extends BaseUserCommand
 
         if($selectedMenu !== null)
         {
-            $this->getRequest()->sendAction(Request::ACTION_UPLOADING_DOCUMENT);
             $hbIcon = "\xF0\x9F\x8D\x94";
-            $cap = $menus[$selectedMenu]->caption;
-            $result = $this->getRequest()->caption("$hbIcon $cap")->sendDocument($menus[$selectedMenu]->link);
+            $cap = "Aquí tienes el menú para esta semana";
+            $linkMenu = $menus[$selectedMenu]->link;
+
+            if (strpos($linkMenu, ".jpg") !== false) {
+                $this->getRequest()->sendAction(Request::ACTION_UPLOADING_PHOTO);
+                $result = $this->getRequest()->caption("$hbIcon $cap")->sendPhoto($linkMenu);
+            } elseif ((strpos($linkMenu, ".pdf") !== false)) {
+                $this->getRequest()->sendAction(Request::ACTION_UPLOADING_DOCUMENT);
+                $result = $this->getRequest()->caption("$hbIcon $cap")->sendDocument($linkMenu);
+            } else {
+                $this->getRequest()->sendAction(Request::ACTION_TYPING);
+                $result = $this->getRequest()->caption("$hbIcon $cap")->sendMessage($linkMenu);
+            }
         }
         else
         {
             if(!empty($menus))
             {
-                $cap = $menus[0]->caption;
-                $result = $this->getRequest()->markdown()->sendMessage("⚠️ El menú disponible en la web de la cafetería es antiguo (*$cap*). Prueba más tarde.");
+                $menuDA = $menus[0];
+                $dateFrom = date("d/m/Y", $menuDA->validFrom);
+                $dateTo = date("d/m/Y", $menuDA->validTo);
+                $result = $this->getRequest()->markdown()->sendMessage("⚠️ El menú disponible de la cafetería es antiguo (*$dateFrom - $dateTo*). Prueba más tarde.");
             }
             else
             {
-                $result = $this->getRequest()->markdown()->sendMessage("⚠️ *No se ha encontrado ningún menú* en la web de la cafetería. Prueba más tarde.");
+                $result = $this->getRequest()->markdown()->sendMessage("⚠️ *No se ha encontrado ningún menú* de la cafetería. Prueba más tarde.");
             }
         }
 
