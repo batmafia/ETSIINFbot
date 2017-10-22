@@ -35,17 +35,57 @@ class MenuRepository
     {
         $menus = [];
 
-        # Get menu from DA
-        $menuDA = self::getMenuFromDA();
-        if ($menuDA != null && sizeof($menuDA) == 1)
-            foreach($menuDA as $mDA)
-                $menus[] = $mDA;
+        try
+        {
+            # Get menu from DA
+            $menuDAJSON = self::getMenuFromDA();
+            if ($menuDAJSON != null && sizeof($menuDAJSON) == 1)
+                foreach($menuDAJSON as $mDAJSON)
+                    if ($mDAJSON != null && sizeof($mDAJSON) >= 1)
+                        foreach($mDAJSON as $mDA)
+                            $menus[] = $mDA;
+        }
+        catch (\Exception $exception)
+        {
+            if ($exception->getMessage() == "Unable to parse response as JSON"
+                || preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                // send mesage to Alvaro
+                $msg = "Parece que el servicio del menu de la web de DAETSIINF esta caida";
+                // $this->getRequest()->markdown()->sendMessage($msg."\n\n");
+                print($msg);
+            }
+            else
+            {
+                throw $exception;
+            }
+        }
 
-        # Get menus from FI
-        $menusFI = self::getMenusFromFI();
-        if ($menusFI != null && sizeof($menusFI) > 1)
-            foreach($menusFI as $mFI)
-                $menus[] = $mFI;
+        try
+        {
+            # Get menus from FI
+            $menusFI = self::getMenusFromFI();
+            if ($menusFI != null && sizeof($menusFI) > 1)
+                foreach($menusFI as $mFI)
+                    $menus[] = $mFI;
+        }
+        catch (\Exception $exception)
+        {
+            if ($exception->getMessage() == "Unable to parse response as JSON"
+                || preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                // send mesage to pmoso
+                $msg = "Parece que la web de la facultad esta caida";
+                // $this->getRequest()->markdown()->sendMessage($msg."\n\n");
+                print($msg);
+            }
+            else
+            {
+                throw $exception;
+            }
+        }
+
+
 
         return $menus;
     }
@@ -53,40 +93,22 @@ class MenuRepository
 
     public static function getMenuFromDA()
     {
-        $menus = [];
         $request = Request::get("http://da.etsiinf.upm.es/menu/menu.json")->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
-            $data = \GuzzleHttp\json_decode($request->raw_body, true);
             $menuDAjson = new MenuDAjson();
+
+            $data = \GuzzleHttp\json_decode($request->raw_body, true);
+
             $menuDAjson->setAttributes($data);
 
-            if ($menuDAjson->validate()) {
+            return $menuDAjson;
 
-                $title = $menuDAjson->title;
-                $text = explode("_", $title);
-                $day1 = $text[1];
-                $endDate_temp = explode("-", $text[3]);
-                $day2 = $endDate_temp[0];
-                $month = $endDate_temp[1];
-                $year = "20".$endDate_temp[2];
-
-                $menu = new MenuModel();
-                $menu->setAttributes([
-                    'link'=>"http://da.etsiinf.upm.es/menu/menu.jpg",
-                    'caption'=>html_entity_decode($title),
-                    'validFrom'=>strtotime($day1."-".$month."-".$year),
-                    'validTo'=>strtotime($day2."-".$month."-".$year),
-                ]);
-
-                if($menu->validate())
-                    $menus[] = $menu;
-
-                return $menus;
-
-            } else {
-                print_r($menuDAjson->getErrors());
-                return null;
-            }
+//            if ($menuDAjson->validate()) {
+//                return $menuDAjson;
+//            } else {
+//                print_r($menuDAjson->getErrors());
+//                return null;
+//            }
 
         } else {
             throw new Exception("Repository exception");
