@@ -17,12 +17,12 @@ class MenuModel extends Model
     public $link;
     public $validFrom;
     public $validTo;
-    public $caption;
+    public $name;
 
     function rules()
     {
         return [
-            [['link', 'caption'], 'string'],
+            [['link', 'name'], 'string'],
             [['validFrom','validTo'], 'integer']
         ];
     }

@@ -3,7 +3,6 @@
 namespace app\models\repositories;
 
 
-use app\models\menu\MenuDAjson;
 use app\models\menu\MenuModel;
 use Httpful\Mime;
 use Httpful\Request;
@@ -34,16 +33,11 @@ class MenuRepository
     public static function getMenus()
     {
         $menus = [];
-
         try
         {
             # Get menu from DA
-            $menuDAJSON = self::getMenuFromDA();
-            if ($menuDAJSON != null && sizeof($menuDAJSON) == 1)
-                foreach($menuDAJSON as $mDAJSON)
-                    if ($mDAJSON != null && sizeof($mDAJSON) >= 1)
-                        foreach($mDAJSON as $mDA)
-                            $menus[] = $mDA;
+            $menusDA = self::getMenuFromDA();
+            $menus = array_merge($menus, $menusDA);
         }
         catch (\Exception $exception)
         {
@@ -65,9 +59,7 @@ class MenuRepository
         {
             # Get menus from FI
             $menusFI = self::getMenusFromFI();
-            if ($menusFI != null && sizeof($menusFI) > 1)
-                foreach($menusFI as $mFI)
-                    $menus[] = $mFI;
+            $menus = array_merge($menus, $menusFI);
         }
         catch (\Exception $exception)
         {
@@ -85,30 +77,36 @@ class MenuRepository
             }
         }
 
-
-
         return $menus;
     }
 
 
-    public static function getMenuFromDA()
+    private static function getMenuFromDA()
     {
         $request = Request::get("http://da.etsiinf.upm.es/menu/menu.json")->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
-            $menuDAjson = new MenuDAjson();
-
+            $menus = [];
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
+            foreach($data as $m){
+                $menu = new MenuModel();
 
-            $menuDAjson->setAttributes($data);
+                $link = $m['link'];
+                $title = $m['name'];
+                $vF = $m['validFrom'];
+                $vT = $m['validTo'];
 
-            return $menuDAjson;
+                $menu->setAttributes([
+                    'link'=>$link,
+                    'caption'=>html_entity_decode($title),
+                    'validFrom'=>\DateTime::createFromFormat('d-m-y', $vF)->getTimestamp(),
+                    'validTo'=>\DateTime::createFromFormat('d-m-y', $vT)->getTimestamp(),
+                ]);
 
-//            if ($menuDAjson->validate()) {
-//                return $menuDAjson;
-//            } else {
-//                print_r($menuDAjson->getErrors());
-//                return null;
-//            }
+                if($menu->validate())
+                    $menus[] = $menu;
+            }
+
+            return $menus;
 
         } else {
             throw new Exception("Repository exception");
@@ -118,7 +116,7 @@ class MenuRepository
 
 
 
-    public static function getMenusFromFI()
+    private  static function getMenusFromFI()
     {
         $request = Request::get("http://www.fi.upm.es/?pagina=228")->send();
         if(!$request->hasErrors())
@@ -139,12 +137,15 @@ class MenuRepository
                     return intval($e) > 0;
                 }));
 
+                $vF = $days[0]."-".$month."-".$year;
+                $vT = $days[1]."-".$month."-".$year;
+
                 $menu = new MenuModel();
                 $menu->setAttributes([
                     'link'=>"http://www.fi.upm.es/".$elem->getAttribute("href"),
-                    'caption'=>html_entity_decode($elem->innertext()),
-                    'validFrom'=>strtotime($days[0]."-".$month."-".$year),
-                    'validTo'=>strtotime($days[1]."-".$month."-".$year),
+                    'name'=>html_entity_decode($elem->innertext()),
+                    'validFrom'=>\DateTime::createFromFormat('d-m-Y', $vF)->getTimestamp(),
+                    'validTo'=>\DateTime::createFromFormat('d-m-Y', $vT)->getTimestamp(),
                 ]);
 
                 if($menu->validate())
