@@ -11,6 +11,7 @@ namespace app\commands\user;
 use app\commands\base\Request;
 use app\models\repositories\BusRepository;
 use app\commands\base\BaseUserCommand;
+use app\models\repositories\MetroligeroRepository;
 use \DateTime;
 use \DateTimeZone;
 
@@ -45,6 +46,10 @@ class TransporteCommand extends BaseUserCommand
     const COLONIA = 'Colonia Jardín';
     const MONCLOA = 'Moncloa';
     const BOADILLA = 'Boadilla';
+
+    const ML_COLONIA = '201';
+    const ML_MONTEPRINCIPE = '353';
+    const ML_PUERTABOADILLA = '362';
 
 
     const TODAS = 'Todas';
@@ -159,7 +164,7 @@ class TransporteCommand extends BaseUserCommand
 
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
-        $busIcon = "\xF0\x9F\x9A\x8C"; // http://apps.timwhitlock.info/unicode/inspect/hex/1F68C
+        $busIcon = "\xF0\x9F\x95\x92"; // https://apps.timwhitlock.info/emoji/tables/unicode
 
 
         $lineByNumber_array = [];
@@ -209,7 +214,7 @@ class TransporteCommand extends BaseUserCommand
                         $outText_lines .= "$msg, ";
                     }
                     $outText_lines = substr($outText_lines, 0, -2);
-                    $outText_lines .= "\n";
+                    $outText_lines .= ".\n";
                 } else {
                     $lineswithoutExits[] = $lineID;
                 }
@@ -219,11 +224,35 @@ class TransporteCommand extends BaseUserCommand
         }
 
 
+        // metroligero
+        $origin_ML_stopId = $this->getStopIdML($origin);
+        if ($origin === self::COLONIA || $origin === self::BOADILLA) {
+            $destination_ML_stopId = self::ML_MONTEPRINCIPE;
+        } else {
+            $destination_ML_stopId = $this->getStopIdML($destination);
+        }
+        $llegadas = MetroligeroRepository::getMetroligeroStop($origin_ML_stopId, $destination_ML_stopId);
+
+        $arrivals = $llegadas->getArrivals();
+
+        $outText_lines_ML = " - *ML*: ";
+        if ($arrivals[0] == 0 && $arrivals[1] == 0) {
+            $lineswithoutExits[] = 'Metro ligero';
+        } else if ($arrivals[0] == 0 && $arrivals[1] != 0) {
+            $outText_lines_ML .= "Entrando, " . $arrivals[1] . " min.";
+        } else if ($arrivals[0] != 0 && $arrivals[1] == 0) {
+            $outText_lines_ML .= $arrivals[0] . " min.";
+        } else if ($arrivals[0] != 0 && $arrivals[1] != 0) {
+            $outText_lines_ML .= $arrivals[0] . " min, " . $arrivals[1] . " min.";
+        }
+        $outText_lines_ML .= "\n";
+
+
         $outText_tosend = "";
         //print_r($lineByNumber_array);
         if (!empty($lineByNumber_array)){
-            $outText_header = "$busIcon Próximas salidas de: *$origin* con destino: *$destination*:\n";
-            $outText_tosend = $outText_header . $outText_lines;
+            $outText_header = "$busIcon Próximas salidas de *$origin* con destino *$destination*:\n";
+            $outText_tosend = $outText_header . $outText_lines . $outText_lines_ML;
             if (!empty($lineswithoutExits)){
                 $outText_tosend = $outText_tosend . "No hay ninguna salida próxima de ninguno de los siguientes buses:\n*";
             }
@@ -299,6 +328,18 @@ class TransporteCommand extends BaseUserCommand
             # self::BOADILLA => [ '865' ]
         ][$location];
 
+    }
+
+    private function getStopIdML($origin)
+    {
+        switch ($origin) {
+            case self::COLONIA:
+                return self::ML_COLONIA;
+            case self::BOADILLA:
+                return self::ML_PUERTABOADILLA;
+            case self::ETSIINF:
+                return self::ML_MONTEPRINCIPE;
+        }
     }
 
 
