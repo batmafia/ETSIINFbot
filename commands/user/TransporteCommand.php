@@ -221,27 +221,41 @@ class TransporteCommand extends BaseUserCommand
 
 
         // metroligero
-        $origin_ML_stopId = $this->getStopIdML($origin);
+        $isMetro = false;
         if ($origin === self::COLONIA || $origin === self::BOADILLA) {
+            $isMetro = true;
+            $origin_ML_stopId = $this->getStopIdML($origin);
             $destination_ML_stopId = self::ML_MONTEPRINCIPE;
-        } else {
+            $llegadas = MetroligeroRepository::getMetroligeroStop($origin_ML_stopId, $destination_ML_stopId);
+        } elseif ( ($origin === self::ETSIINF) && ($destination === self::COLONIA || $destination === self::BOADILLA)) {
+            $isMetro = true;
+            $origin_ML_stopId = $this->getStopIdML($origin);
             $destination_ML_stopId = $this->getStopIdML($destination);
+            $llegadas = MetroligeroRepository::getMetroligeroStop($origin_ML_stopId, $destination_ML_stopId);
+        } else {
+            $isMetro = false;
         }
-        $llegadas = MetroligeroRepository::getMetroligeroStop($origin_ML_stopId, $destination_ML_stopId);
 
-        $arrivals = $llegadas->getArrivals();
+        $outText_lines_ML = "";
+        if ($isMetro) {
 
-        $outText_lines_ML = " - *ML*: ";
-        if ($arrivals[0] == 0 && $arrivals[1] == 0) {
-            $lineswithoutExits[] = 'Metro ligero';
-        } else if ($arrivals[0] == 0 && $arrivals[1] != 0) {
-            $outText_lines_ML .= "Entrando, " . $arrivals[1] . " min.";
-        } else if ($arrivals[0] != 0 && $arrivals[1] == 0) {
-            $outText_lines_ML .= $arrivals[0] . " min.";
-        } else if ($arrivals[0] != 0 && $arrivals[1] != 0) {
-            $outText_lines_ML .= $arrivals[0] . " min, " . $arrivals[1] . " min.";
+            $arrivals = $llegadas->getArrivals();
+
+            $outText_lines_ML = " - *ML*: ";
+            if ($arrivals[0] == 0 && $arrivals[1] == 0) {
+                $lineswithoutExits[] = 'Metro ligero';
+            } else if ($arrivals[0] == 0 && $arrivals[1] != 0) {
+                $outText_lines_ML .= "Entrando, " . $arrivals[1] . " min.";
+            } else if ($arrivals[0] != 0 && $arrivals[1] == 0) {
+                $outText_lines_ML .= $arrivals[0] . " min.";
+            } else if ($arrivals[0] != 0 && $arrivals[1] != 0) {
+                $outText_lines_ML .= $arrivals[0] . " min, " . $arrivals[1] . " min.";
+            }
+            $outText_lines_ML .= "\n";
         }
-        $outText_lines_ML .= "\n";
+
+
+
 
 
         $outText_tosend = "";
