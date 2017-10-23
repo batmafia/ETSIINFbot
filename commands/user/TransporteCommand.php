@@ -64,9 +64,7 @@ class TransporteCommand extends BaseUserCommand
      */
     public function processSelectOrigin($text)
     {
-
-        $opts = [self::ETSIINF, self::ALUCHE, self::COLONIA, self::MONCLOA];
-        # $opts = [self::ETSIINF, self::ALUCHE, self::COLONIA, self::MONCLOA, self::BOADILLA];
+        $opts = [self::ETSIINF, self::ALUCHE, self::COLONIA, self::MONCLOA, self::BOADILLA];
 
         $keyboard = array_chunk(($opts), 2);
         $keyboard [] = [self::CANCELAR];
@@ -116,9 +114,7 @@ class TransporteCommand extends BaseUserCommand
      */
     public function processSelectDestination($text)
     {
-
-        $opts = [self::ALUCHE, self::COLONIA, self::MONCLOA];
-        # $opts = [self::ALUCHE, self::COLONIA, self::MONCLOA, self::BOADILLA];
+        $opts = [self::ALUCHE, self::COLONIA, self::MONCLOA, self::BOADILLA];
         $keyboard = array_chunk(($opts), 2);
         $keyboard [] = [self::CANCELAR,self::ATRAS];
         $titleKeyboard = 'Selecciona donde quieres ir:';
@@ -304,11 +300,12 @@ class TransporteCommand extends BaseUserCommand
                 '573' => '08409'
             ],
             self::MONCLOA => [
-                '865' => '8-1684',
+                '865' => '8-1684'
+            ],
+            self::BOADILLA => [
+                '571' => '08875',
+                '573' => '15580'
             ]
-            # self::BOADILLA => [
-            #'865' => '8-1684',
-            # ]
         ][$location][$busLine];
     }
 
@@ -325,7 +322,7 @@ class TransporteCommand extends BaseUserCommand
             self::ALUCHE => [ '591', '571', '573' ],
             self::COLONIA => [ '591', '571', '573' ],
             self::MONCLOA => [ '865' ],
-            # self::BOADILLA => [ '865' ]
+            self::BOADILLA => [ '571', '573' ]
         ][$location];
 
     }
