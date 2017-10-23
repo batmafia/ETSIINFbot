@@ -42,8 +42,18 @@ class MetroligeroStop extends Model
     public function getArrivals(){
 
         $intervalo = $this->getIntervalo();
-        $myFirstStop = round(($this->first_stop/60)-$intervalo);
-        $mySecondStop = round(($this->second_stop/60)-$intervalo);
+        if ($this->first_stop === 0)
+        {
+            $myFirstStop = 0;
+        } else {
+            $myFirstStop = round(($this->first_stop/60)-$intervalo);
+        }
+        if ($this->second_stop === 0)
+        {
+            $mySecondStop = 0;
+        } else {
+            $mySecondStop = round(($this->second_stop / 60) - $intervalo);
+        }
 
         $arrivals [0] = $myFirstStop;
         $arrivals [1] = $mySecondStop;
