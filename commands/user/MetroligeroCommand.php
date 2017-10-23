@@ -124,7 +124,7 @@ class MetroligeroCommand extends BaseUserCommand
         }
         else if($arrivals[0] != 0 && $arrivals[1] == 0)
         {
-            $outText = "$metroIcon El último tren llegará en *$arrivals[1] minutos*.";
+            $outText = "$metroIcon El último tren llegará en *$arrivals[0] minutos*.";
         }
         else if ($arrivals[0] != 0 && $arrivals[1] != 0)
         {

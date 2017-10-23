@@ -49,10 +49,12 @@ class MenuCommand extends BaseUserCommand
         $selectedMenu = null;
         foreach ($menus as $key => $weekMenu)
         {
-            if (time() < strtotime("+1 day",$weekMenu->validTo))
+            if (time() < strtotime("+1 day", $weekMenu->validTo))
             {
-                $selectedMenu=$key;
+                $selectedMenu = $key;
+                break;
             }
+
         }
 
         if($selectedMenu !== null)
