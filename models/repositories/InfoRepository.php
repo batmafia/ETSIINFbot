@@ -162,19 +162,13 @@ Poner tu correo institucional (...@alumnos.upm.es) y tu clave.
 
 *Más información*: http://www.upm.es/UPM/InformaticaComunicaciones/wifi?id=e83fe60106778110VgnVCM10000009c7648a\\_\\_\\_\\_&fmt=detail&prefmt=articulo'
             ],
-            'VPN' => '
-*NOTA*: si tienes MacOS http://www.jpromero.com/2016/05/configuracion-vpn-etsiinf-upm.html
-
-*Tipo de conexión*: Point-to-Point Tunnelling Protocol (PPTP)
-*Pasarela o Gateway*: otilio.fi.upm.es si se conecta desde fuera de la facultad;10.10.1.2 si se conecta desde la red de portatiles o FIWIFI
-*Usuario o User Name*: usuario de la facultad que se proporciona en el centro de cálculo y que coincide con el número de matricula.
-*Contraseña o Password*: Las password vinculada a su usuario de la facultad.
-*Authentication*: Desmarcar los siguientes métodos de autentificación: PAP, MSCHAP y EAP.
-*Security and Compresion*: Marcar usar Point-to-Point encryption (MPPE) y en security selecciónar 128-bit (Most secure) y Dejar marcadas: Allow BSD data compresion, Allow Deflate data compresion, Use TCP header compression.
-*Echo*: No marcar nada.
-*Misc*: Use custom unit number 1500.
-
-*Más información*: https://www.fi.upm.es/?pagina=373',
+            'VPN' => [
+                'INFO' => '*Más información*: https://www.fi.upm.es/?pagina=373',
+                'Windows 10' => '*Guia*: https://www.fi.upm.es/docs/servicios/red-acceso/373\\_Guia\\_VPN-Windows\\_10.pdf',
+                'Mac' => '*NOTA*: si tienes MacOS http://www.jpromero.com/2016/05/configuracion-vpn-etsiinf-upm.html',
+                'Ubuntu' => '*Guia*: https://www.fi.upm.es/docs/servicios/red-acceso/373\\_Guia\\_Ubuntu\\_16.04.pdf',
+                'Windows7' => '*Guia*: https://www.fi.upm.es/docs/servicios/red-acceso/373\\_Guia\\_VPN-Windows\\_7.pdf'
+            ],
             'FTP' => '
 *Acceso a directorios personales*
 Los alumnos de la Facultad tienen la posibilidad de acceder a sus directorios de trabajo compartidos en Windows y Unix desde sus equipos personales. Este acceso se realizará mediante protocol SCP/SFTP con el servidor *www.alumnos.fi.upm.es con su usuario y contraseña habituales*. Linux dispone de comandos para scp y sftp mientras que en Windows se pueden instalar programas libres (WinSCP, Filezilla).
