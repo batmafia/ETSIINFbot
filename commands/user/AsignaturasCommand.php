@@ -52,7 +52,33 @@ class AsignaturasCommand extends BaseUserCommand
         $this->getConversation();
 
         // ETSIINF = 10; PSC = Primer y Segundo Ciclo; GRA = Grado
-        $plans = SubjectRepository::getPlansFromCenter('10','PSC','GRA,MOF',$this->getActualYear());
+        try
+        {
+            $plans = SubjectRepository::getPlansFromCenter('10','PSC','GRA,MOF',$this->getActualYear());
+        }
+        catch (\Exception $exception)
+        {
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msge = "Parece que la API de la UPM esta caida.";
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la API de la UPM esta caida.";
+                print("No se ha interpretado el JSON de la petición.");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            else
+            {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
+                throw $exception;
+            }
+            $msge .= " Vuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
+        }
 
         foreach ($plans as $plan){
             $options[$plan->codigo] =  "$plan->nombre";
@@ -88,7 +114,34 @@ class AsignaturasCommand extends BaseUserCommand
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
+
+        try
+        {
+            $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
+        }
+        catch (\Exception $exception)
+        {
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msge = "Parece que la API de la UPM esta caida.";
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la API de la UPM esta caida.";
+                print("No se ha interpretado el JSON de la petición.");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            else
+            {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
+                throw $exception;
+            }
+            $msge .= " Vuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
+        }
 
         $opts2 = array_keys($ordenadas);
         if(count($opts2) === 1)
@@ -139,7 +192,35 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedCourse = $this->getConversation()->notes['course'];
 
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
+
+        try
+        {
+            $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
+        }
+        catch (\Exception $exception)
+        {
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msge = "Parece que la API de la UPM esta caida.";
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la API de la UPM esta caida.";
+                print("No se ha interpretado el JSON de la petición.");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            else
+            {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
+                throw $exception;
+            }
+            $msge .= " Vuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
+        }
+
 
         $opts3 = array_keys($ordenadas[$selectedCourse]);
 
@@ -181,7 +262,35 @@ class AsignaturasCommand extends BaseUserCommand
         $selectedSemester = $this->getConversation()->notes['semester'];
         $selectedCourse = $this->getConversation()->notes['course'];
         $selectedPlan = $this->getConversation()->notes['plan'];
-        $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
+
+        try
+        {
+            $ordenadas = SubjectRepository::getSubjectsList($selectedPlan, $this->getActualYear());
+        }
+        catch (\Exception $exception)
+        {
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msge = "Parece que la API de la UPM esta caida.";
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la API de la UPM esta caida.";
+                print("No se ha interpretado el JSON de la petición.");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            else
+            {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
+                throw $exception;
+            }
+            $msge .= " Vuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
+        }
+
         $asignaturas = $ordenadas[$selectedCourse][$selectedSemester];
 
         foreach ($asignaturas as $asignatura)
@@ -239,19 +348,28 @@ class AsignaturasCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            if ($exception->getMessage() == "Unable to parse response as JSON")
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
             {
-                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                $msge = "Parece que la API de la UPM esta caida.";
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*\n\n");
-
+                    "*Por favor, selecciona otra asignatura de la lista.*\n\n";
+                $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
                 return $this->previousStep();
             }
             else
             {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
                 throw $exception;
             }
+            $msge .= " Vuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
         }
 
         $numProfesores = count($subject->profesores);
@@ -305,19 +423,28 @@ class AsignaturasCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            if ($exception->getMessage() == "Unable to parse response as JSON")
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
             {
-                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                $msge = "Parece que la API de la UPM esta caida.";
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*\n\n");
-
+                    "*Por favor, selecciona otra asignatura de la lista.*\n\n";
+                $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
                 return $this->previousStep();
             }
             else
             {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
                 throw $exception;
             }
+            $msge .= " Vuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
         }
 
 
@@ -344,19 +471,28 @@ class AsignaturasCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            if ($exception->getMessage() == "Unable to parse response as JSON")
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
             {
-                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                $msge = "Parece que la API de la UPM esta caida.";
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*\n\n");
-
+                    "*Por favor, selecciona otra asignatura de la lista.*\n\n";
+                $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
                 return $this->previousStep();
             }
             else
             {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
                 throw $exception;
             }
+            $msge .= " Vuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
         }
 
         $profesoresKB = [];
@@ -441,19 +577,28 @@ class AsignaturasCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            if ($exception->getMessage() == "Unable to parse response as JSON")
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
             {
-                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                $msge = "Parece que la API de la UPM esta caida.";
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*\n\n");
-
+                    "*Por favor, selecciona otra asignatura de la lista.*\n\n";
+                $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
                 return $this->previousStep();
             }
             else
             {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
                 throw $exception;
             }
+            $msge .= " Vuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
         }
 
         $cancel = [self::CANCELAR, self::ATRAS];
