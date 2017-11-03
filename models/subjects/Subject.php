@@ -108,7 +108,8 @@ class Subject extends Model
         return [
             [['nombre','anio','semestre','guia','depto','plan','caracter','fecha_actualizacion'], 'string'],
             ['profesores', 'safe'],
-            [['codigo','ects'], 'integer'],
+            ['ects', 'double'],
+            ['codigo', 'integer'],
         ];
     }
 
