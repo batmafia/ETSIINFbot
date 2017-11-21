@@ -21,8 +21,8 @@ class SubjectRepository
     public static function getSubject($plan, $codSubject, $semester, $year)
     {
         $year2 = substr($year + 1, -2);
-        $request = Request::get("https://www.upm.es/comun_gauss/publico/api/$year-$year2/$semester/$plan" . "_" . "$codSubject.json")
-            ->expects(Mime::JSON)->send();
+        $url = "https://www.upm.es/comun_gauss/publico/api/$year-$year2/$semester/$plan" . "_" . "$codSubject.json";
+        $request = Request::get($url)->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
             $subjObj = new Subject();
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
@@ -43,8 +43,8 @@ class SubjectRepository
     public static function getPlansFromCenter($center, $studyType, $studySubType, $year)
     {
         $year2 = substr($year + 1, -2);
-        $request = Request::get("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json/$center/planes/$studyType?subtipo_estudio=$studySubType&anio=$year$year2")
-            ->expects(Mime::JSON)->send();
+        $url = "https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/centro.json/$center/planes/$studyType?subtipo_estudio=$studySubType&anio=$year$year2";
+        $request = Request::get($url)->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
 
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
@@ -76,9 +76,8 @@ class SubjectRepository
     public static function getSubjectsList($plan, $year)
     {
         $year2 = substr($year + 1, -2);
-        $request = Request::get
-        ("https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/plan.json/$plan/asignaturas?anio=$year$year2")
-            ->expects(Mime::JSON)->send();
+        $url = "https://www.upm.es/wapi_upm/academico/comun/index.upm/v2/plan.json/$plan/asignaturas?anio=$year$year2";
+        $request = Request::get($url)->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
 
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
