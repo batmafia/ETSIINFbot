@@ -306,7 +306,6 @@ class TransporteCommand extends BaseUserCommand
             self::ALUCHE => [
                 '591' => '08380',
                 '571' => '15782',
-                '573' => '11278'
             ],
             self::COLONIA => [
                 '591' => '08409',
@@ -314,7 +313,8 @@ class TransporteCommand extends BaseUserCommand
                 '573' => '08409'
             ],
             self::MONCLOA => [
-                '865' => '8-1684'
+                '865' => '8-1684',
+                '573' => '11278'
             ],
             self::BOADILLA => [
                 '571' => '08875',
@@ -333,9 +333,9 @@ class TransporteCommand extends BaseUserCommand
     {
         return [
             self::ETSIINF => [ '591', '865', '571', '573' ],
-            self::ALUCHE => [ '591', '571', '573' ],
+            self::ALUCHE => [ '591', '571' ],
             self::COLONIA => [ '591', '571', '573' ],
-            self::MONCLOA => [ '865' ],
+            self::MONCLOA => [ '865', '573' ],
             self::BOADILLA => [ '571', '573' ]
         ][$location];
 
