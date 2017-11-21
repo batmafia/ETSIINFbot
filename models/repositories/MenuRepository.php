@@ -83,7 +83,7 @@ class MenuRepository
 
     private static function getMenuFromDA()
     {
-        $request = Request::get("http://da.etsiinf.upm.es/menu/menu.json")->expects(Mime::JSON)->send();
+        $request = Request::get("https://da.etsiinf.upm.es/menu/menu.json")->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
             $menus = [];
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
