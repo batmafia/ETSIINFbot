@@ -62,7 +62,7 @@ class BusLine extends Model
 
     /**
      * [getWaitHumanTime ]
-     * @return string retunr wait time in human time mode: En la parada, En 1 minuto, En 2 minutos,  10:00 OR 9:05 ...
+     * @return string return wait time in human time mode: En la parada, En 1 minuto, En 2 minutos,  10:00 OR 9:05 ...
      */
     public function getWaitHumanTime()
     {
@@ -86,6 +86,37 @@ class BusLine extends Model
                 if (strlen((string)$mins) == 1)
                     $mins = "0$mins";
                 $msg .= "A las *$hours:$mins*";
+                break;
+            default:
+                $msg .= "$waitTimeMinutes NO VALIDO";
+                break;
+        }
+        return $msg;
+    }
+
+    /**
+     * [getWaitHumanTime_transportes ]
+     * @return string return wait time in human time mode: En la parada, En 1 minuto, En 2 minutos,  10:00 OR 9:05 ...
+     */
+    public function getWaitHumanTime_transportes()
+    {
+        $waitTimeMinutes = $this->getWaitMinutes();
+        $msg = "";
+        switch (true)
+        {
+            case ($waitTimeMinutes == 0):
+                # TODO: mirar si es una parada intermedia (Llegando a la parada )o no (Saliendo de la parada)
+                $msg .= "*en la parada*";
+                break;
+            case ($waitTimeMinutes  <= 60):
+                $msg .= "*$waitTimeMinutes"." min"."*";
+                break;
+            case ($waitTimeMinutes > 60):
+                $hours = floor($waitTimeMinutes/60);
+                $mins = $waitTimeMinutes%60;
+                if (strlen((string)$mins) == 1)
+                    $mins = "0$mins";
+                $msg .= "*$hours:$mins*";
                 break;
             default:
                 $msg .= "$waitTimeMinutes NO VALIDO";
