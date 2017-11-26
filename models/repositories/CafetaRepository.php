@@ -31,7 +31,7 @@ Donuts azucar: 0,76€
 Napolitana: 0,81€
 Palmera: 0,92€
 Pepito: 0,92€
-Porras / Churro 3u: 0,66€
+Porra 1u / Churro 3u: 0,66€
 ",
         'Refrescos / Cervezas' => "
 Agua 50cL: 0,71€
