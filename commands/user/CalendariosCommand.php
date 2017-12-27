@@ -65,6 +65,11 @@ class CalendariosCommand extends BaseUserCommand
     public function processPickDegree($text)
     {
         $degrees = CalendarRepository::getDegrees();
+        if ($degrees == null || empty($degrees)){
+            $result = $this->getRequest()->markdown()->hideKeyboard()->sendMessage("⚠️ Parece que la web de la escuela esta caida. Prueba más tarde.");
+            return $result;
+        }
+
         $keyboard = array_chunk(array_keys($degrees), 1);
         $keyboard[] = [self::CANCEL];
 
@@ -94,6 +99,11 @@ class CalendariosCommand extends BaseUserCommand
     public function processTimetablePeriod($text)
     {
         $timetables = CalendarRepository::getTimetables($this->getConversation()->notes['degree']);
+        if ($timetables == null || empty($timetables)){
+            $result = $this->getRequest()->markdown()->hideKeyboard()->sendMessage("⚠️ Parece que la web de la escuela esta caida. Prueba más tarde.");
+            return $result;
+        }
+
         if(count($timetables) === 1)
         {
             // Skip this step since there is only one option
@@ -124,6 +134,11 @@ class CalendariosCommand extends BaseUserCommand
     public function processTimetableSemester($text)
     {
         $timetables = CalendarRepository::getTimetables($this->getConversation()->notes['degree'])[$this->getConversation()->notes['period']];
+        if ($timetables == null || empty($timetables)){
+            $result = $this->getRequest()->markdown()->hideKeyboard()->sendMessage("⚠️ Parece que la web de la escuela esta caida. Prueba más tarde.");
+            return $result;
+        }
+
         $opts = array_keys($timetables);
         $keyboard = array_chunk($opts, 2);
         $keyboard[] = [self::CANCEL];
@@ -150,6 +165,11 @@ class CalendariosCommand extends BaseUserCommand
     public function processExamCalendar($text)
     {
         $examCalendars = CalendarRepository::getExamCalendars($this->getConversation()->notes['degree']);
+        if ($examCalendars == null || empty($examCalendars)){
+            $result = $this->getRequest()->markdown()->hideKeyboard()->sendMessage("⚠️ Parece que la web de la escuela esta caida. Prueba más tarde.");
+            return $result;
+        }
+
         $opts = array_keys($examCalendars);
         $keyboard = array_chunk($opts, 1);
         $keyboard[] = [self::CANCEL];
@@ -176,6 +196,11 @@ class CalendariosCommand extends BaseUserCommand
     public function processBusinessCalendar($text)
     {
         $businessCalendars = CalendarRepository::getBusinessCalendars();
+        if ($businessCalendars == null || empty($businessCalendars)){
+            $result = $this->getRequest()->markdown()->hideKeyboard()->sendMessage("⚠️ Parece que la web de la escuela esta caida. Prueba más tarde.");
+            return $result;
+        }
+
         $opts = array_keys($businessCalendars);
         $keyboard = array_chunk($opts, 1);
         $keyboard[] = [self::CANCEL];
