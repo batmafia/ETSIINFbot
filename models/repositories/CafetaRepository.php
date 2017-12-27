@@ -7,6 +7,10 @@ class CafetaRepository
 
     // NOTE: to skip _ -> \_ -> to skip \ -> \\_
     private static $cafetaArray = [
+        'Bebidas en máquina' => "
+?Cerbeza (latas 33cl): 1,00€
+?Refrescos (latas 33cl): 1,00€
+",
         'Bebidas calientes' => "
 Cafe con leche: 0,81€
 Cafe cortado: 0,81€
@@ -23,6 +27,7 @@ Cafe con hielo: 0,81€
 Vaso de leche: 0,61€
 Zumo de fruta variado: 1,02€
 Zumo natural: 1,32€
+?Horchata: 1,02€
 ",
         'Bollería' => "
 Chapata: 1,00€
@@ -33,11 +38,14 @@ Palmera: 0,92€
 Pepito: 0,92€
 Porra 1u / Churro 3u: 0,66€
 ",
+        'Desayunos' => "
+@TODO
+",
         'Refrescos / Cervezas' => "
 Agua 50cL: 0,71€
 Aquarius vidrio 350cL: 1,15€
 Burn: 1,53€
-Caña de cerveza: 0,81€
+Caña de cerveza barril: 0,81€
 Cerveza 1/3: 0,97€
 Cerveza 1/5: 0,81€
 Cerveza sin alcohol: 0,81€
@@ -49,7 +57,7 @@ Mosto: 0,66€
 Nestea vidrio 350cL: 1,15€
 Nestea: 1,00€
 Tonica: 1,00€
-Trina: 1,00€
+Trina (naraja, limón, piña, manzana): 1,00€
 ",
         'Licores' => "
 Licor de frutas: 1,53€
@@ -68,7 +76,7 @@ Lomo, huevo, patatas: 3,62€
 Menu con bebida: 5,30€
 Menu dieta: 4,80€
 Menu dieta + bebida: 5,30€
-Menu especial: 8,15€
+Menu especial (entrecot, dorada o similar): 8,15€
 Menu sin bebida: 4,80€
 Postre: 0,87€
 1º plato + postre: 2,85€
@@ -127,13 +135,13 @@ Filete ternera: 1,63€
 ",
         'Baguettes' => "
 Atún con tomate: 2,19€
-Embutido + tomate: 2,04€
+Embutido (Chorizo, salchichón, chopped) + tomate: 2,04€
 Tortilla española + pimientos: 2,09€
 Bacon con queso: 2,09€
 Bonito con pimiento: 2,19€
 Calamares: 2,34€
 Chorizo: 1,73€
-Embutido + queso: 2,04€
+Embutido (Chorizo, salchichón, chopped) + queso: 2,04€
 Filete ternera + pimientos: 2,29€
 Jamón serrano: 2,14€
 Jamón serrano + queso: 2,24€
@@ -146,8 +154,9 @@ Vegetal con atún: 2,09€
 Tortilla francesa: 2,24€
 Suplemento: 0,30€
 ",
+        '' => ""
         'Combinados' => "
-XX con refresco: 2,65€
+Ginebra Larios con refresco: 2,65€
 Ron Bacardi con refresco: 2,65€
 Whisky de importación con refresco: 3,46€
 Whisky nacional con refresco: 2,75€
