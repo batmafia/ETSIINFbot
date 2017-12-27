@@ -21,7 +21,34 @@ class CalendarRepository
 
     public static function getBusinessCalendars()
     {
-        $request = Request::get("https://www.fi.upm.es/?pagina=55")->expects(Mime::HTML)->send();
+
+        $calendars = [];
+
+        try
+        {
+            $calendars = self::getBusinessCalendars_petition();
+        }
+        catch (\Exception $exception)
+        {
+            if ($exception->getMessage() == "Unable to parse response as JSON"
+                || preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msg = "Parece que la web de la facultad esta caida";
+                print($msg.PHP_EOL);
+            }
+            else
+            {
+                throw $exception;
+            }
+        }
+
+        return $calendars;
+
+    }
+
+    public static function getBusinessCalendars_petition()
+    {
+        $request = Request::get("https://www.fi1.upm.es/?pagina=55")->expects(Mime::HTML)->send();
         if(!$request->hasErrors())
         {
             $dom = HtmlDomParser::str_get_html($request->raw_body);
@@ -62,6 +89,33 @@ class CalendarRepository
 
     public static function getDegrees()
     {
+
+        $degrees = [];
+
+        try
+        {
+            $degrees = self::getDegrees_petition();
+        }
+        catch (\Exception $exception)
+        {
+            if ($exception->getMessage() == "Unable to parse response as JSON"
+                || preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msg = "Parece que la web de la facultad esta caida";
+                print($msg.PHP_EOL);
+            }
+            else
+            {
+                throw $exception;
+            }
+        }
+
+        return $degrees;
+
+    }
+
+    public static function getDegrees_petition()
+    {
         $request = Request::get("https://www.fi.upm.es/?id=estudios")->expects(Mime::HTML)->send();
         if(!$request->hasErrors())
         {
@@ -95,7 +149,36 @@ class CalendarRepository
         }
     }
 
+
     public static function getExamCalendars($degree)
+    {
+
+
+        $calendars = [];
+
+        try
+        {
+            $calendars = self::getExamCalendars_petition($degree);
+        }
+        catch (\Exception $exception)
+        {
+            if ($exception->getMessage() == "Unable to parse response as JSON"
+                || preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msg = "Parece que la web de la facultad esta caida";
+                print($msg.PHP_EOL);
+            }
+            else
+            {
+                throw $exception;
+            }
+        }
+
+        return $calendars;
+
+    }
+
+    public static function getExamCalendars_petition($degree)
     {
         $request = Request::get("https://www.fi.upm.es/$degree")->followRedirects(true)->expects(Mime::HTML)->send();
         if(!$request->hasErrors())
@@ -146,7 +229,36 @@ class CalendarRepository
         }
     }
 
+
     public static function getTimetables($degree)
+    {
+
+
+        $timetables = [];
+
+        try
+        {
+            $timetables = self::getTimetables_petition($degree);
+        }
+        catch (\Exception $exception)
+        {
+            if ($exception->getMessage() == "Unable to parse response as JSON"
+                || preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msg = "Parece que la web de la facultad esta caida";
+                print($msg.PHP_EOL);
+            }
+            else
+            {
+                throw $exception;
+            }
+        }
+
+        return $timetables;
+
+    }
+
+    public static function getTimetables_petition($degree)
     {
         $request = Request::get("https://www.fi.upm.es/$degree")->followRedirects(true)->expects(Mime::HTML)->send();
         if(!$request->hasErrors())
