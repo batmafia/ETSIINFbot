@@ -101,7 +101,7 @@ Sandwich, jamon, queso: 1,43€
 Sandwich, jamon: 1,43€
 Sandwich, queso: 1,43€
 ",
-        'Pulgitas' => "
+        'Pulguitas' => "
 Bonito: 1,02€
 Chorizo: 0,76€
 Jamón york: 0,76€
@@ -153,50 +153,24 @@ Whisky de importación con refresco: 3,46€
 Whisky nacional con refresco: 2,75€
 ",
         'Ofertas' => "
-Oferta 1: 4,20€
-    XXXXXXX
+*Oferta 1: 4,20€*
+    Bravas o Alioli o Braviolis + mini de cerveza o de sangría
 
-Oferta 2: 2,50€
-    XXXXXXX
+*Oferta 2: 2,50€*
+    Sandwich mixto con patatas fritas + refresco o doble de cerveza 
     
-Oferta 3: 5,50€
-    XXXXXXX
+*Oferta 3: 5,50€*
+    Salchichas con patatas bravas + mini de cerveza o de sangría
     
-Oferta 4: 1,80€
-    XXXXXXX
+*Oferta 4: 1,80€*
+    Pulguita variada + refresco o doble de cerveza
     
-Oferta 5: 7,50€
-    XXXXXXX
+*Oferta 5: 7,50€*
+    Tortilla Española de patata + mini de cerveza o de sangría
     
-Oferta 6: 3,00€
-    XXXXXXX
+*Oferta 6: 3,00€*
+    Sandwich mixto con huevo y patatas fritas + refresco o doble de cerveza
 ",
-        'Ofertas Array' => [
-            'Oferta 1' => '
-Oferta 1: 4,20€
-    XXXXXXX
-',
-            'Oferta 2' => '
-Oferta 2: 2,50€
-    XXXXXXX
-',
-            'Oferta 3' => '
-Oferta 3: 5,50€
-    XXXXXXX
-',
-            'Oferta 4' => '
-Oferta 4: 1,80€
-    XXXXXXX
-',
-            'Oferta 5' => '
-Oferta 5: 7,50€
-    XXXXXXX
-',
-            'Oferta 6' => '
-Oferta 6: 3,00€
-    XXXXXXX
-',
-        ],
     ];
 
 
