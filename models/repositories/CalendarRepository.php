@@ -48,7 +48,7 @@ class CalendarRepository
 
     public static function getBusinessCalendars_petition()
     {
-        $request = Request::get("https://www.fi1.upm.es/?pagina=55")->expects(Mime::HTML)->send();
+        $request = Request::get("https://www.fi.upm.es/?pagina=55")->expects(Mime::HTML)->send();
         if(!$request->hasErrors())
         {
             $dom = HtmlDomParser::str_get_html($request->raw_body);
