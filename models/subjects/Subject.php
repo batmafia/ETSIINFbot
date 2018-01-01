@@ -23,81 +23,10 @@ class Subject extends Model
     public $plan;
     public $caracter;
     public $profesores = [];
+    public $recursos_didacticos = [];
+    public $actividades_evaluacion = [];
+    public $criterios_evaluacion;
     public $fecha_actualizacion;
-
-// "codigo":"105000004",
-// "nombre":"Matematica discreta II",
-// "ects":"3",
-// "anio":"2016-17",
-// "semestre":"1S",
-// "guia":"https:\/\/www.upm.es\/comun_gauss\/publico\/guias\/2016-17\/1S\/GA_10II_105000004_1S_2016-17.pdf",
-// "depto":"Matem\u00e1tica Aplicada a las Tecnolog\u00edas D la Informaci\u00f3n y las Comunicaciones",
-// "plan":"Grado en Ingenieria Informatica",
-// "caracter":"Obligatoria",
-// "profesores":[
-    // {
-    // "nombre":"Maria Gloria",
-    // "apellidos":"Sanchez Torrubia",
-    // "email":"mariagloria.sanchez@upm.es",
-    // "despacho":"1318",
-    // "coordinador":false,
-    // "tutorias":[
-    // {
-    // "dia":null,
-    // "hora_inicio":null,
-    // "hora_fin":null,
-    // "observaciones":null
-    // }
-    // ]
-// },
-// {
-// "nombre":"Blanca Nieves",
-// "apellidos":"Castro Gonzalez",
-// "email":"nieves.castro.gonzalez@upm.es",
-// "despacho":"1319",
-// "coordinador":false,
-// "tutorias":[
-// {
-// "dia":null,
-// "hora_inicio":null,
-// "hora_fin":null,
-// "observaciones":null
-// }
-// ]
-// },
-// {
-// "nombre":"M. del Carmen",
-// "apellidos":"Escribano Iglesias",
-// "email":"mariadelcarmen.escribano@upm.es",
-// "despacho":"1303",
-// "coordinador":false,
-// "tutorias":[
-// {
-// "dia":null,
-// "hora_inicio":null,
-// "hora_fin":null,
-// "observaciones":null
-// }
-// ]
-// },
-// {
-// "nombre":"Victoria",
-// "apellidos":"Zarzosa Rodriguez",
-// "email":"victoria.zarzosa@upm.es",
-// "despacho":"1313",
-// "coordinador":false,
-// "tutorias":[
-// {
-// "dia":null,
-// "hora_inicio":null,
-// "hora_fin":null,
-// "observaciones":null
-// }
-// ]
-// }
-// ],
-// "fecha_actualizacion":"June 27, 2016, 9:08 pm"
-// }
 
 
     /**
@@ -106,8 +35,8 @@ class Subject extends Model
     public function rules()
     {
         return [
-            [['nombre','anio','semestre','guia','depto','plan','caracter','fecha_actualizacion'], 'string'],
-            ['profesores', 'safe'],
+            [['nombre','anio','semestre','guia','depto','plan','caracter','criterios_evaluacion','fecha_actualizacion'], 'string'],
+            [['profesores','recursos_didacticos','actividades_evaluacion'], 'safe'],
             ['ects', 'double'],
             ['codigo', 'integer'],
         ];
@@ -134,6 +63,32 @@ class Subject extends Model
 
         }
         $this->profesores = $profesores;
+
+        $recursos_didacticos = [];
+        foreach($this->recursos_didacticos as $i=>$k)
+        {
+            $didacticResources = new DidacticResources();
+            $didacticResources->setAttributes($k);
+            if($didacticResources->validate())
+            {
+                $recursos_didacticos[] = $didacticResources;
+            }
+
+        }
+        $this->recursos_didacticos = $recursos_didacticos;
+
+        $actividades_evaluacion = [];
+        foreach($this->actividades_evaluacion as $i=>$k)
+        {
+            $evaluationActivity = new EvaluationActivities();
+            $evaluationActivity->setAttributes($k);
+            if($evaluationActivity->validate())
+            {
+                $actividades_evaluacion[] = $evaluationActivity;
+            }
+
+        }
+        $this->actividades_evaluacion = $actividades_evaluacion;
 
     }
 
