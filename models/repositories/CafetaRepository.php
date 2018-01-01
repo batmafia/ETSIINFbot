@@ -154,7 +154,6 @@ Vegetal con atún: 2,09€
 Tortilla francesa: 2,24€
 Suplemento: 0,30€
 ",
-        '' => ""
         'Combinados' => "
 Ginebra Larios con refresco: 2,65€
 Ron Bacardi con refresco: 2,65€
