@@ -27,7 +27,11 @@ class AsignaturasCommand extends BaseUserCommand
     protected $need_mysql = true;
 
     const PROFESORES = 'Profesores y Tutorías';
-    const GUIA_DOCENTE = 'Guía Docente';
+    const HORARIO = 'Horario';
+    const CRITERIOS = 'Criterios de evaluación';
+    const ACTIVIDADES = 'Actividades de evaluación';
+    const RECURSOS = 'Recursos didácticos';
+    const GUIA_DOCENTE = 'Guía docente';
 
     const CANCELAR = 'Cancelar';
     const ATRAS = 'Atrás';
@@ -374,24 +378,41 @@ class AsignaturasCommand extends BaseUserCommand
 
         $numProfesores = count($subject->profesores);
 
-        $message = "Información sobre...\n*$subject->nombre*\nDepartamento: *$subject->depto*\nTipo: *$subject->caracter*\n" .
+//        $message = "Información sobre...\n*$subject->nombre*\nDepartamento: *$subject->depto*\nTipo: *$subject->caracter*\n" .
+//            "Créditos: *$subject->ects ECTS*\nProfesores: *$numProfesores profesores*\n\n" .
+//            "Selecciona mediante el teclado una opción.\n";
+        $message = "Información sobre...\n*$subject->nombre*\nPlan: *$subject->plan*\nAño: *$subject->anio*\n" .
+            "Curso: *$selectedCourse*\nSemestre: *$subject->semestre*\nDepartamento: *$subject->depto*\nTipo: *$subject->caracter*\n" .
             "Créditos: *$subject->ects ECTS*\nProfesores: *$numProfesores profesores*\n\n" .
             "Selecciona mediante el teclado una opción.\n";
 
 
         $cancel = [self::CANCELAR, self::ATRAS];
         $keyboard = [[self::GUIA_DOCENTE], [self::PROFESORES], $cancel];
+//        $keyboard = [[self::PROFESORES], [self::HORARIO], [self::CRITERIOS], [self::ACTIVIDADES], [self::RECURSOS], [self::GUIA_DOCENTE], $cancel];
         $this->getRequest()->keyboard($keyboard);
         if($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->markdown()->sendMessage($message);
         }
+        if($text == self::PROFESORES) {
+            return $this->nextStep('teacher');
+        }
+//        if($text == self::HORARIO)
+//        {
+//            return $this->nextStep('timetable');
+//        }
+        if($text == self::CRITERIOS) {
+            return $this->nextStep('criteria');
+        }
+        if($text == self::ACTIVIDADES) {
+            return $this->nextStep('activities');
+        }
+        if($text == self::RECURSOS) {
+            return $this->nextStep('resources');
+        }
         if($text == self::GUIA_DOCENTE) {
             return $this->nextStep('sendGuide');
-        }
-        if($text == self::PROFESORES)
-        {
-            return $this->nextStep('teacher');
         }
         if (in_array($text, $cancel))
         {
@@ -452,7 +473,15 @@ class AsignaturasCommand extends BaseUserCommand
         //$guiaPDF=SubjectRepository::getGuia($subject->guia);
         //$cap = "Aquí te enviamos la guia docente de $subject->nombre";
         //$this->getRequest()->caption("$cap")->sendDocument($guiaPDF);
-        $result = $this->getRequest()->hideKeyboard()->sendMessage("Aquí tienes la guia docente de $subject->nombre\n$subject->guia");
+
+        $mensaje = "Aquí tienes la guia docente de $subject->nombre:\n";
+        $mensaje .= "$subject->guia\n";
+        if ($subject->fecha_actualizacion !== null && $subject->fecha_actualizacion !== "")
+        {
+            $mensaje .= "Última actualización: $subject->fecha_actualizacion\n";
+        }
+
+        $result = $this->getRequest()->hideKeyboard()->sendMessage($mensaje);
         $this->stopConversation();
         return $result;
     }
@@ -503,15 +532,18 @@ class AsignaturasCommand extends BaseUserCommand
 
             foreach ($subject->profesores as $profesor)
             {
+                $mensaje .= "- ";
+                # nombre and apellidos are required
+                $mensaje .= "*$profesor->nombre $profesor->apellidos*";
                 if ($profesor->coordinador == true)
                 {
-                    $mensaje .= "- *$profesor->nombre $profesor->apellidos* (coordinador) ($profesor->despacho)\n";
+                    $mensaje .= " (coordinador)";
                 }
-                else
+                if ($profesor->despacho !== null && $profesor->despacho !== "")
                 {
-                    $mensaje .= "- *$profesor->nombre $profesor->apellidos ($profesor->despacho)*\n";
+                    $mensaje .= " ($profesor->despacho)";
                 }
-
+                $mensaje .= "\n";
                 $profesoresKB[] = "$profesor->nombre $profesor->apellidos";
 
             }
@@ -619,9 +651,15 @@ class AsignaturasCommand extends BaseUserCommand
             {
                 if (("$profesor->nombre $profesor->apellidos") == $selectedTeacher)
                 {
-                    $mensaje = "Información sobre...\n*$profesor->nombre $profesor->apellidos*\n".
-                        "$mailIcon Email: $profesor->email\n"."$departmentIcon Despacho: *$profesor->despacho*\n";
+                    $mensaje = "Información sobre...\n";
+                    $mensaje .= "*$profesor->nombre $profesor->apellidos*\n";
 
+                    if ($profesor->email !== null && $profesor->email !== "") {
+                        $mensaje .= "$mailIcon Email: $profesor->email\n";
+                    }
+                    if ($profesor->despacho !== null && $profesor->despacho !== "") {
+                        $mensaje .= "$departmentIcon Despacho: *$profesor->despacho*\n";
+                    }
 
                     if (count($profesor->tutorias) !== 0)
                     {
@@ -649,6 +687,27 @@ class AsignaturasCommand extends BaseUserCommand
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
 
+    }
+
+    public function processCriteria($text)
+    {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+        $this->getRequest()->sendMessage('NOT IMPLEMENTED');
+        return $this->previousStep();
+    }
+
+    public function processActivities($text)
+    {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+        $this->getRequest()->sendMessage('NOT IMPLEMENTED');
+        return $this->previousStep();
+    }
+
+    public function processResources($text)
+    {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+        $this->getRequest()->sendMessage('NOT IMPLEMENTED');
+        return $this->previousStep();
     }
 
 }
