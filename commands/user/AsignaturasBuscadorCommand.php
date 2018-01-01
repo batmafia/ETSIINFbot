@@ -6,6 +6,7 @@
 
 namespace app\commands\user;
 use app\commands\base\Request;
+use app\commands\user\AsignaturasCommand;
 use app\models\repositories\SubjectRepository;
 use app\models\repositories\CalendarRepository;
 use app\commands\base\BaseUserCommand;
@@ -25,9 +26,12 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
     protected $version = '0.1.0';
     protected $need_mysql = true;
 
-    const GUIA_DOCENTE = 'Guía Docente';
-    const HORARIO = 'Horario';
     const PROFESORES = 'Profesores y Tutorías';
+    const HORARIO = 'Horario';
+    const CRITERIOS = 'Criterios de evaluación';
+    const ACTIVIDADES = 'Actividades de evaluación';
+    const RECURSOS = 'Recursos didácticos';
+    const GUIA_DOCENTE = 'Guía docente';
 
 
     const CANCELAR = 'Cancelar';
@@ -37,6 +41,10 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
     public $subjectlist = [];
 
 
+    /**
+     * @param $text
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
     public function processGetTextForSearch($text)
     {
         $this->getConversation();
@@ -46,8 +54,9 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
 
         if ($this->isProcessed() || empty($text))
         {
-            return $this->getRequest()->markdown()->keyboard($keyboard)
-                ->sendMessage("Introduce el nombre de la asignatura que deseas buscar información (con acentos si los tiene):");
+            $msg = "Introduce el nombre de la asignatura que deseas buscar información (con acentos si los tiene):";
+            $msg .= "Tenga paciencia, la búsqueda tardará un poco...";
+            return $this->getRequest()->markdown()->keyboard($keyboard)->sendMessage($msg);
         }
         if ($text === self::CANCELAR)
         {
@@ -58,6 +67,10 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         return $this->nextStep();
     }
 
+    /**
+     * @param $text
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
     public function processReturnSearch($text)
     {
 
@@ -85,6 +98,7 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             return $this->previousStep();
         }
 
+        $opts4 = [];
         foreach ($asignaturasPosibles as $asignatura) {
             $codigo = $asignatura->codigo;
             $nombre = $asignatura->nombre;
@@ -106,12 +120,10 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
                     $plan = explode("_", substr($guia_pdf, 61));
                     $plan = $plan[0];
                 }
-
                 array_push($opts4, "[$plan][$semestre_curso] $nombre");
-                $opts4SubjectsCode[$asignatura->codigo] = "[$plan][$semestre_curso] $nombre";
+                $opts4SubjectsCode[$asignatura->codigo] = "[$plan] [$semestre_curso] $nombre";
 
-
-                echo "[$plan] [$year-$year2] [$curso] [$semestre] [$semestre_curso] $nombre($codigo) [$guia_pdf]\n";
+                //echo "[$plan] [$year-$year2] [$curso] [$semestre] [$semestre_curso] $nombre($codigo) [$guia_pdf]\n";
                 //echo "[$plan] [$year-$year2] [$semestre_curso] $nombre($codigo) [$guia_pdf]\n";
             }
         }
@@ -137,7 +149,13 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
 
             if ($this->isProcessed() || empty($text))
             {
-                return $this->getRequest()->sendMessage("Selecciona la asignatura de la cual necesitas información (todas son del curso $year-$year2)\nSi la asginatura no está, puede ser que no este colgada la guía:");
+                $msg = "Selecciona la asignatura de la cual necesitas información (todas son del curso $year-$year2)"."\n";
+                $msg .= "Si la asginatura no está, puede ser que no este colgada la guía."."\n";
+                $msg .= "Recuerda que la búsqueda es sensible a acentos."."\n";
+                $msg .= "El formato de las opciones del teclado es el siguiente:"."\n";
+                $msg .= "`[plan] [semestre_curso] nombreAsignatura`"."\n";
+                return $this->getRequest()->markdown()->sendMessage($msg);
+
             }
 
             if (!(in_array($text, $opts4) || in_array($text, $cancel)))
@@ -145,24 +163,24 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
                 return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
             }
 
-            if (in_array($text, $cancel))
+
+            if ($text === self::CANCELAR)
             {
-                if ($text === self::CANCELAR)
-                {
-                    return $this->cancelConversation();
-                }
-                else
-                {
-                    return $this->previousStep();
-                }
+                return $this->cancelConversation();
             }
+            if ($text === self::ATRAS)
+            {
+                return $this->previousStep();
+            }
+
 
             $keyboardSubjectSelectedName = $text;
         }
 
 
-        $subjectCodeSelected = array_search($keyboardSubjectSelectedName,$opts4);
-        $subjectSelected = $asignaturasPosibles[$subjectCodeSelected];
+        $subjectIndexSelectedKeyboard = array_search($keyboardSubjectSelectedName,$opts4);
+        $subjectIndexSelected = $subjectIndexSelectedKeyboard - 1;
+        $subjectSelected = $keyboardSubjectSelectedName = array_values($asignaturasPosibles)[$subjectIndexSelected];
         $subjectSelectedAPIPointJSON = $subjectSelected->imparticion[0]->guia_json;
         $subjectSelectedDegree = $subjectSelected->curso;
         $subjectSelectedGroupsArray = $subjectSelected->imparticion[0]->grupos_matricula;
@@ -174,6 +192,11 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         return $this->nextStep();
     }
 
+    /**
+     * @param $text
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     * @throws \Exception
+     */
     public function processShowInfoSubject($text)
     {
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
@@ -187,28 +210,43 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            if ($exception->getMessage() == "Unable to parse response as JSON")
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
             {
-                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                $msge = "Parece que la API de la UPM esta caida.\n";
+                print("Unable to connect\n");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*\n\n");
-
-                return $this->previousStep();
+                    "*Por favor, selecciona otra asignatura de la lista.*";
+                print("No se ha interpretado el JSON de la petición.\n");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
             }
             elseif ($exception->getMessage() == "Attempting to send a request before defining a URI endpoint.")
             {
-                $this->getRequest()->markdown()->sendMessage("Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*\n\n");
-
-                return $this->previousStep();
+                    "*Por favor, selecciona otra asignatura de la lista.*\n";
+                print("Attempting to send a request before defining a URI endpoint.");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
             }
             else
             {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
                 throw $exception;
             }
+
+            $msge .= "\nVuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
         }
 
         $numProfesores = count($subject->profesores);
@@ -227,38 +265,52 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
 
         $cancel = [self::CANCELAR, self::ATRAS];
         $keyboard = [[self::GUIA_DOCENTE], [self::PROFESORES], $cancel];
-        //$keyboard = [[self::GUIA_DOCENTE], [self::HORARIO], [self::PROFESORES], $cancel];
+//        $keyboard = [[self::PROFESORES], [self::HORARIO], [self::CRITERIOS], [self::ACTIVIDADES], [self::RECURSOS], [self::GUIA_DOCENTE], $cancel];
         $this->getRequest()->keyboard($keyboard);
         if($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->markdown()->sendMessage($message);
         }
-        if($text == self::GUIA_DOCENTE) {
-            return $this->nextStep('sendGuide');
+        if($text == self::PROFESORES) {
+            return $this->nextStep('teacher');
         }
-        if($text == self::PROFESORES)
+        if($text == self::HORARIO)
         {
             return $this->nextStep('timetable');
         }
-        if($text == self::PROFESORES)
-        {
-            return $this->nextStep('teacher');
+        if($text == self::CRITERIOS) {
+//            return self::processCriteria();
+            return $this->nextStep('criteria');
         }
-        if (in_array($text, $cancel))
+        if($text == self::ACTIVIDADES) {
+//            return self::processActivities();
+            return $this->nextStep('activities');
+        }
+        if($text == self::RECURSOS) {
+//            return self::processResources();
+            return $this->nextStep('resources');
+        }
+        if($text == self::GUIA_DOCENTE) {
+            return $this->nextStep('sendGuide');
+        }
+
+
+        if ($text === self::CANCELAR)
         {
-            if ($text === self::CANCELAR)
-            {
-                return $this->cancelConversation();
-            }
-            else
-            {
-                return $this->previousStep();
-            }
+            return $this->cancelConversation();
+        }
+        if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
         }
 
         return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
     }
 
+    /**
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     * @throws \Exception
+     */
     public function processSendGuide()
     {
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
@@ -276,7 +328,43 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            throw $exception;
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msge = "Parece que la API de la UPM esta caida.\n";
+                print("Unable to connect\n");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*";
+                print("No se ha interpretado el JSON de la petición.\n");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            elseif ($exception->getMessage() == "Attempting to send a request before defining a URI endpoint.")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*\n";
+                print("Attempting to send a request before defining a URI endpoint.");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            else
+            {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
+                throw $exception;
+            }
+
+            $msge .= "\nVuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
         }
 
         //print_r($subject);
@@ -294,6 +382,11 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         return $result;
     }
 
+    /**
+     * TODO: Not finish
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     * @throws \Exception
+     */
     public function processTimetable()
     {
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
@@ -311,16 +404,57 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         }
 
 
-
-
         //print_r($subject);
         $nombre = $subject->nombre;
         $curso = $subjectSelectedDegree;
         $semestre = $subject->semestre;
 
-        // TODO: send calendar
+        try
+        {
+            // TODO: send calendar
 //        $timetables = CalendarRepository::getTimetables($this->getConversation()->notes['degree'])[$this->getConversation()->notes['period']];
 //        $timetable = $timetables[$text];
+        }
+        catch (\Exception $exception)
+        {
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msge = "Parece que la API de la UPM esta caida.\n";
+                print("Unable to connect\n");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*";
+                print("No se ha interpretado el JSON de la petición.\n");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            elseif ($exception->getMessage() == "Attempting to send a request before defining a URI endpoint.")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*\n";
+                print("Attempting to send a request before defining a URI endpoint.");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            else
+            {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
+                throw $exception;
+            }
+
+            $msge .= "\nVuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
+        }
 
         $year = $subject->anio;
         $msg = "Aquí tienes el horario de:\n*[$plan] [$year-$year2] [$curso] [$semestre] $nombre*\n$horario";
@@ -343,7 +477,43 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            throw $exception;
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msge = "Parece que la API de la UPM esta caida.\n";
+                print("Unable to connect\n");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*";
+                print("No se ha interpretado el JSON de la petición.\n");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            elseif ($exception->getMessage() == "Attempting to send a request before defining a URI endpoint.")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*\n";
+                print("Attempting to send a request before defining a URI endpoint.");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            else
+            {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
+                throw $exception;
+            }
+
+            $msge .= "\nVuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
         }
 
         $profesoresKB = [];
@@ -390,16 +560,13 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
 
-        if (in_array($text, $cancel))
+        if ($text === self::CANCELAR)
         {
-            if ($text === self::CANCELAR)
-            {
-                return $this->cancelConversation();
-            }
-            else
-            {
-                return $this->previousStep();
-            }
+            return $this->cancelConversation();
+        }
+        if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
         }
 
         $this->getConversation()->notes['teacher'] = $text;
@@ -430,7 +597,43 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            throw $exception;
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msge = "Parece que la API de la UPM esta caida.\n";
+                print("Unable to connect\n");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*";
+                print("No se ha interpretado el JSON de la petición.\n");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            elseif ($exception->getMessage() == "Attempting to send a request before defining a URI endpoint.")
+            {
+                $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
+                    "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
+                    "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
+                    "*Por favor, selecciona otra asignatura de la lista.*\n";
+                print("Attempting to send a request before defining a URI endpoint.");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            else
+            {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
+                throw $exception;
+            }
+
+            $msge .= "\nVuelva a intentarlo mas tarde.";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $result;
         }
 
 
@@ -443,6 +646,7 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             return $this->previousStep();
         }
 
+        $mensaje = "";
         if ($this->isProcessed() || empty($text))
         {
             foreach ($subject->profesores as $profesor)
@@ -480,5 +684,39 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         }
 
     }
+
+    /**
+     * @param $text
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
+    public function processCriteria($text)
+    {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+        $this->getRequest()->sendMessage('NOT IMPLEMENTED');
+        return $this->previousStep();
+    }
+
+    /**
+     * @param $text
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
+    public function processActivities($text)
+    {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+        $this->getRequest()->sendMessage('NOT IMPLEMENTED');
+        return $this->previousStep();
+    }
+
+    /**
+     * @param $text
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
+    public function processResources($text)
+    {
+        $this->getRequest()->sendAction(Request::ACTION_TYPING);
+        $this->getRequest()->sendMessage('NOT IMPLEMENTED');
+        return $this->previousStep();
+    }
+
 
 }

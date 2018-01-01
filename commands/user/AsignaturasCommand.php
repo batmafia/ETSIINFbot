@@ -27,6 +27,7 @@ class AsignaturasCommand extends BaseUserCommand
     protected $need_mysql = true;
 
     const PROFESORES = 'Profesores y Tutorías';
+    const HORARIO = 'Horario';
     const CRITERIOS = 'Criterios de evaluación';
     const ACTIVIDADES = 'Actividades de evaluación';
     const RECURSOS = 'Recursos didácticos';
@@ -377,13 +378,18 @@ class AsignaturasCommand extends BaseUserCommand
 
         $numProfesores = count($subject->profesores);
 
-        $message = "Información sobre...\n*$subject->nombre*\nDepartamento: *$subject->depto*\nTipo: *$subject->caracter*\n" .
+//        $message = "Información sobre...\n*$subject->nombre*\nDepartamento: *$subject->depto*\nTipo: *$subject->caracter*\n" .
+//            "Créditos: *$subject->ects ECTS*\nProfesores: *$numProfesores profesores*\n\n" .
+//            "Selecciona mediante el teclado una opción.\n";
+        $message = "Información sobre...\n*$subject->nombre*\nPlan: *$subject->plan*\nAño: *$subject->anio*\n" .
+            "Curso: *$selectedCourse*\nSemestre: *$subject->semestre*\nDepartamento: *$subject->depto*\nTipo: *$subject->caracter*\n" .
             "Créditos: *$subject->ects ECTS*\nProfesores: *$numProfesores profesores*\n\n" .
             "Selecciona mediante el teclado una opción.\n";
 
 
         $cancel = [self::CANCELAR, self::ATRAS];
-        $keyboard = [[self::PROFESORES], [self::CRITERIOS], [self::ACTIVIDADES], [self::RECURSOS], [self::GUIA_DOCENTE], $cancel];
+        $keyboard = [[self::GUIA_DOCENTE], [self::PROFESORES], $cancel];
+//        $keyboard = [[self::PROFESORES], [self::HORARIO], [self::CRITERIOS], [self::ACTIVIDADES], [self::RECURSOS], [self::GUIA_DOCENTE], $cancel];
         $this->getRequest()->keyboard($keyboard);
         if($this->isProcessed() || empty($text))
         {
@@ -392,6 +398,10 @@ class AsignaturasCommand extends BaseUserCommand
         if($text == self::PROFESORES) {
             return $this->nextStep('teacher');
         }
+//        if($text == self::HORARIO)
+//        {
+//            return $this->nextStep('timetable');
+//        }
         if($text == self::CRITERIOS) {
             return $this->nextStep('criteria');
         }
