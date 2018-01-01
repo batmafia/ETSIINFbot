@@ -41,7 +41,7 @@ class DirectorioCommand extends BaseUserCommand
         if ($this->isProcessed() || empty($text))
         {
             return $this->getRequest()->markdown()->keyboard($keyboard)
-                ->sendMessage("Introduce el nombre del personal/profesor del que deseas buscar información:");
+                ->sendMessage("Introduce el nombre del personal/profesor (sensible a tildes) del que deseas buscar información.");
         }
         if ($text === self::CANCELAR)
         {
@@ -93,7 +93,7 @@ class DirectorioCommand extends BaseUserCommand
         }
         else
         {
-            $mensaje = "*No se han encontrado resultados para tu búsqueda. Prueba a buscar con otros términos.*";
+            $mensaje = "*No se han encontrado resultados para tu búsqueda. Prueba a buscar con otros términos. Recuerda poner acentos si el nombre los tiene.*";
             $this->getRequest()->markdown()->sendMessage($mensaje);
             $this->stopConversation();
             return $this->resetCommand();
@@ -143,20 +143,51 @@ class DirectorioCommand extends BaseUserCommand
 
         $phoneIcon = "\xF0\x9F\x93\x9E";
         $mailIcon = "\xF0\x9F\x93\xA7";
-        $departmentIcon = "\xF0\x9F\x91\x94";
+        $departmentIcon = "\xF0\x9F\x8F\xA2";
+
 
         $person = $directory[$selectedIndexPersonal];
 
-        $mensaje = "Información sobre...\n*$person->nombre $person->apellidos [$person->departamento]*\n".
-        "$mailIcon Email: $person->nombreEmail@$person->dominioEmail\n";
 
-        if ($person->despacho !== "" && $person->despacho !== null)
+
+        $mensaje = "Información sobre:\n";
+        $this->getRequest()->markdown()->sendMessage($mensaje);
+
+
+        $mensaje = "";
+
+        if ($person->enlace !== null && $person->enlace !== "")
         {
-            $mensaje.="$departmentIcon Despacho: *$person->despacho*\n";
+            $mensaje .= "[$person->nombre $person->apellidos]($person->enlace)";
+        } else {
+            $mensaje .= "*$person->nombre $person->apellidos*";
+        }
+        if ($person->departamento !== null && $person->departamento !== "")
+        {
+            $mensaje .= " del *$person->departamento*\n";
         }
 
-        $mensaje.="$phoneIcon Teléfono: *$person->telefono*\n\n".
-        "Selecciona una opción del teclado por favor:";
+        if ($person->nombreEmail !== null && $person->dominioEmail !== null &&
+            $person->nombreEmail !== "" && $person->dominioEmail !== "")
+        {
+            $mensaje .= "$mailIcon Email: $person->nombreEmail@$person->dominioEmail\n";
+        }
+
+        if ($person->despacho !== null && $person->despacho !== "")
+        {
+            $mensaje .= "$departmentIcon Despacho: *$person->despacho*\n";
+        }
+
+        if ($person->telefono !== null && $person->telefono !== "")
+        {
+            $mensaje .= "$phoneIcon Teléfono: +34$person->telefono\n";
+        }
+
+
+        $this->getRequest()->markdown()->sendMessage($mensaje);
+
+
+        $mensaje = "Selecciona una opción del teclado por favor:";
 
         $newSearch = [self::NUEVA_BUSQUEDA];
         $cancel = [self::CANCELAR,self::ATRAS];
