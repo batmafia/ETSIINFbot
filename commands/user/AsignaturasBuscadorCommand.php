@@ -54,7 +54,7 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
 
         if ($this->isProcessed() || empty($text))
         {
-            $msg = "Introduce el nombre de la asignatura que deseas buscar información (con acentos si los tiene):";
+            $msg = "Introduce el nombre de la asignatura que deseas buscar información (con acentos si los tiene): \n\n";
             $msg .= "Tenga paciencia, la búsqueda tardará un poco...";
             return $this->getRequest()->markdown()->keyboard($keyboard)->sendMessage($msg);
         }
@@ -133,12 +133,6 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             $this->getRequest()->sendMessage("Hay demasiadas asignaturas que coinciden con esa búsqueda \"$textForSearch\". Por favor introduce alguna palabra mas para refinar la siguiente búsqueda.");
             return $this->previousStep();
         }
-
-        // If only have 1 matched
-        if (count($opts4) == 1)
-        {
-            $keyboardSubjectSelectedName = array_values($opts4)[0];
-        }
         else
         {
             $cancel = [self::CANCELAR,self::ATRAS];
@@ -178,9 +172,9 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         }
 
 
-        $subjectIndexSelectedKeyboard = array_search($keyboardSubjectSelectedName,$opts4);
-        $subjectIndexSelected = $subjectIndexSelectedKeyboard - 1;
-        $subjectSelected = $keyboardSubjectSelectedName = array_values($asignaturasPosibles)[$subjectIndexSelected];
+
+        $keyboardSubjectSelectedIndex = array_search($keyboardSubjectSelectedName,$opts4);
+        $subjectSelected = array_values($asignaturasPosibles)[$keyboardSubjectSelectedIndex];
         $subjectSelectedAPIPointJSON = $subjectSelected->imparticion[0]->guia_json;
         $subjectSelectedDegree = $subjectSelected->curso;
         $subjectSelectedGroupsArray = $subjectSelected->imparticion[0]->grupos_matricula;
@@ -204,6 +198,15 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         $subjectSelectedAPIPointJSON = $this->getConversation()->notes['subjectAPIPoint'];
         $subjectSelectedDegree = $this->getConversation()->notes['degree'];
 
+        if ($text === self::CANCELAR)
+        {
+            return $this->cancelConversation();
+        }
+        if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
+        }
+
         try
         {
             $subject = SubjectRepository::getSubjectByAPIPoint($subjectSelectedAPIPointJSON);
@@ -213,40 +216,41 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             if (preg_match('/Unable to connect to /',$exception->getMessage()))
             {
                 $msge = "Parece que la API de la UPM esta caida.\n";
+                $msge .= "\nVuelva a intentarlo mas tarde.";
                 print("Unable to connect\n");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                print($exception->getMessage())."\n";
+                print($exception->getTraceAsString()."\n");
             }
             elseif ($exception->getMessage() == "Unable to parse response as JSON")
             {
                 $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*";
+                    "*Por favor, selecciona otra asignatura de la lista o haga una nueva búsqueda.*\n";
                 print("No se ha interpretado el JSON de la petición.\n");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                print($exception->getMessage()."\n");
+                print($exception->getTraceAsString()."\n");
             }
             elseif ($exception->getMessage() == "Attempting to send a request before defining a URI endpoint.")
             {
                 $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*\n";
-                print("Attempting to send a request before defining a URI endpoint.");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                    "*Por favor, selecciona otra asignatura de la lista o haga una nueva búsqueda.*\n";
+                print("Attempting to send a request before defining a URI endpoint.\n");
+                print($exception->getMessage()."\n");
+                print($exception->getTraceAsString()."\n");
             }
             else
             {
-                $msge = "Ocurrió un error inesperado.";
+                $msge = "Ocurrió un error inesperado.\n";
+                $msge .= "\nVuelva a intentarlo mas tarde.";
                 print($msge);
                 throw $exception;
             }
 
-            $msge .= "\nVuelva a intentarlo mas tarde.";
-            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
-            return $result;
+            $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            return $this->previousStep();
         }
 
         $numProfesores = count($subject->profesores);
@@ -294,7 +298,6 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             return $this->nextStep('sendGuide');
         }
 
-
         if ($text === self::CANCELAR)
         {
             return $this->cancelConversation();
@@ -313,6 +316,16 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
      */
     public function processSendGuide()
     {
+
+        if ($text === self::CANCELAR)
+        {
+            return $this->cancelConversation();
+        }
+        if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
+        }
+
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $subjectSelectedAPIPointJSON = $this->getConversation()->notes['subjectAPIPoint'];
@@ -331,38 +344,39 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             if (preg_match('/Unable to connect to /',$exception->getMessage()))
             {
                 $msge = "Parece que la API de la UPM esta caida.\n";
+                $msge .= "\nVuelva a intentarlo mas tarde.";
                 print("Unable to connect\n");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                print($exception->getMessage())."\n";
+                print($exception->getTraceAsString()."\n");
             }
             elseif ($exception->getMessage() == "Unable to parse response as JSON")
             {
                 $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*";
+                    "*Por favor, selecciona otra asignatura de la lista o haga una nueva búsqueda.*\n";
                 print("No se ha interpretado el JSON de la petición.\n");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                print($exception->getMessage()."\n");
+                print($exception->getTraceAsString()."\n");
             }
             elseif ($exception->getMessage() == "Attempting to send a request before defining a URI endpoint.")
             {
                 $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*\n";
-                print("Attempting to send a request before defining a URI endpoint.");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                    "*Por favor, selecciona otra asignatura de la lista o haga una nueva búsqueda.*\n";
+                print("Attempting to send a request before defining a URI endpoint.\n");
+                print($exception->getMessage()."\n");
+                print($exception->getTraceAsString()."\n");
             }
             else
             {
-                $msge = "Ocurrió un error inesperado.";
+                $msge = "Ocurrió un error inesperado.\n";
+                $msge .= "\nVuelva a intentarlo mas tarde.";
                 print($msge);
                 throw $exception;
             }
 
-            $msge .= "\nVuelva a intentarlo mas tarde.";
             $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
             return $result;
         }
@@ -394,6 +408,7 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         $subjectSelectedAPIPointJSON = $this->getConversation()->notes['subjectAPIPoint'];
         $subjectSelectedDegree = $this->getConversation()->notes['degree'];
 
+        // TODO:
         try
         {
             $subject = SubjectRepository::getSubjectByAPIPoint($subjectSelectedAPIPointJSON);
@@ -420,38 +435,39 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             if (preg_match('/Unable to connect to /',$exception->getMessage()))
             {
                 $msge = "Parece que la API de la UPM esta caida.\n";
+                $msge .= "\nVuelva a intentarlo mas tarde.";
                 print("Unable to connect\n");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                print($exception->getMessage())."\n";
+                print($exception->getTraceAsString()."\n");
             }
             elseif ($exception->getMessage() == "Unable to parse response as JSON")
             {
                 $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*";
+                    "*Por favor, selecciona otra asignatura de la lista o haga una nueva búsqueda.*\n";
                 print("No se ha interpretado el JSON de la petición.\n");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                print($exception->getMessage()."\n");
+                print($exception->getTraceAsString()."\n");
             }
             elseif ($exception->getMessage() == "Attempting to send a request before defining a URI endpoint.")
             {
                 $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*\n";
-                print("Attempting to send a request before defining a URI endpoint.");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                    "*Por favor, selecciona otra asignatura de la lista o haga una nueva búsqueda.*\n";
+                print("Attempting to send a request before defining a URI endpoint.\n");
+                print($exception->getMessage()."\n");
+                print($exception->getTraceAsString()."\n");
             }
             else
             {
-                $msge = "Ocurrió un error inesperado.";
+                $msge = "Ocurrió un error inesperado.\n";
+                $msge .= "\nVuelva a intentarlo mas tarde.";
                 print($msge);
                 throw $exception;
             }
 
-            $msge .= "\nVuelva a intentarlo mas tarde.";
             $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
             return $result;
         }
@@ -469,6 +485,15 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
     {
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
+        if ($text === self::CANCELAR)
+        {
+            return $this->cancelConversation();
+        }
+        if ($text === self::ATRAS)
+        {
+            return $this->previousStep();
+        }
+
         $subjectSelectedAPIPointJSON = $this->getConversation()->notes['subjectAPIPoint'];
 
         try
@@ -480,38 +505,39 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             if (preg_match('/Unable to connect to /',$exception->getMessage()))
             {
                 $msge = "Parece que la API de la UPM esta caida.\n";
+                $msge .= "\nVuelva a intentarlo mas tarde.";
                 print("Unable to connect\n");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                print($exception->getMessage())."\n";
+                print($exception->getTraceAsString()."\n");
             }
             elseif ($exception->getMessage() == "Unable to parse response as JSON")
             {
                 $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*";
+                    "*Por favor, selecciona otra asignatura de la lista o haga una nueva búsqueda.*\n";
                 print("No se ha interpretado el JSON de la petición.\n");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                print($exception->getMessage()."\n");
+                print($exception->getTraceAsString()."\n");
             }
             elseif ($exception->getMessage() == "Attempting to send a request before defining a URI endpoint.")
             {
                 $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*\n";
-                print("Attempting to send a request before defining a URI endpoint.");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                    "*Por favor, selecciona otra asignatura de la lista o haga una nueva búsqueda.*\n";
+                print("Attempting to send a request before defining a URI endpoint.\n");
+                print($exception->getMessage()."\n");
+                print($exception->getTraceAsString()."\n");
             }
             else
             {
-                $msge = "Ocurrió un error inesperado.";
+                $msge = "Ocurrió un error inesperado.\n";
+                $msge .= "\nVuelva a intentarlo mas tarde.";
                 print($msge);
                 throw $exception;
             }
 
-            $msge .= "\nVuelva a intentarlo mas tarde.";
             $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
             return $result;
         }
@@ -560,14 +586,6 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             return $this->getRequest()->sendMessage('Selecciona una opción del teclado por favor:');
         }
 
-        if ($text === self::CANCELAR)
-        {
-            return $this->cancelConversation();
-        }
-        if ($text === self::ATRAS)
-        {
-            return $this->previousStep();
-        }
 
         $this->getConversation()->notes['teacher'] = $text;
         return $this->nextStep();
@@ -600,38 +618,39 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             if (preg_match('/Unable to connect to /',$exception->getMessage()))
             {
                 $msge = "Parece que la API de la UPM esta caida.\n";
+                $msge .= "\nVuelva a intentarlo mas tarde.";
                 print("Unable to connect\n");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                print($exception->getMessage())."\n";
+                print($exception->getTraceAsString()."\n");
             }
             elseif ($exception->getMessage() == "Unable to parse response as JSON")
             {
                 $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*";
+                    "*Por favor, selecciona otra asignatura de la lista o haga una nueva búsqueda.*\n";
                 print("No se ha interpretado el JSON de la petición.\n");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                print($exception->getMessage()."\n");
+                print($exception->getTraceAsString()."\n");
             }
             elseif ($exception->getMessage() == "Attempting to send a request before defining a URI endpoint.")
             {
                 $msge = "Parece que la asignatura escogida *no tiene información disponible en estos momentos*.\n" .
                     "Esto puede suceder al escoger una asignatura del semestre siguiente al actual (la cual no estan las guias " .
                     "aun redactadas), o bien al intentar acceder a una asignatura de créditos optativos, la cual no tiene guía docente.\n" .
-                    "*Por favor, selecciona otra asignatura de la lista.*\n";
-                print("Attempting to send a request before defining a URI endpoint.");
-                print($exception->getMessage());
-                print($exception->getTraceAsString());
+                    "*Por favor, selecciona otra asignatura de la lista o haga una nueva búsqueda.*\n";
+                print("Attempting to send a request before defining a URI endpoint.\n");
+                print($exception->getMessage()."\n");
+                print($exception->getTraceAsString()."\n");
             }
             else
             {
-                $msge = "Ocurrió un error inesperado.";
+                $msge = "Ocurrió un error inesperado.\n";
+                $msge .= "\nVuelva a intentarlo mas tarde.";
                 print($msge);
                 throw $exception;
             }
 
-            $msge .= "\nVuelva a intentarlo mas tarde.";
             $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
             return $result;
         }
