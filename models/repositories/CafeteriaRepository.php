@@ -2,7 +2,7 @@
 
 namespace app\models\repositories;
 
-class CafetaRepository
+class CafeteriaRepository
 {
 
     // NOTE: to skip _ -> \_ -> to skip \ -> \\_
