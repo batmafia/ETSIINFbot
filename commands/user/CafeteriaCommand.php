@@ -2,12 +2,12 @@
 
 namespace app\commands\user;
 use app\commands\base\BaseUserCommand;
-use app\models\repositories\CafetaRepository;
+use app\models\repositories\cafeteriaRepository;
 
 /**
- * User "/cafeta" command
+ * User "/cafeteria" command
  */
-class CafetaCommand extends BaseUserCommand
+class cafeteriaCommand extends BaseUserCommand
 {
     /**#@+
      * {@inheritdoc}
@@ -16,7 +16,7 @@ class CafetaCommand extends BaseUserCommand
 
     protected $name = 'cafeta';
     protected $description = 'Consulta los precios de los productos de cafeteria.';
-    protected $usage = '/cafeta';
+    protected $usage = '/cafeteria';
     protected $version = '0.5';
     protected $need_mysql = true;
     /**#@-*/
@@ -33,7 +33,7 @@ class CafetaCommand extends BaseUserCommand
      */
     public function processOptions($text)
     {
-        $cafetaArray = CafetaRepository::getCafetaArray();
+        $cafetaArray = cafeteriaRepository::getCafetaArray();
 
         $opts = $this->getCurrentOptions($cafetaArray);
 
