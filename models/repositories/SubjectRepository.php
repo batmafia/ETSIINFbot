@@ -43,10 +43,7 @@ class SubjectRepository
 
     public static function getSubjectByAPIPoint($urlAPIPoint)
     {
-        $year = substr($urlAPIPoint, 77, 4);
-        $year2 = self::getYear2($year);
-        $request = Request::get($urlAPIPoint)
-            ->expects(Mime::JSON)->send();
+        $request = Request::get($urlAPIPoint)->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
             $subjObj = new Subject();
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
