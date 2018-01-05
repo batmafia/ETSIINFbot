@@ -317,15 +317,6 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
     public function processSendGuide()
     {
 
-        if ($text === self::CANCELAR)
-        {
-            return $this->cancelConversation();
-        }
-        if ($text === self::ATRAS)
-        {
-            return $this->previousStep();
-        }
-
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
         $subjectSelectedAPIPointJSON = $this->getConversation()->notes['subjectAPIPoint'];
@@ -381,17 +372,22 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
             return $result;
         }
 
-        //print_r($subject);
         $nombre = $subject->nombre;
         $curso = $subjectSelectedDegree;
         $semestre = $subject->semestre;
-        $guia_pdf = $subject->guia;
-        $plan = explode("_", substr($guia_pdf, 61))[0];
+        $guia_url_pdf = $subject->guia;
+        $fecha_actualizacion = $subject->fecha_actualizacion;
+        $plan = explode("_", substr($guia_url_pdf, 61))[0];
         $year = $subject->anio;
-        $msg = "Aquí tienes la guia docente de:\n*[$plan] [$year] [$curso] [$semestre] $nombre*\n$guia_pdf";
-        // $msg = "Aquí tienes la guia docente de:\n*[$plan] $nombre*\n$guia_pdf";
+        $msg = "Aquí tienes la guia docente de:\n";
+        $msg .= "[$plan] [$year] [$curso] [$semestre] $nombre\n";
+        if ($fecha_actualizacion !== null && $fecha_actualizacion !== "")
+        {
+            $msg .= "Última actualización: $fecha_actualizacion\n";
+        }
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($msg);
+        $result = $this->getRequest()->hideKeyboard()->sendMessage($guia_url_pdf);
         $this->stopConversation();
         return $result;
     }
