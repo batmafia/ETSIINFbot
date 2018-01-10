@@ -404,7 +404,7 @@ class BusCommand extends BaseUserCommand
             ],
             self::MADRID => [
                 '591' => '08380',
-                '865' => '8-1684',
+                '865' => '11278',
                 '571' => '15782',
                 '573' => '11278'
             ]
