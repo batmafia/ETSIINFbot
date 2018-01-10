@@ -42,7 +42,8 @@ class BusRepository
      */
     private static function getFullTimeBuses()
     {
-        $request = Request::get("http://www.etsiinf.upm.es/apps/autobuses/v2/")->expects(Mime::JSON)->send();
+//        $request = Request::get("http://www.etsiinf.upm.es/apps/autobuses/v2/")->expects(Mime::JSON)->send();
+        $request = Request::get("https://gist.githubusercontent.com/svg153/33620db198756fd5a680a8d414674949/raw/d95cf16fa7b5686b3474490cb7b44138d8127a2d/buses.json")->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
             $data = \GuzzleHttp\json_decode($request->raw_body, true);
 
@@ -96,10 +97,10 @@ class BusRepository
             $dest = 'ETSIINF >> Aluche';
         }
         if ($idLine==='865' && $origin==='Madrid') {
-            $dest = 'C.Universitaria >> ETSIINF';
+            $dest = 'Moncloa >> ETSIINF';
         }
         if ($idLine==='865' && $origin==='ETSIINF') {
-            $dest = 'ETSIINF >> C.Universitaria';
+            $dest = 'ETSIINF >> Moncloa';
         }
         if ($idLine==='571' && $origin==='Madrid') {
             $dest = 'Aluche >> Boadilla';
