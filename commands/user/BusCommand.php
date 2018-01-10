@@ -278,7 +278,7 @@ class BusCommand extends BaseUserCommand
         $lastEl = end($fullTimeBuses);
         $lastTimeBusSTR = "$lastEl:00";
         $lastTimeBus = strtotime($lastTimeBusSTR);
-        $nowTimeSTR = $this->myDateFormat("H:i:s", false, 'Europe/Madrid'); // false for timeestamp
+        $nowTimeSTR = $this->myDateFormat("H:i:s", false); // false for timeestamp
         $nowTime = strtotime($nowTimeSTR);
 
         $outText = "";
