@@ -74,6 +74,10 @@ class BusRepository
 
     public static function getFullTimeBusesOpts($idLine, $origin, $timestamp=false)
     {
+        $myDateFormatTimestamp = (($timestamp!=false)?$timestamp:false);
+
+//        to test
+//        $myDateFormatTimestamp = strtotime("2017-08-03");
 
         try
         {
@@ -84,16 +88,23 @@ class BusRepository
             throw $exception;
         }
 
-        $dayType = "";
-        if ($idLine==='591' || $idLine==='865') {
-            $dayType = 'lectivo';
-        }
-        if ($idLine==='571') {
-            $dayType = 'laboral';
-        }
-        if ($idLine==='573') {
-            $dayType = 'laborsabado';
-        }
+        $codValid_base = "000000000000";
+        $numActualMonth_STR = self::myDateFormat("n", $myDateFormatTimestamp, 'Europe/Madrid'); // false for timeestamp
+        $numActualMonth = intval($numActualMonth_STR);
+        $codValid = $codValid_base;
+        $codValid_toCheck = $numActualMonth-1;
+        $codValid[$codValid_toCheck] = 1;
+
+//        $dayType = "";
+//        if ($idLine==='591' || $idLine==='865') {
+//            $dayType = 'lectivo';
+//        }
+//        if ($idLine==='571') {
+//            $dayType = 'laboral';
+//        }
+//        if ($idLine==='573') {
+//            $dayType = 'laborsabado';
+//        }
 
 
         $dest = "";
@@ -122,19 +133,37 @@ class BusRepository
             $dest = 'Boadilla >> Moncloa';
         }
 
-        $myDateFormatTimestamp = (($timestamp!=false)?$timestamp:false);
         $nowTimeSTR = self::myDateFormat("D M j G:i:s T Y", $myDateFormatTimestamp, 'Europe/Madrid'); // false for timeestamp
         $nowTime = strtotime($nowTimeSTR);
         $dw = idate("w", $nowTime);
         $dayWeekNumber = ($dw===0)?7:$dw;
 
         $hours = [];
-        foreach ($availableLines[$idLine]['periodos'][$dayType]['horarios'][$dest]['listadoHoras'] as $key => $value)
+//        $NOW_availableLines = $availableLines[$idLine]['periodos'][$dayType]['horarios'][$dest]['listadoHoras'];
+//        foreach ($NOW_availableLines as $key => $value)
+//        {
+//            if (strpos($key, "$dayWeekNumber") !== FALSE)
+//            {
+//                $hours = array_merge($hours, $value['horas']);
+//            }
+//        }
+        $NOW_availableLines = $availableLines[$idLine]['periodos'];
+        foreach ($NOW_availableLines as $key => $value)
         {
-            if (strpos($key, "$dayWeekNumber") !== FALSE)
+            $valid = $value['validez'];
+            if ($valid[$codValid_toCheck] === "1")
             {
-                $hours = array_merge($hours, $value['horas']);
+                $dayType = $value['idPeriodo'];
+                $NOW_availableLines = $NOW_availableLines[$dayType]['horarios'][$dest]['listadoHoras'];
+                foreach ($NOW_availableLines as $key => $value)
+                {
+                    if (strpos($key, "$dayWeekNumber") !== FALSE)
+                    {
+                        $hours = array_merge($hours, $value['horas']);
+                    }
+                }
             }
+
         }
         //echo $availableLines[$idLine]['periodos'][$dayType]['horarios'][$dest]['listadoHoras']['12345']['horas'][0];
         return $hours;
