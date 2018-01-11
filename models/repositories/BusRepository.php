@@ -50,16 +50,16 @@ class BusRepository
             $availableLines=[];
             foreach ($data as $key => $line)
             {
-               foreach ($line as $k => $lineObject){
-                   $myLine = new fullTimeBuses\FullTimeBusesLine();
-                   $myLine->setAttributes($lineObject);
+                foreach ($line as $k => $lineObject){
+                    $myLine = new fullTimeBuses\FullTimeBusesLine();
+                    $myLine->setAttributes($lineObject);
 
-                   if ($myLine->validate()) {
-                       $availableLines[$lineObject['idLinea']]=$myLine;
-                   } else {
-                       print_r($myLine->getErrors());
-                   }
-               }
+                    if ($myLine->validate()) {
+                        $availableLines[$lineObject['idLinea']]=$myLine;
+                    } else {
+                        print_r($myLine->getErrors());
+                    }
+                }
 
             }
 
@@ -75,7 +75,14 @@ class BusRepository
     public static function getFullTimeBusesOpts($idLine, $origin, $timestamp=false)
     {
 
-        $availableLines = self::getFullTimeBuses();
+        try
+        {
+            $availableLines = self::getFullTimeBuses();
+        }
+        catch (\Exception $exception)
+        {
+            throw $exception;
+        }
 
         $dayType = "";
         if ($idLine==='591' || $idLine==='865') {
