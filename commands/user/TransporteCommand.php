@@ -192,6 +192,7 @@ class TransporteCommand extends BaseUserCommand
                     $result = $this->getRequest()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes " .
                         "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas " .
                         "llegadas.*\n Prueba a realizar la consulta más tarde.\n\n");
+                    $this->stopConversation();
                     return $result;
 
                 } else {
@@ -313,7 +314,7 @@ class TransporteCommand extends BaseUserCommand
                 '573' => '08409'
             ],
             self::MONCLOA => [
-                '865' => '8-1684',
+                '865' => '11278',
                 '573' => '11278'
             ],
             self::BOADILLA => [
