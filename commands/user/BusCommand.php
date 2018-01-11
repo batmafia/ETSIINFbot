@@ -246,7 +246,6 @@ class BusCommand extends BaseUserCommand
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText);
         $this->stopConversation();
-
         return $result;
     }
 
@@ -271,7 +270,17 @@ class BusCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            throw $exception;
+            if ($exception->getMessage() == "Unable to parse response as JSON"
+                || preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $result = $this->getRequest()->markdown()->sendMessage("Parece que no podemos ver todas las salidas.*\n Prueba a realizar la consulta más tarde.\n\n");
+                $this->stopConversation();
+                return $result;
+            }
+            else
+            {
+                throw $exception;
+            }
         }
 
 
@@ -443,7 +452,17 @@ class BusCommand extends BaseUserCommand
             }
             catch (\Exception $exception)
             {
-                throw $exception;
+                if ($exception->getMessage() == "Unable to parse response as JSON"
+                    || preg_match('/Unable to connect to /',$exception->getMessage()))
+                {
+                    $result = $this->getRequest()->markdown()->sendMessage("Parece que no podemos ver todas las salidas.*\n Prueba a realizar la consulta más tarde.\n\n");
+                    $this->stopConversation();
+                    return $result;
+                }
+                else
+                {
+                    throw $exception;
+                }
             }
         } while (sizeof($fullTimeBuses)==0);
 
