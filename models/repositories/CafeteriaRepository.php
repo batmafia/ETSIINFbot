@@ -8,7 +8,7 @@ class CafeteriaRepository
     // NOTE: to skip _ -> \_ -> to skip \ -> \\_
     private static $cafetaArray = [
         'Bebidas en máquina' => "
-?Cerbeza (latas 33cl): 1,00€
+?Cerveza (latas 33cl): 1,00€
 ?Refrescos (latas 33cl): 1,00€
 ",
         'Bebidas calientes' => "
