@@ -46,6 +46,7 @@ class TransporteCommand extends BaseUserCommand
     const COLONIA = 'Colonia Jardín';
     const MONCLOA = 'Moncloa';
     const BOADILLA = 'Boadilla';
+    const POZUELO = 'Pozuelo';
 
     const ML_COLONIA = '201';
     const ML_MONTEPRINCIPE = '353';
@@ -64,7 +65,7 @@ class TransporteCommand extends BaseUserCommand
      */
     public function processSelectOrigin($text)
     {
-        $opts = [self::ETSIINF, self::ALUCHE, self::COLONIA, self::MONCLOA, self::BOADILLA];
+        $opts = $this->getOrigin();
 
         $keyboard = array_chunk(($opts), 2);
         $keyboard [] = [self::CANCELAR];
@@ -96,12 +97,14 @@ class TransporteCommand extends BaseUserCommand
 
         $this->getConversation()->notes['origin'] = $text;
 
-        if ($text === self::ETSIINF) {
 
-            return $this->nextStep();
-        } else {
-            $this->getConversation()->notes['destination'] = self::ETSIINF;
+        $dest = $this->getDestination($this->getConversation()->notes['origin']);
+
+        if (sizeof($dest) === 1) {
+            $this->getConversation()->notes['destination'] = $dest[0];
             return $this->nextStep('sendLineInfo');
+        } else {
+            return $this->nextStep();
         }
     }
 
@@ -114,7 +117,7 @@ class TransporteCommand extends BaseUserCommand
      */
     public function processSelectDestination($text)
     {
-        $opts = [self::ALUCHE, self::COLONIA, self::MONCLOA, self::BOADILLA];
+        $opts = $this->getDestination($this->getConversation()->notes['origin']);
         $keyboard = array_chunk(($opts), 2);
         $keyboard [] = [self::CANCELAR,self::ATRAS];
         $titleKeyboard = 'Selecciona donde quieres ir:';
@@ -176,7 +179,7 @@ class TransporteCommand extends BaseUserCommand
 
         $stopsIDs = [];
         foreach ($linesIDs as $lineID) {
-            $stopId_tmp = $this->getStopId($lineID, $origin);
+            $stopId_tmp = $this->getStopId($lineID, $origin, $destination);
             $stopsIDs[$stopId_tmp][] = $lineID;
         }
 
@@ -283,6 +286,11 @@ class TransporteCommand extends BaseUserCommand
         }
 
         $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage($outText_tosend);
+//        http://www.crtm.es/widgets/#/line/8__571___/route/8__571____2_-_IT_1
+//        http://www.crtm.es/widgets/api/GetLineLocation.php?mode=8&codItinerary=8__571____2_-_IT_1&codLine=8__571___&codStop=8_08875&direction=
+//        $longitude = "-3.8778300285339";
+//        $latitude = "40.404960632324";
+//        $result = $this->getRequest()->hideKeyboard()->sendLocation($longitude, $latitude);
         $this->stopConversation();
 
         return $result;
@@ -290,39 +298,52 @@ class TransporteCommand extends BaseUserCommand
 
 
     /**
-     * [getStopId description]
-     * @param  [type] $busline  [description]
-     * @param  [type] $location [description]
-     * @return [type]           [description]
+     * @return array
      */
-    private function getStopId($busLine, $location)
+    private function getOrigin()
+    {
+        return [
+            self::ETSIINF,
+            self::ALUCHE,
+            self::COLONIA,
+            self::MONCLOA,
+            self::BOADILLA,
+            self::POZUELO
+        ];
+    }
+
+    /**
+     * @param $locationOrigin
+     * @return mixed
+     */
+    private function getDestination($locationOrigin)
     {
         return [
             self::ETSIINF => [
-                '591' => '08411',
-                '865' => '17573',
-                '571' => '08771',
-                '573' => '08771'
+                self::ALUCHE,
+                self::COLONIA,
+                self::MONCLOA,
+                self::BOADILLA,
+                self::POZUELO
             ],
             self::ALUCHE => [
-                '591' => '08380',
-                '571' => '15782',
+                self::ETSIINF
             ],
             self::COLONIA => [
-                '591' => '08409',
-                '571' => '08409',
-                '573' => '08409'
+                self::ETSIINF
             ],
             self::MONCLOA => [
-                '865' => '11278',
-                '573' => '11278'
+                self::ETSIINF
             ],
             self::BOADILLA => [
-                '571' => '08875',
-                '573' => '15580'
+                self::ETSIINF
+            ],
+            self::POZUELO => [
+                self::ETSIINF
             ]
-        ][$location][$busLine];
+        ][$locationOrigin];
     }
+
 
     /**
      * [getStopId description]
@@ -330,14 +351,91 @@ class TransporteCommand extends BaseUserCommand
      * @param  [type] $location [description]
      * @return [type]           [description]
      */
+    private function getStopId($busLine, $origin, $destination)
+    {
+        return [
+            self::ETSIINF => [
+                '591' => [
+                    self::ALUCHE => '08411'
+                ],
+                '865' => [
+                    self::MONCLOA => '17573'
+                ],
+                '571' => [
+                    self::ALUCHE => '08771',
+                    self::BOADILLA => '08758'
+                ],
+                '573' => [
+                    self::ALUCHE => '08771',
+                    self::BOADILLA => '08758'
+                ],
+                '566' => [
+                    self::POZUELO => '08771',
+                    self::BOADILLA => '08758'
+                ],
+            ],
+            self::ALUCHE => [
+                '591' => [
+                    self::ETSIINF => '08380'
+                ],
+                '571' => [
+                    self::ETSIINF => '15782'
+                ]
+            ],
+            self::COLONIA => [
+                '591' => [
+                    self::ETSIINF => '08409',
+//                    self::ALUCHE => '08410'
+                ],
+                '571' => [
+                    self::ETSIINF => '08409',
+//                    self::ALUCHE => '08410'
+                ],
+                '573' => [
+                    self::ETSIINF => '08409',
+//                    self::ALUCHE => '08410'
+                ],
+            ],
+            self::MONCLOA => [
+                '865' => [
+                    self::ETSIINF => '11278'
+                ],
+                '573' => [
+                    self::ETSIINF => '11278'
+                ]
+            ],
+            self::BOADILLA => [
+                '571' => [
+                    self::ETSIINF => '08875'
+                ],
+                '573' => [
+                    self::ETSIINF => '15580'
+                ],
+                '566' => [
+                    self::ETSIINF => '17092'
+                ]
+            ],
+            self::POZUELO => [
+                '566' => [
+                    self::ETSIINF => '09047'
+                ]
+            ]
+        ][$origin][$busLine][$destination];
+    }
+
+    /**
+     * @param $location
+     * @return mixed
+     */
     private function getLines($location)
     {
         return [
-            self::ETSIINF => [ '591', '865', '571', '573' ],
+            self::ETSIINF => [ '591', '865', '571', '573', '566' ],
             self::ALUCHE => [ '591', '571' ],
             self::COLONIA => [ '591', '571', '573' ],
             self::MONCLOA => [ '865', '573' ],
-            self::BOADILLA => [ '571', '573' ]
+            self::BOADILLA => [ '571', '573' ],
+            self::POZUELO => [ '566' ]
         ][$location];
 
     }
