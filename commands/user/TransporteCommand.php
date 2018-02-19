@@ -192,7 +192,7 @@ class TransporteCommand extends BaseUserCommand
             } catch (\Exception $exception) {
                 $emsg = $exception->getMessage();
                 if ( $emsg == "Unable to parse response as JSON" || preg_match('/Unable to connect to /', $emsg ) ){
-                    $result = $this->getRequest()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes " .
+                    $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes " .
                         "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas " .
                         "llegadas.*\n Prueba a realizar la consulta más tarde.\n\n");
                     $this->stopConversation();
@@ -346,33 +346,41 @@ class TransporteCommand extends BaseUserCommand
 
 
     /**
-     * [getStopId description]
-     * @param  [type] $busline  [description]
-     * @param  [type] $location [description]
-     * @return [type]           [description]
+     * @param $busLine
+     * @param $origin
+     * @param $destination
+     * @return mixed
      */
     private function getStopId($busLine, $origin, $destination)
     {
         return [
             self::ETSIINF => [
                 '591' => [
+                    self::COLONIA => '08411',
                     self::ALUCHE => '08411'
                 ],
                 '865' => [
                     self::MONCLOA => '17573'
                 ],
                 '571' => [
+                    self::COLONIA => '08771',
                     self::ALUCHE => '08771',
                     self::BOADILLA => '08758'
                 ],
                 '573' => [
-                    self::ALUCHE => '08771',
+                    self::COLONIA => '08771',
+                    self::MONCLOA => '08771',
                     self::BOADILLA => '08758'
                 ],
                 '566' => [
-                    self::POZUELO => '08771',
-                    self::BOADILLA => '08758'
+                    self::POZUELO => '08758',
+                    self::BOADILLA => '08771'
                 ],
+                'N905' => [
+                    self::COLONIA => '08771',
+                    self::MONCLOA => '08771',
+                    self::BOADILLA => '08758'
+                ]
             ],
             self::ALUCHE => [
                 '591' => [
@@ -395,12 +403,18 @@ class TransporteCommand extends BaseUserCommand
                     self::ETSIINF => '08409',
 //                    self::ALUCHE => '08410'
                 ],
+                'N905' => [
+                    self::ETSIINF => '08409',
+                ],
             ],
             self::MONCLOA => [
                 '865' => [
                     self::ETSIINF => '11278'
                 ],
                 '573' => [
+                    self::ETSIINF => '11278'
+                ],
+                'N905' => [
                     self::ETSIINF => '11278'
                 ]
             ],
@@ -412,7 +426,10 @@ class TransporteCommand extends BaseUserCommand
                     self::ETSIINF => '15580'
                 ],
                 '566' => [
-                    self::ETSIINF => '17092'
+                    self::ETSIINF => '17902'
+                ],
+                'N905' => [
+                    self::ETSIINF => '15579'
                 ]
             ],
             self::POZUELO => [
@@ -430,16 +447,20 @@ class TransporteCommand extends BaseUserCommand
     private function getLines($location)
     {
         return [
-            self::ETSIINF => [ '591', '865', '571', '573', '566' ],
+            self::ETSIINF => [ '591', '865', '571', '573', '566', 'N905' ],
             self::ALUCHE => [ '591', '571' ],
-            self::COLONIA => [ '591', '571', '573' ],
-            self::MONCLOA => [ '865', '573' ],
-            self::BOADILLA => [ '571', '573' ],
+            self::COLONIA => [ '591', '571', '573', 'N905' ],
+            self::MONCLOA => [ '865', '573', 'N905' ],
+            self::BOADILLA => [ '571', '573', '566', 'N905' ],
             self::POZUELO => [ '566' ]
         ][$location];
 
     }
 
+    /**
+     * @param $origin
+     * @return string
+     */
     private function getStopIdML($origin)
     {
         switch ($origin) {
