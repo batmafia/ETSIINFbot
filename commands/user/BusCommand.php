@@ -273,7 +273,7 @@ class BusCommand extends BaseUserCommand
             if ($exception->getMessage() == "Unable to parse response as JSON"
                 || preg_match('/Unable to connect to /',$exception->getMessage()))
             {
-                $result = $this->getRequest()->markdown()->sendMessage("Parece que no podemos ver todas las salidas.*\n Prueba a realizar la consulta más tarde.\n\n");
+                $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage("Parece que no podemos ver todas las salidas.*\n Prueba a realizar la consulta más tarde.\n\n");
                 $this->stopConversation();
                 return $result;
             }
@@ -455,7 +455,7 @@ class BusCommand extends BaseUserCommand
                 if ($exception->getMessage() == "Unable to parse response as JSON"
                     || preg_match('/Unable to connect to /',$exception->getMessage()))
                 {
-                    $result = $this->getRequest()->markdown()->sendMessage("Parece que no podemos ver todas las salidas.*\n Prueba a realizar la consulta más tarde.\n\n");
+                    $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage("Parece que no podemos ver todas las salidas.*\n Prueba a realizar la consulta más tarde.\n\n");
                     $this->stopConversation();
                     return $result;
                 }
