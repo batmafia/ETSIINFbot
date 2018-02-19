@@ -20,8 +20,8 @@ class MetroligeroRepository
      */
     public static function getMetroligeroStop($origin,$destination)
     {
-        $request = Request::get("https://www.metroligero-oeste.es/api/next-stop?origin=$origin&destination=$destination")
-            ->expects(Mime::JSON)->send();
+        $url="https://www.metroligero-oeste.es/api/next-stop?origin=$origin&destination=$destination";
+        $request = Request::get($url)->expects(Mime::JSON)->send();
         if(!$request->hasErrors())
         {
 
