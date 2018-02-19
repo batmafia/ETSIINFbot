@@ -48,7 +48,7 @@ class HelpCommand extends BaseUserCommand
             $text = $this->telegram->getBotName() . ' v. ' . $this->telegram->getVersion() . "\n\n";
             $text .= "Bienvenido al bot de la escuela ". $this->message->getChat()->getFirstName() .
                 ", espero serte útil.\n";
-            $text .= "Todas vuestras sugerencias o errores que observéis del bot escribidlas a @frildoren @svg153 o a @diegofpb.\n\n";
+            $text .= "Todas vuestras sugerencias o errores que observéis del bot escribidlas a @svg153, @diegofpb o @frildoren.\n\n";
             $text .= 'Aquí tienes la lista de comandos:' . "\n";
             foreach ($commands as $command) {
                 $text .= '/' . $command->getName() . ' - ' . $command->getDescription() . "\n";
