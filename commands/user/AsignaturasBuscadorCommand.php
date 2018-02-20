@@ -99,6 +99,7 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
         }
 
         $opts4 = [];
+        $asignaturaKeyboard = [];
         foreach ($asignaturasPosibles as $asignatura) {
             $codigo = $asignatura->codigo;
             $nombre = $asignatura->nombre;
@@ -121,6 +122,7 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
                     $plan = $plan[0];
                 }
                 array_push($opts4, "[$plan][$semestre_curso] $nombre");
+                array_push($asignaturaKeyboard, $asignatura);
                 $opts4SubjectsCode[$asignatura->codigo] = "[$plan] [$semestre_curso] $nombre";
 
                 //echo "[$plan] [$year-$year2] [$curso] [$semestre] [$semestre_curso] $nombre($codigo) [$guia_pdf]\n";
@@ -174,7 +176,7 @@ class AsignaturasBuscadorCommand extends BaseUserCommand
 
 
         $keyboardSubjectSelectedIndex = array_search($keyboardSubjectSelectedName,$opts4);
-        $subjectSelected = array_values($asignaturasPosibles)[$keyboardSubjectSelectedIndex];
+        $subjectSelected = array_values($asignaturaKeyboard)[$keyboardSubjectSelectedIndex];
         $subjectSelectedAPIPointJSON = $subjectSelected->imparticion[0]->guia_json;
         $subjectSelectedDegree = $subjectSelected->curso;
         $subjectSelectedGroupsArray = $subjectSelected->imparticion[0]->grupos_matricula;
