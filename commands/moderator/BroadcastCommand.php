@@ -156,6 +156,11 @@ class BroadcastCommand extends BaseUserCommand
             {
                 $number++;
             }
+
+            // TELEGRAM LIMIT = 30 msg / 1 seg
+            // OUR LIMIT = 20 msg / 1 seg
+            // 20 msg / 1 seg ==> 1 msg / 50 miliseg
+            usleep(50000);
         }
 
         return $number;
