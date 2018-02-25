@@ -3,16 +3,16 @@
  * Created by PhpStorm.
  * User: sergio
  * Date: 25/02/18
- * Time: 12:18
+ * Time: 12:44
  */
 
 namespace app\models\tryit;
 
 
-class Yearsessions extends Model
+class Sessions extends Model
 {
 
-    public $yearsessions = [];
+    public $sessions = [];
 
     /**
      * @return array
@@ -29,9 +29,9 @@ class Yearsessions extends Model
         parent::setAttributes($values, $safeOnly);
 
         $sessions_tmp = [];
-        foreach($this->yearsessions as $i=> $s)
+        foreach($this->sessions as $i=> $s)
         {
-            $session_i = new Yearsession();
+            $session_i = new Session();
             $session_i->setAttributes($s);
             if($session_i->validate())
             {
@@ -39,8 +39,7 @@ class Yearsessions extends Model
             }
 
         }
-        $this->yearsessions = $sessions_tmp;
+        $this->sessions = $sessions_tmp;
 
     }
-
 }

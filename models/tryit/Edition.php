@@ -23,7 +23,8 @@ class Edition extends Model
     function rules()
     {
         return [
-            [['url', 'year', 'title', 'slogan', 'description', 'start_date', 'end_date'], 'string'],
+            [['year', 'title', 'slogan', 'description', 'start_date', 'end_date'], 'string'],
+            [['url'], 'url'],
         ];
     }
 
