@@ -39,6 +39,9 @@ class MenuCommand extends BaseUserCommand
     public function processMenu()
     {
         date_default_timezone_set('Europe/Madrid');
+        
+        $this->getConversation();
+        
         $menus = MenuRepository::getMenus();
 
         if ($menus == null){
