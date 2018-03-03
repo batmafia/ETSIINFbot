@@ -33,6 +33,8 @@ class CafeteriaCommand extends BaseUserCommand
      */
     public function processOptions($text)
     {
+        $this->getConversation();
+        
         $cafetaArray = CafeteriaRepository::getCafetaArray();
 
         $opts = $this->getCurrentOptions($cafetaArray);
