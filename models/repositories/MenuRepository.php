@@ -95,15 +95,26 @@ class MenuRepository
                 $vF = $m['validFrom'];
                 $vT = $m['validTo'];
 
-                $menu->setAttributes([
-                    'link'=>$link,
-                    'caption'=>html_entity_decode($title),
-                    'validFrom'=>\DateTime::createFromFormat('d-m-y', $vF)->getTimestamp(),
-                    'validTo'=>\DateTime::createFromFormat('d-m-y', $vT)->getTimestamp(),
-                ]);
+                try
+                {
+                    $caption = html_entity_decode($title);
+                    $validFrom = \DateTime::createFromFormat('d-m-y', $vF)->getTimestamp();
+                    $validTo = \DateTime::createFromFormat('d-m-y', $vT)->getTimestamp();
 
-                if($menu->validate())
-                    $menus[] = $menu;
+                    $menu->setAttributes([
+                        'link'=>$link,
+                        'caption'=>$caption,
+                        'validFrom'=>$validFrom,
+                        'validTo'=>$validTo,
+                    ]);
+
+                    if($menu->validate())
+                        $menus[] = $menu;
+                }
+                catch (\Error $error)
+                {
+                    continue;
+                }
             }
 
             return $menus;
