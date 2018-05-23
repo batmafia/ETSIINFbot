@@ -66,7 +66,47 @@ class TutorCommand extends BaseUserCommand
 
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
 
-        $tutoria = TutorRepository::getTutoria(urlencode($textForSearch));
+
+        $tutoria = null;
+
+        try
+        {
+            $tutoria = TutorRepository::getTutoria(urlencode($textForSearch));
+        }
+        catch (\Exception $exception)
+        {
+            if (preg_match('/Unable to connect to /',$exception->getMessage()))
+            {
+                $msge = "Parece que la API de la UPM esta caida.";
+            }
+            elseif ($exception->getMessage() == "Unable to parse response as JSON")
+            {
+                $msge = "Parece que la API de la UPM esta caida.";
+                print("No se ha interpretado el JSON de la petición.");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            elseif ($exception->getMessage() == "json_decode error: Syntax error")
+            {
+                $msge = "Parece que la API de la UPM esta caida.";
+                print("La petición se queda pillada");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+            }
+            else
+            {
+                $msge = "Ocurrió un error inesperado.";
+                print($msge);
+                throw $exception;
+            }
+            $msge .= "Prueba a realizar la consulta más tarde." . "\n";
+            $msge .= "Si el problema persiste, escribe a /contacta." . "\n";
+            $msge .=  "\n";
+            $result = $this->getRequest()->markdown()->sendMessage($msge."\n\n");
+            $this->stopConversation();
+            return $this->resetCommand();
+        }
+
 
         if ($tutoria == null)
         {
