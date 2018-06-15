@@ -84,14 +84,13 @@ class DirectorioCommand extends BaseUserCommand
                 print("La petición se queda pillada");
                 print($exception->getMessage());
                 print($exception->getTraceAsString());
-                $msge = "Parece que la API tiene problemas con ese patrón de nombre." . "\n";
-                $msge .= "Prueba a alternar el nombre o el apellido de la persona." . "\n";
+                $msge = "Parece que la API tiene problemas con ese patrón de nombre." . "\n\n";
+                $msge .= "Prueba a alternar el nombre o el apellido de la persona." . "\n\n";
                 $msge = "*" . "$msge" . "*";
                 $msge .= "Si el problema persiste, escribe a /contacta." . "\n";
                 $msge .= "\n";
-                $this->getRequest()->markdown()->sendMessage($msge . "\n\n");
-                $this->stopConversation();
-                return $this->resetCommand();
+                $this->getRequest()->markdown()->hideKeyboard()->sendMessage($msge . "\n\n");
+                return $this->stopConversation();
             } else {
                 if (preg_match('/Unable to connect to /', $exception->getMessage())) {
                     $msge = "Parece que la API de la UPM esta caida.";
@@ -201,9 +200,8 @@ class DirectorioCommand extends BaseUserCommand
                 $msge = "*" . "$msge" . "*";
                 $msge .= "Si el problema persiste, escribe a /contacta." . "\n";
                 $msge .= "\n";
-                $this->getRequest()->markdown()->sendMessage($msge . "\n\n");
-                $this->stopConversation();
-                return $this->resetCommand();
+                $this->getRequest()->markdown()->hideKeyboard()->sendMessage($msge . "\n\n");
+                return $this->stopConversation();
             } else {
                 if (preg_match('/Unable to connect to /', $exception->getMessage())) {
                     $msge = "Parece que la API de la UPM esta caida.";
