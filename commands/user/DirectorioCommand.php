@@ -40,8 +40,11 @@ class DirectorioCommand extends BaseUserCommand
 
         if ($this->isProcessed() || empty($text))
         {
+            $des = "Introduce el nombre del personal / profesor (sensible a tildes) del que deseas buscar información." . "\n" ;
+            $des .= "\n";
+            $des .= "*Para una busqueda óptima escribe el nombre y primer apellido de la persona.*" . "\n";
             return $this->getRequest()->markdown()->keyboard($keyboard)
-                ->sendMessage("Introduce el nombre del personal/profesor (sensible a tildes) del que deseas buscar información.");
+                ->sendMessage($des);
         }
         if ($text === self::CANCELAR)
         {
@@ -67,7 +70,48 @@ class DirectorioCommand extends BaseUserCommand
         $textForSearch = $this->getConversation()->notes['text'];
 
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
-        $directory = DirectoryRepository::getDirectoryInfo(urlencode($textForSearch));
+
+
+        $directory = [];
+
+        try
+        {
+            $directory = DirectoryRepository::getDirectoryInfo(urlencode($textForSearch));
+        }
+        catch (\Exception $exception)
+        {
+            if (preg_match('/json_decode error: Syntax error/', $exception->getMessage())) {
+                print("La petición se queda pillada");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+                $msge = "Parece que la API tiene problemas con ese patrón de nombre." . "\n";
+                $msge .= "Prueba a alternar el nombre o el apellido de la persona." . "\n";
+                $msge = "*" . "$msge" . "*";
+                $msge .= "Si el problema persiste, escribe a /contacta." . "\n";
+                $msge .= "\n";
+                $this->getRequest()->markdown()->sendMessage($msge . "\n\n");
+                $this->stopConversation();
+                return $this->resetCommand();
+            } else {
+                if (preg_match('/Unable to connect to /', $exception->getMessage())) {
+                    $msge = "Parece que la API de la UPM esta caida.";
+                } elseif ($exception->getMessage() == "Unable to parse response as JSON") {
+                    $msge = "Parece que la API de la UPM esta caida.";
+                    print("No se ha interpretado el JSON de la petición.");
+                    print($exception->getMessage());
+                    print($exception->getTraceAsString());
+                } else {
+                    $msge = "Ocurrió un error inesperado.";
+                    print($msge);
+                    throw $exception;
+                }
+                $msge .= "Prueba a realizar la consulta más tarde." . "\n";
+                $msge .= "Si el problema persiste, escribe a /contacta." . "\n";
+                $msge .= "\n";
+                $this->getRequest()->markdown()->sendMessage($msge . "\n\n");
+                return $this->cancelConversation();
+            }
+        }
 
         if(count($directory)!==0)
         {
@@ -139,7 +183,47 @@ class DirectorioCommand extends BaseUserCommand
         $selectedIndexPersonal = $this->getConversation()->notes['personal'];
 
         $this->getRequest()->sendAction(Request::ACTION_TYPING);
-        $directory = DirectoryRepository::getDirectoryInfo(urlencode($textForSearch));
+
+        $directory = [];
+
+        try
+        {
+            $directory = DirectoryRepository::getDirectoryInfo(urlencode($textForSearch));
+        }
+        catch (\Exception $exception)
+        {
+            if (preg_match('json_decode error: Syntax error', $exception->getMessage())) {
+                print("La petición se queda pillada");
+                print($exception->getMessage());
+                print($exception->getTraceAsString());
+                $msge = "Parece que la API tiene problemas con ese patrón de nombre." . "\n";
+                $msge .= "Prueba a alternar el nombre o el apellido de la persona." . "\n";
+                $msge = "*" . "$msge" . "*";
+                $msge .= "Si el problema persiste, escribe a /contacta." . "\n";
+                $msge .= "\n";
+                $this->getRequest()->markdown()->sendMessage($msge . "\n\n");
+                $this->stopConversation();
+                return $this->resetCommand();
+            } else {
+                if (preg_match('/Unable to connect to /', $exception->getMessage())) {
+                    $msge = "Parece que la API de la UPM esta caida.";
+                } elseif ($exception->getMessage() == "Unable to parse response as JSON") {
+                    $msge = "Parece que la API de la UPM esta caida.";
+                    print("No se ha interpretado el JSON de la petición.");
+                    print($exception->getMessage());
+                    print($exception->getTraceAsString());
+                } else {
+                    $msge = "Ocurrió un error inesperado.";
+                    print($msge);
+                    throw $exception;
+                }
+                $msge .= "Prueba a realizar la consulta más tarde." . "\n";
+                $msge .= "Si el problema persiste, escribe a /contacta." . "\n";
+                $msge .= "\n";
+                $this->getRequest()->markdown()->sendMessage($msge . "\n\n");
+                return $this->cancelConversation();
+            }
+        }
 
         $phoneIcon = "\xF0\x9F\x93\x9E";
         $mailIcon = "\xF0\x9F\x93\xA7";

@@ -17,8 +17,8 @@ class DirectoryRepository
 
     public static function getDirectoryInfo($text)
     {
-
-        $request = Request::get("http://www.etsiinf.upm.es/apps/personal/v2/?texto=$text")
+        $url = "http://www.etsiinf.upm.es/apps/personal/v2/?texto=$text";
+        $request = Request::get($url)
             ->expects(Mime::JSON)->send();
         if (!$request->hasErrors()) {
 
