@@ -80,7 +80,7 @@ class DirectorioCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            if ($exception->getMessage() == "json_decode error: Syntax error") {
+            if (preg_match('/json_decode error: Syntax error/', $exception->getMessage())) {
                 print("La petición se queda pillada");
                 print($exception->getMessage());
                 print($exception->getTraceAsString());
@@ -192,7 +192,7 @@ class DirectorioCommand extends BaseUserCommand
         }
         catch (\Exception $exception)
         {
-            if ($exception->getMessage() == "json_decode error: Syntax error") {
+            if (preg_match('json_decode error: Syntax error', $exception->getMessage())) {
                 print("La petición se queda pillada");
                 print($exception->getMessage());
                 print($exception->getTraceAsString());
