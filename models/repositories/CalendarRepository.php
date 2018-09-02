@@ -53,7 +53,7 @@ class CalendarRepository
         {
             $dom = HtmlDomParser::str_get_html($request->raw_body);
             /** @var $dom simple_html_dom */
-            $titles = $dom->find(".contenido h3");
+            $titles = $dom->find(".contenido h4");
             $links = $dom->find(".contenido ul li a");
 
             $calendars = [];
@@ -73,7 +73,7 @@ class CalendarRepository
 
                 if($businessCalendar->validate())
                 {
-                    $calendars[html_entity_decode($t->innertext())] = $businessCalendar;
+                    $calendars[html_entity_decode($caption)] = $businessCalendar;
                 }
             }
 
