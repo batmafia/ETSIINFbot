@@ -13,7 +13,7 @@ class ContactaCommand extends BaseUserCommand
     /**#@+
      * {@inheritdoc}
      */
-    protected $name = 'Contacta';
+    protected $name = 'contacta';
     protected $description = 'Muestra los admin del bot para hablarles.';
     protected $usage = '/contacta';
     protected $version = '1.0.0';
