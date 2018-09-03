@@ -26,11 +26,26 @@ class CafeteriaCommand extends BaseUserCommand
     const CANCEL = 'Cancelar';
     const BACK = 'Atrás';
 
+
     /**
      * [process_SelectLine description]
      * @param  [type] $text [description]
      * @return [type]       [description]
      */
+    public function processOptions($text)
+    {
+        $mensaje = "*Debido al cambio de la empresa de cafetería, por ahora no podemos enviar los precios de la cafetería.\nEstamos trabajando para solucionarlo.\nPerdonen las molestias.*";
+        $results = $this->getRequest()->markdown()->sendMessage($mensaje);
+        return $results;
+    }
+
+
+    /**
+     * [process_SelectLine description]
+     * @param  [type] $text [description]
+     * @return [type]       [description]
+     */
+    /*
     public function processOptions($text)
     {
         $this->getConversation();
@@ -108,4 +123,5 @@ class CafeteriaCommand extends BaseUserCommand
         array_pop($this->getConversation()->notes['indexes']);
         return $this->resetCommand();
     }
+    */
 }
