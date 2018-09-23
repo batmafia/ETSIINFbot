@@ -647,6 +647,7 @@ class AsignaturasCommand extends BaseUserCommand
 
         if ($this->isProcessed() || empty($text))
         {
+            $mensaje = "No hay ningún profesor segun la api.";
             foreach ($subject->profesores as $profesor)
             {
                 if (("$profesor->nombre $profesor->apellidos") == $selectedTeacher)
