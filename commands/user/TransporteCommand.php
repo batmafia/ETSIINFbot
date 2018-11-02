@@ -190,17 +190,11 @@ class TransporteCommand extends BaseUserCommand
                 $stop = BusRepository::getBusStop($stopID);
                 $stop_array[$stopID] = $stop;
             } catch (\Exception $exception) {
-                $emsg = $exception->getMessage();
-                if ( $emsg == "Unable to parse response as JSON" || preg_match('/Unable to connect to /', $emsg ) ){
-                    $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes " .
-                        "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas " .
-                        "llegadas.*\n Prueba a realizar la consulta más tarde.\n\n");
-                    $this->stopConversation();
-                    return $result;
-
-                } else {
-                    throw $exception;
-                }
+                $result = $this->getRequest()->hideKeyboard()->markdown()->sendMessage("Parece que la API del Consorcio de Transportes " .
+                    "de Madrid no está disponible en estos momentos y por ello *no te podemos mostrar las próximas " .
+                    "llegadas.*\n Prueba a realizar la consulta más tarde.\n\n");
+                $this->stopConversation();
+                return $result;
             }
 
 
