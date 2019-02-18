@@ -134,13 +134,31 @@ class MenuRepository
         {
             $dom = HtmlDomParser::str_get_html($request->raw_body);
             /** @var $dom simple_html_dom */
-            $elems = $dom->find("a.pdf");
+            $elems = $dom->find("div.contenido p a[href*=pdf]");
 
             $menus = [];
-            foreach($elems as $elem)
-            {
+            foreach($elems as $elem) {
+
                 /** @var $elem simple_html_dom_node */
                 $text = explode(" ", preg_replace('/[^ \w]+/', '', $elem->innertext()));
+
+                // Filter text
+                $newtext = [];
+                foreach ($text as $k => $t) {
+
+                    $t = str_replace('acute', '', $t);
+                    $t = str_replace('nbsp', '', $t);
+                    $t = str_replace('span', '', $t);
+                    $t = str_replace('stylefontsize', '', $t);
+                    $t = str_replace('128px', '', $t);
+
+                    if(!empty($t)) {
+                        $newtext[] = $t;
+                    }
+                }
+                $text = $newtext;
+
+
                 $month = array_search(strtolower(end($text)), self::$months)+1;
                 $year = date('Y');
 
@@ -152,11 +170,19 @@ class MenuRepository
                 $vT = $days[1]."-".$month."-".$year;
 
                 $menu = new MenuModel();
+                $link = "http://www.fi.upm.es/".$elem->getAttribute("href");
+                # $name = html_entity_decode($elem->innertext());
+                $name = "";
+                foreach ($text as $t) {
+                    $name .= $t." ";
+                }
+                $validFrom = \DateTime::createFromFormat('d-m-Y', $vF)->getTimestamp();
+                $validTo = \DateTime::createFromFormat('d-m-Y', $vT)->getTimestamp();
                 $menu->setAttributes([
-                    'link'=>"http://www.fi.upm.es/".$elem->getAttribute("href"),
-                    'name'=>html_entity_decode($elem->innertext()),
-                    'validFrom'=>\DateTime::createFromFormat('d-m-Y', $vF)->getTimestamp(),
-                    'validTo'=>\DateTime::createFromFormat('d-m-Y', $vT)->getTimestamp(),
+                    'link'=>$link,
+                    'name'=>$name,
+                    'validFrom'=>$validFrom,
+                    'validTo'=>$validTo,
                 ]);
 
                 if($menu->validate())
