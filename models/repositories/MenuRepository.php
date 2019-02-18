@@ -171,7 +171,7 @@ class MenuRepository
                 if(array_search("y", $text)) {
                     $vT = \DateTime::createFromFormat('d-m-Y', $vT);
                     $vT = $vT->getTimestamp();
-                    $vT = strtotime("+6 day", $vT);
+                    $vT = strtotime("next Friday", $vT);
                     $vT = date('d-m-Y', $vT);
                 }
 
