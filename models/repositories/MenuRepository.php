@@ -168,6 +168,12 @@ class MenuRepository
 
                 $vF = $days[0]."-".$month."-".$year;
                 $vT = $days[1]."-".$month."-".$year;
+                if(array_search("y", $text)) {
+                    $vT = \DateTime::createFromFormat('d-m-Y', $vT);
+                    $vT = $vT->getTimestamp();
+                    $vT = strtotime("+6 day", $vT);
+                    $vT = date('d-m-Y', $vT);
+                }
 
                 $menu = new MenuModel();
                 $link = "http://www.fi.upm.es/".$elem->getAttribute("href");
@@ -176,8 +182,10 @@ class MenuRepository
                 foreach ($text as $t) {
                     $name .= $t." ";
                 }
-                $validFrom = \DateTime::createFromFormat('d-m-Y', $vF)->getTimestamp();
-                $validTo = \DateTime::createFromFormat('d-m-Y', $vT)->getTimestamp();
+                $validFrom = \DateTime::createFromFormat('d-m-Y', $vF);
+                $validFrom = $validFrom->getTimestamp();
+                $validTo = \DateTime::createFromFormat('d-m-Y', $vT);
+                $validTo = $validTo->getTimestamp();
                 $menu->setAttributes([
                     'link'=>$link,
                     'name'=>$name,
