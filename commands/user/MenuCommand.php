@@ -73,7 +73,8 @@ class MenuCommand extends BaseUserCommand
         if($selectedMenu !== null)
         {
             $hbIcon = "\xF0\x9F\x8D\x94";
-            $cap = "Aquí tienes el menú para esta semana";
+            $dateTo = date("d/m/Y", $menuDA->validTo);
+            $cap = "Aquí tienes el menú hasta el $dateTo";
             $linkMenu = $menus[$selectedMenu]->link;
 
             if (strpos($linkMenu, ".jpg") !== false) {
