@@ -31,12 +31,14 @@ class MenuCommand extends BaseUserCommand
     protected $need_mysql = true;
 
 
-    public function processMenu()
+    /*
+     * public function processMenu()
     {
         $mensaje = "*Debido al cambio de la empresa de cafetería, por ahora no podemos enviar el menú.\nEstamos trabajando para solucionarlo.\nPerdonen las molestias.*";
         $results = $this->getRequest()->markdown()->sendMessage($mensaje);
         return $results;
     }
+    */
 
 
     /**
@@ -44,7 +46,6 @@ class MenuCommand extends BaseUserCommand
      * @param  [type] $text [description]
      * @return [type]       [description]
      */
-    /*
     public function processMenu()
     {
         date_default_timezone_set('Europe/Madrid');
@@ -103,6 +104,5 @@ class MenuCommand extends BaseUserCommand
 
         return $result;
     }
-    */
 
 }
